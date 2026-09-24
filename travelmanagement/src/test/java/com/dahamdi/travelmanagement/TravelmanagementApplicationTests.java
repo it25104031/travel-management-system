@@ -1,10 +1,10 @@
-package com.travel.backend;
+package com.dahamdi.travelmanagement;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BackendApplicationTests {
+class TravelmanagementApplicationTests {
 
 	@Test
 	void contextLoads() {
