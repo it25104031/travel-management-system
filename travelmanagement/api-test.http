@@ -1,0 +1,10 @@
+POST http://localhost:8081/api/invoices
+Content-Type: application/json
+
+{
+  "invoiceNumber": "INV-0004",
+  "customerName": "Saman Perera",
+  "invoiceDate": "2026-09-25T10:00:00",
+  "totalAmount": 275000.00,
+  "invoiceStatus": "UNPAID"
+}
