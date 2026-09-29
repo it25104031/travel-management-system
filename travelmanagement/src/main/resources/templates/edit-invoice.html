@@ -2,135 +2,517 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Edit Invoice</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================== */
+
+        .navbar {
+            background: #1f2937;
+            color: white;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            font-size: 22px;
+        }
+
+        .navbar span {
+            font-size: 14px;
+            color: #d1d5db;
+        }
+
+        /* =========================
+           CONTAINER
+        ========================== */
+
+        .container {
+            width: 90%;
+            max-width: 850px;
+            margin: 40px auto;
+        }
+
+        /* =========================
+           PAGE HEADER
+        ========================== */
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+
+        .page-header p {
+            color: #6b7280;
+        }
+
+        /* =========================
+           CARD
+        ========================== */
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h3 {
+            margin-bottom: 25px;
+            font-size: 20px;
+            color: #1f2937;
+        }
+
+        /* =========================
+           ERROR MESSAGE
+        ========================== */
+
+        .alert {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 13px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc2626;
+        }
+
+        /* =========================
+           FORM
+        ========================== */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        input[readonly] {
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================== */
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .update-btn {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .update-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 12px 22px;
+            border-radius: 6px;
+            background: #6b7280;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: #4b5563;
+        }
+
+        /* =========================
+           INFORMATION BOX
+        ========================== */
+
+        .info-box {
+            margin-top: 25px;
+            padding: 15px;
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            border-radius: 6px;
+            color: #1e40af;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .navbar h1 {
+                font-size: 18px;
+            }
+
+            .navbar span {
+                font-size: 12px;
+            }
+
+            .container {
+                width: 94%;
+                margin: 25px auto;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+
+            .button-row {
+                flex-direction: column;
+            }
+
+            .update-btn,
+            .back-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
 </head>
 
 <body>
 
-<h1>Edit Invoice</h1>
+<!-- =========================
+     NAVIGATION
+========================== -->
 
-<div
-        th:if="${errorMessage}"
-        style="color: red; margin-bottom: 15px;">
+<div class="navbar">
 
-    <strong th:text="${errorMessage}"></strong>
+    <h1>Dahamdi Pilgrims & Tours</h1>
+
+    <span>Admin Operations & Billing</span>
 
 </div>
 
-<form th:action="@{/invoices/update/{id}(id=${invoice.invoiceId})}"
-      method="post">
 
-    <label>Invoice Number:</label>
+<!-- =========================
+     MAIN CONTAINER
+========================== -->
 
-    <input type="text"
-           name="invoiceNumber"
-           th:value="${invoice.invoiceNumber}"
-           required>
+<div class="container">
 
-    <br><br>
+    <!-- PAGE HEADER -->
 
+    <div class="page-header">
 
-    <label>Booking:</label>
+        <h2>Edit Invoice</h2>
 
-    <select id="bookingId"
-            name="bookingId"
-            required>
+        <p>
+            Update invoice information and booking details.
+        </p>
 
-        <option value="">
-            -- Select Booking --
-        </option>
-
-        <option
-                th:each="booking : ${bookings}"
-                th:value="${booking.id}"
-                th:text="${'Booking #' + booking.id + ' - ' + booking.customerName + ' - ' + booking.totalAmount}"
-                th:selected="${invoice.booking != null and invoice.booking.id == booking.id}">
-        </option>
-
-    </select>
-
-    <br><br>
+    </div>
 
 
-    <label>Customer Name:</label>
+    <!-- ERROR MESSAGE -->
 
-    <input type="text"
-           id="customerName"
-           th:value="${invoice.customerName}"
-           readonly>
+    <div
+            th:if="${errorMessage}"
+            class="alert">
 
-    <br><br>
+        <strong th:text="${errorMessage}"></strong>
 
-
-    <label>Invoice Date:</label>
-
-    <input type="datetime-local"
-           name="invoiceDate"
-           th:value="${#temporals.format(invoice.invoiceDate, 'yyyy-MM-dd''T''HH:mm')}"
-           required>
-
-    <br><br>
+    </div>
 
 
-    <label>Total Amount:</label>
+    <!-- EDIT FORM -->
 
-    <input type="number"
-           id="totalAmount"
-           step="0.01"
-           th:value="${invoice.totalAmount}"
-           readonly>
+    <div class="card">
 
-    <br><br>
+        <h3>Invoice Details</h3>
+
+        <form
+                th:action="@{/invoices/update/{id}(id=${invoice.invoiceId})}"
+                method="post">
+
+            <div class="form-grid">
 
 
-    <label>Invoice Status:</label>
+                <!-- Invoice Number -->
 
-    <select name="invoiceStatus" required>
+                <div class="form-group">
 
-        <option value="UNPAID"
-                th:selected="${invoice.invoiceStatus == 'UNPAID'}">
-            UNPAID
-        </option>
+                    <label for="invoiceNumber">
+                        Invoice Number
+                    </label>
 
-        <option value="PARTIAL"
-                th:selected="${invoice.invoiceStatus == 'PARTIAL'}">
-            PARTIAL
-        </option>
+                    <input
+                            type="text"
+                            id="invoiceNumber"
+                            name="invoiceNumber"
+                            th:value="${invoice.invoiceNumber}"
+                            required>
 
-        <option value="PAID"
-                th:selected="${invoice.invoiceStatus == 'PAID'}">
-            PAID
-        </option>
+                </div>
 
-    </select>
 
-    <br><br>
+                <!-- Booking -->
 
-    <button type="submit">
-        Update Invoice
-    </button>
+                <div class="form-group">
 
-</form>
+                    <label for="bookingId">
+                        Booking
+                    </label>
 
-<br>
+                    <select
+                            id="bookingId"
+                            name="bookingId"
+                            required>
 
-<a href="/invoices">
-    Back to Invoices
-</a>
+                        <option value="">
+                            -- Select Booking --
+                        </option>
 
+                        <option
+                                th:each="booking : ${bookings}"
+                                th:value="${booking.id}"
+                                th:text="${'Booking #' + booking.id + ' - ' + booking.customerName + ' - ' + booking.totalAmount}"
+                                th:selected="${invoice.booking != null and invoice.booking.id == booking.id}">
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Customer -->
+
+                <div class="form-group">
+
+                    <label for="customerName">
+                        Customer Name
+                    </label>
+
+                    <input
+                            type="text"
+                            id="customerName"
+                            th:value="${invoice.customerName}"
+                            readonly>
+
+                </div>
+
+
+                <!-- Invoice Date -->
+
+                <div class="form-group">
+
+                    <label for="invoiceDate">
+                        Invoice Date
+                    </label>
+
+                    <input
+                            type="datetime-local"
+                            id="invoiceDate"
+                            name="invoiceDate"
+                            th:value="${#temporals.format(invoice.invoiceDate, 'yyyy-MM-dd''T''HH:mm')}"
+                            required>
+
+                </div>
+
+
+                <!-- Total Amount -->
+
+                <div class="form-group">
+
+                    <label for="totalAmount">
+                        Total Amount
+                    </label>
+
+                    <input
+                            type="number"
+                            id="totalAmount"
+                            step="0.01"
+                            th:value="${invoice.totalAmount}"
+                            readonly>
+
+                </div>
+
+
+                <!-- Invoice Status -->
+
+                <div class="form-group">
+
+                    <label for="invoiceStatus">
+                        Invoice Status
+                    </label>
+
+                    <select
+                            id="invoiceStatus"
+                            name="invoiceStatus"
+                            required>
+
+                        <option
+                                value="UNPAID"
+                                th:selected="${invoice.invoiceStatus == 'UNPAID'}">
+                            UNPAID
+                        </option>
+
+                        <option
+                                value="PARTIAL"
+                                th:selected="${invoice.invoiceStatus == 'PARTIAL'}">
+                            PARTIAL
+                        </option>
+
+                        <option
+                                value="PAID"
+                                th:selected="${invoice.invoiceStatus == 'PAID'}">
+                            PAID
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- BUTTONS -->
+
+            <div class="button-row">
+
+                <button
+                        type="submit"
+                        class="update-btn">
+
+                    Update Invoice
+
+                </button>
+
+                <a
+                        href="/invoices"
+                        class="back-btn">
+
+                    Back to Invoices
+
+                </a>
+
+            </div>
+
+        </form>
+
+
+        <!-- INFORMATION -->
+
+        <div class="info-box">
+
+            <strong>Note:</strong>
+            Customer name and total amount are automatically
+            retrieved from the selected airline booking.
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     BOOKING DETAILS SCRIPT
+========================== -->
 
 <script>
 
-    const bookingSelect = document.getElementById("bookingId");
-    const customerNameInput = document.getElementById("customerName");
-    const totalAmountInput = document.getElementById("totalAmount");
+    const bookingSelect =
+        document.getElementById("bookingId");
+
+    const customerNameInput =
+        document.getElementById("customerName");
+
+    const totalAmountInput =
+        document.getElementById("totalAmount");
+
 
     bookingSelect.addEventListener("change", function () {
 
         const bookingId = this.value;
+
 
         if (!bookingId) {
 
@@ -140,29 +522,43 @@
             return;
         }
 
+
         fetch("/api/airline/bookings/" + bookingId)
 
             .then(response => {
 
                 if (!response.ok) {
-                    throw new Error("Booking could not be loaded.");
+
+                    throw new Error(
+                        "Booking could not be loaded."
+                    );
+
                 }
 
                 return response.json();
+
             })
 
             .then(booking => {
 
-                customerNameInput.value = booking.customerName;
-                totalAmountInput.value = booking.totalAmount;
+                customerNameInput.value =
+                    booking.customerName;
+
+                totalAmountInput.value =
+                    booking.totalAmount;
 
             })
 
             .catch(error => {
 
-                console.error("Error loading booking:", error);
+                console.error(
+                    "Error loading booking:",
+                    error
+                );
 
-                alert("Unable to load booking information.");
+                alert(
+                    "Unable to load booking information."
+                );
 
                 customerNameInput.value = "";
                 totalAmountInput.value = "";
@@ -172,6 +568,7 @@
     });
 
 </script>
+
 
 </body>
 

@@ -38,7 +38,10 @@ public class InvoicePageController {
         this.invoiceRepository = invoiceRepository;
     }
 
+    // ============================================================
     // Display all invoices
+    // ============================================================
+
     @GetMapping("/invoices")
     public String showInvoicesPage(Model model) {
 
@@ -77,7 +80,10 @@ public class InvoicePageController {
         return "invoices";
     }
 
+    // ============================================================
     // Add a new invoice
+    // ============================================================
+
     @PostMapping("/invoices/add")
     public String addInvoice(
             @RequestParam String invoiceNumber,
@@ -133,7 +139,10 @@ public class InvoicePageController {
         return "redirect:/invoices";
     }
 
+    // ============================================================
     // Display the edit invoice page
+    // ============================================================
+
     @GetMapping("/invoices/edit/{id}")
     public String showEditInvoicePage(
             @PathVariable Integer id,
@@ -151,7 +160,10 @@ public class InvoicePageController {
         return "edit-invoice";
     }
 
+    // ============================================================
     // Update an existing invoice
+    // ============================================================
+
     @PostMapping("/invoices/update/{id}")
     public String updateInvoice(
             @PathVariable Integer id,
@@ -222,7 +234,50 @@ public class InvoicePageController {
         return "redirect:/invoices";
     }
 
+    // ============================================================
+    // Print invoice
+    // ============================================================
+
+    @GetMapping("/invoices/print/{id}")
+    public String printInvoice(
+            @PathVariable Integer id,
+            Model model) {
+
+        Invoice invoice = invoiceService.getInvoiceById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Invoice not found"));
+
+        Integer invoiceId = invoice.getInvoiceId();
+
+        // Calculate payment information
+        Double paidAmount =
+                paymentService.getCompletedPaymentTotal(invoiceId);
+
+        Double outstandingBalance =
+                paymentService.getOutstandingBalance(invoiceId);
+
+        String calculatedStatus =
+                paymentService.getInvoiceStatus(invoiceId);
+
+        // Send invoice information to the printable page
+        model.addAttribute("invoice", invoice);
+        model.addAttribute("paidAmount", paidAmount);
+        model.addAttribute(
+                "outstandingBalance",
+                outstandingBalance
+        );
+        model.addAttribute(
+                "calculatedStatus",
+                calculatedStatus
+        );
+
+        return "print-invoice";
+    }
+
+    // ============================================================
     // Delete an invoice
+    // ============================================================
+
     @PostMapping("/invoices/delete/{id}")
     public String deleteInvoice(@PathVariable Integer id) {
 
@@ -231,7 +286,11 @@ public class InvoicePageController {
         return "redirect:/invoices";
     }
 
-    // Load data needed by invoices.html when validation fails
+    // ============================================================
+    // Load data needed by invoices.html
+    // when validation fails
+    // ============================================================
+
     private void loadInvoicePageData(Model model) {
 
         List<Invoice> invoices = invoiceService.getAllInvoices();
@@ -254,16 +313,34 @@ public class InvoicePageController {
                     paymentService.getInvoiceStatus(invoiceId);
 
             paidAmounts.put(invoiceId, paidAmount);
-            outstandingBalances.put(invoiceId, outstandingBalance);
-            calculatedStatuses.put(invoiceId, calculatedStatus);
+            outstandingBalances.put(
+                    invoiceId,
+                    outstandingBalance
+            );
+            calculatedStatuses.put(
+                    invoiceId,
+                    calculatedStatus
+            );
         }
 
         List<Booking> bookings = bookingRepository.findAll();
 
         model.addAttribute("invoices", invoices);
-        model.addAttribute("paidAmounts", paidAmounts);
-        model.addAttribute("outstandingBalances", outstandingBalances);
-        model.addAttribute("calculatedStatuses", calculatedStatuses);
-        model.addAttribute("bookings", bookings);
+        model.addAttribute(
+                "paidAmounts",
+                paidAmounts
+        );
+        model.addAttribute(
+                "outstandingBalances",
+                outstandingBalances
+        );
+        model.addAttribute(
+                "calculatedStatuses",
+                calculatedStatuses
+        );
+        model.addAttribute(
+                "bookings",
+                bookings
+        );
     }
 }
