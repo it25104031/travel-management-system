@@ -2,10 +2,23 @@ package com.dahamdi.travelmanagement.controller;
 
 import com.dahamdi.travelmanagement.entity.Payment;
 import com.dahamdi.travelmanagement.service.PaymentService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * REST API for payments. ADMIN login required (AuthInterceptor).
+ * Create/update go through PaymentService, so the API can no longer skip the
+ * "amount > 0" and "not more than outstanding balance" checks.
+ * Request body example:
+ * {"invoice": {"invoiceId": 1}, "paymentDate": "2026-10-08T10:00:00",
+ *  "amount": 50000.00, "paymentMethod": "CARD", "paymentStatus": "COMPLETED"}
+ */
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -16,37 +29,6 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PutMapping("/{id}")
-    public Payment updatePayment(
-            @PathVariable Integer id,
-            @RequestBody Payment payment) {
-
-        Payment existingPayment = paymentService.getPaymentById(id)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
-
-        existingPayment.setInvoice(payment.getInvoice());
-        existingPayment.setPaymentDate(payment.getPaymentDate());
-        existingPayment.setAmount(payment.getAmount());
-        existingPayment.setPaymentMethod(payment.getPaymentMethod());
-        existingPayment.setPaymentStatus(payment.getPaymentStatus());
-
-        return paymentService.createPayment(existingPayment);
-    }
-
-    @GetMapping("/invoice/{invoiceId}/outstanding-balance")
-    public Double getOutstandingBalance(
-            @PathVariable Integer invoiceId) {
-
-        return paymentService.getOutstandingBalance(invoiceId);
-    }
-
-    @GetMapping("/invoice/{invoiceId}/completed-total")
-    public Double getCompletedPaymentTotal(
-            @PathVariable Integer invoiceId) {
-
-        return paymentService.getCompletedPaymentTotal(invoiceId);
-    }
-
     @GetMapping
     public List<Payment> getAllPayments() {
         return paymentService.getAllPayments();
@@ -54,16 +36,61 @@ public class PaymentController {
 
     @GetMapping("/{id}")
     public Payment getPaymentById(@PathVariable Integer id) {
-        return paymentService.getPaymentById(id).orElse(null);
+        return paymentService.getPaymentOrThrow(id);
     }
 
     @PostMapping
-    public Payment createPayment(@RequestBody Payment payment) {
-        return paymentService.createPayment(payment);
+    public ResponseEntity<Payment> createPayment(@RequestBody Payment payment) {
+        Payment created = paymentService.createPayment(
+                invoiceIdOf(payment),
+                payment.getPaymentDate(),
+                payment.getAmount(),
+                payment.getPaymentMethod(),
+                payment.getPaymentStatus());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PutMapping("/{id}")
+    public Payment updatePayment(@PathVariable Integer id, @RequestBody Payment payment) {
+        return paymentService.updatePayment(
+                id,
+                invoiceIdOf(payment),
+                payment.getPaymentDate(),
+                payment.getAmount(),
+                payment.getPaymentMethod(),
+                payment.getPaymentStatus());
     }
 
     @DeleteMapping("/{id}")
-    public void deletePayment(@PathVariable Integer id) {
+    public ResponseEntity<Void> deletePayment(@PathVariable Integer id) {
         paymentService.deletePayment(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/invoice/{invoiceId}/outstanding-balance")
+    public BigDecimal getOutstandingBalance(@PathVariable Integer invoiceId) {
+        return paymentService.getOutstandingBalance(invoiceId);
+    }
+
+    @GetMapping("/invoice/{invoiceId}/completed-total")
+    public BigDecimal getCompletedPaymentTotal(@PathVariable Integer invoiceId) {
+        return paymentService.getCompletedPaymentTotal(invoiceId);
+    }
+
+    @GetMapping("/invoice/{invoiceId}/details")
+    public Map<String, Object> getInvoicePaymentDetails(@PathVariable Integer invoiceId) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("invoiceId", invoiceId);
+        map.put("completedTotal", paymentService.getCompletedPaymentTotal(invoiceId));
+        map.put("outstandingBalance", paymentService.getOutstandingBalance(invoiceId));
+        map.put("status", paymentService.getInvoiceStatus(invoiceId));
+        return map;
+    }
+
+    private static Integer invoiceIdOf(Payment payment) {
+        if (payment.getInvoice() == null || payment.getInvoice().getInvoiceId() == null) {
+            throw new IllegalArgumentException("invoice.invoiceId is required.");
+        }
+        return payment.getInvoice().getInvoiceId();
     }
 }

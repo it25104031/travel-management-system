@@ -55,7 +55,7 @@
         }
 
         /* =========================
-           PAGE HEADER
+           HEADER
         ========================== */
 
         .page-header {
@@ -90,7 +90,7 @@
         }
 
         /* =========================
-           ERROR MESSAGE
+           ERROR
         ========================== */
 
         .alert {
@@ -115,10 +115,6 @@
         .form-group {
             display: flex;
             flex-direction: column;
-        }
-
-        .form-group.full-width {
-            grid-column: span 2;
         }
 
         label {
@@ -192,7 +188,7 @@
         }
 
         /* =========================
-           INFORMATION BOX
+           INFO
         ========================== */
 
         .info-box {
@@ -237,10 +233,6 @@
                 grid-template-columns: 1fr;
             }
 
-            .form-group.full-width {
-                grid-column: span 1;
-            }
-
             .button-row {
                 flex-direction: column;
             }
@@ -250,7 +242,6 @@
                 width: 100%;
                 text-align: center;
             }
-
         }
 
     </style>
@@ -259,8 +250,9 @@
 
 <body>
 
+
 <!-- =========================
-     NAVIGATION
+     NAVBAR
 ========================== -->
 
 <div class="navbar">
@@ -273,12 +265,13 @@
 
 
 <!-- =========================
-     MAIN CONTAINER
+     CONTAINER
 ========================== -->
 
 <div class="container">
 
-    <!-- PAGE HEADER -->
+
+    <!-- HEADER -->
 
     <div class="page-header">
 
@@ -291,26 +284,32 @@
     </div>
 
 
-    <!-- ERROR MESSAGE -->
+    <!-- ERROR -->
 
     <div
             th:if="${errorMessage}"
             class="alert">
 
-        <strong th:text="${errorMessage}"></strong>
+        <strong
+                th:text="${errorMessage}">
+        </strong>
 
     </div>
 
 
-    <!-- EDIT FORM -->
+    <!-- CARD -->
 
     <div class="card">
 
         <h3>Invoice Details</h3>
 
+
+        <!-- FORM -->
+
         <form
                 th:action="@{/invoices/update/{id}(id=${invoice.invoiceId})}"
                 method="post">
+
 
             <div class="form-grid">
 
@@ -333,35 +332,6 @@
                 </div>
 
 
-                <!-- Booking -->
-
-                <div class="form-group">
-
-                    <label for="bookingId">
-                        Booking
-                    </label>
-
-                    <select
-                            id="bookingId"
-                            name="bookingId"
-                            required>
-
-                        <option value="">
-                            -- Select Booking --
-                        </option>
-
-                        <option
-                                th:each="booking : ${bookings}"
-                                th:value="${booking.id}"
-                                th:text="${'Booking #' + booking.id + ' - ' + booking.customerName + ' - ' + booking.totalAmount}"
-                                th:selected="${invoice.booking != null and invoice.booking.id == booking.id}">
-                        </option>
-
-                    </select>
-
-                </div>
-
-
                 <!-- Customer -->
 
                 <div class="form-group">
@@ -373,8 +343,9 @@
                     <input
                             type="text"
                             id="customerName"
+                            name="customerName"
                             th:value="${invoice.customerName}"
-                            readonly>
+                            required>
 
                 </div>
 
@@ -408,45 +379,27 @@
                     <input
                             type="number"
                             id="totalAmount"
+                            name="totalAmount"
                             step="0.01"
+                            min="0.01"
                             th:value="${invoice.totalAmount}"
-                            readonly>
+                            required>
 
                 </div>
 
 
-                <!-- Invoice Status -->
+                <!-- Status (read-only: calculated from payments) -->
 
                 <div class="form-group">
 
-                    <label for="invoiceStatus">
-                        Invoice Status
+                    <label>
+                        Invoice Status (calculated from payments)
                     </label>
 
-                    <select
-                            id="invoiceStatus"
-                            name="invoiceStatus"
-                            required>
-
-                        <option
-                                value="UNPAID"
-                                th:selected="${invoice.invoiceStatus == 'UNPAID'}">
-                            UNPAID
-                        </option>
-
-                        <option
-                                value="PARTIAL"
-                                th:selected="${invoice.invoiceStatus == 'PARTIAL'}">
-                            PARTIAL
-                        </option>
-
-                        <option
-                                value="PAID"
-                                th:selected="${invoice.invoiceStatus == 'PAID'}">
-                            PAID
-                        </option>
-
-                    </select>
+                    <input
+                            type="text"
+                            th:value="${summary.status() + ' - Paid LKR ' + summary.paidAmount() + ' / Outstanding LKR ' + summary.outstandingBalance()}"
+                            disabled>
 
                 </div>
 
@@ -477,98 +430,9 @@
 
         </form>
 
-
-        <!-- INFORMATION -->
-
-        <div class="info-box">
-
-            <strong>Note:</strong>
-            Customer name and total amount are automatically
-            retrieved from the selected airline booking.
-
-        </div>
-
     </div>
 
 </div>
-
-
-<!-- =========================
-     BOOKING DETAILS SCRIPT
-========================== -->
-
-<script>
-
-    const bookingSelect =
-        document.getElementById("bookingId");
-
-    const customerNameInput =
-        document.getElementById("customerName");
-
-    const totalAmountInput =
-        document.getElementById("totalAmount");
-
-
-    bookingSelect.addEventListener("change", function () {
-
-        const bookingId = this.value;
-
-
-        if (!bookingId) {
-
-            customerNameInput.value = "";
-            totalAmountInput.value = "";
-
-            return;
-        }
-
-
-        fetch("/api/airline/bookings/" + bookingId)
-
-            .then(response => {
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        "Booking could not be loaded."
-                    );
-
-                }
-
-                return response.json();
-
-            })
-
-            .then(booking => {
-
-                customerNameInput.value =
-                    booking.customerName;
-
-                totalAmountInput.value =
-                    booking.totalAmount;
-
-            })
-
-            .catch(error => {
-
-                console.error(
-                    "Error loading booking:",
-                    error
-                );
-
-                alert(
-                    "Unable to load booking information."
-                );
-
-                customerNameInput.value = "";
-                totalAmountInput.value = "";
-
-            });
-
-    });
-
-</script>
-
 
 </body>
 

@@ -1,48 +1,62 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Invoice Management</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Payment | Dahamdi Pilgrims & Tours</title>
+
 
     <style>
 
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
+
         body {
+            margin: 0;
             font-family: Arial, Helvetica, sans-serif;
-            background: #f4f6f9;
-            color: #333;
+            background: #f4f6f8;
+            color: #1f2937;
         }
+
 
         /* =========================
            NAVBAR
         ========================== */
 
         .navbar {
-            background: #1f2937;
+            background: #111827;
             color: white;
+
             padding: 18px 40px;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
+
         .navbar h1 {
-            font-size: 22px;
+            margin: 0;
+            font-size: 21px;
+            font-weight: 700;
         }
+
 
         .navbar span {
             font-size: 14px;
             color: #d1d5db;
         }
+
 
         /* =========================
            CONTAINER
@@ -50,9 +64,11 @@
 
         .container {
             width: 90%;
-            max-width: 1200px;
-            margin: 35px auto;
+            max-width: 1000px;
+
+            margin: 40px auto;
         }
+
 
         /* =========================
            PAGE HEADER
@@ -62,14 +78,43 @@
             margin-bottom: 25px;
         }
 
+
         .page-header h2 {
+            margin: 0 0 8px 0;
+
             font-size: 28px;
-            margin-bottom: 8px;
+            color: #111827;
         }
 
+
         .page-header p {
+            margin: 0;
+
             color: #6b7280;
+            font-size: 14px;
         }
+
+
+        /* =========================
+           ALERT
+        ========================== */
+
+        .alert {
+            background: #fee2e2;
+
+            border-left: 5px solid #dc2626;
+
+            color: #991b1b;
+
+            padding: 14px 16px;
+
+            margin-bottom: 25px;
+
+            border-radius: 6px;
+
+            font-size: 14px;
+        }
+
 
         /* =========================
            CARD
@@ -77,17 +122,25 @@
 
         .card {
             background: white;
-            padding: 25px;
+
+            padding: 30px;
+
             border-radius: 10px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 30px;
+
+            box-shadow:
+                    0 2px 10px rgba(0,0,0,0.08);
         }
 
+
         .card h3 {
-            margin-bottom: 20px;
+            margin-top: 0;
+            margin-bottom: 25px;
+
             font-size: 20px;
-            color: #1f2937;
+
+            color: #111827;
         }
+
 
         /* =========================
            FORM
@@ -95,235 +148,172 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+
+            grid-template-columns:
+                    repeat(2, 1fr);
+
+            gap: 22px;
         }
+
 
         .form-group {
             display: flex;
+
             flex-direction: column;
         }
+
 
         .form-group.full-width {
             grid-column: span 2;
         }
 
+
         label {
-            font-weight: bold;
-            margin-bottom: 7px;
+            margin-bottom: 8px;
+
             font-size: 14px;
+
+            font-weight: 600;
+
+            color: #374151;
         }
+
 
         input,
         select {
-            padding: 11px 12px;
+            width: 100%;
+
+            padding: 12px 13px;
+
             border: 1px solid #d1d5db;
+
             border-radius: 6px;
+
             font-size: 14px;
-            outline: none;
+
             background: white;
+
+            color: #111827;
+
+            outline: none;
+
+            transition:
+                    border-color 0.2s,
+                    box-shadow 0.2s;
         }
+
 
         input:focus,
         select:focus {
             border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+
+            box-shadow:
+                    0 0 0 3px rgba(37,99,235,0.12);
         }
+
+
+        /* =========================
+           READONLY
+        ========================== */
 
         input[readonly] {
             background: #f3f4f6;
+
             color: #6b7280;
+
+            cursor: not-allowed;
         }
+
 
         /* =========================
-           CREATE BUTTON
+           BUTTON ROW
         ========================== */
 
-        .btn {
-            margin-top: 20px;
-            padding: 11px 20px;
-            border: none;
-            border-radius: 6px;
-            background: #2563eb;
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
+        .button-row {
+            display: flex;
+
+            gap: 12px;
+
+            margin-top: 30px;
         }
 
-        .btn:hover {
+
+        .update-btn {
+            padding: 12px 22px;
+
+            border: none;
+
+            border-radius: 6px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+            transition: background 0.2s;
+        }
+
+
+        .update-btn:hover {
             background: #1d4ed8;
         }
 
-        /* =========================
-           ERROR MESSAGE
-        ========================== */
 
-        .alert {
-            background: #fee2e2;
-            color: #b91c1c;
-            padding: 12px 15px;
+        .back-btn {
+            display: inline-block;
+
+            padding: 12px 22px;
+
             border-radius: 6px;
-            margin-bottom: 20px;
-            border-left: 4px solid #dc2626;
-        }
 
-        /* =========================
-           SEARCH
-        ========================== */
+            background: #6b7280;
 
-        .search-container {
-            margin-bottom: 20px;
-        }
-
-        .search-label {
-            display: block;
-            font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: #374151;
-        }
-
-        .search-box {
-            width: 100%;
-            max-width: 500px;
-            padding: 12px 15px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .search-box:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
-        }
-
-        /* =========================
-           TABLE
-        ========================== */
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1000px;
-        }
-
-        th {
-            background: #1f2937;
             color: white;
-            padding: 13px;
-            text-align: left;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            transition: background 0.2s;
+        }
+
+
+        .back-btn:hover {
+            background: #4b5563;
+        }
+
+
+        /* =========================
+           INFORMATION BOX
+        ========================== */
+
+        .info-box {
+            margin-top: 25px;
+
+            padding: 15px;
+
+            background: #eff6ff;
+
+            border-left: 4px solid #2563eb;
+
+            border-radius: 6px;
+
+            color: #1e40af;
+
             font-size: 13px;
+
+            line-height: 1.6;
         }
 
-        td {
-            padding: 13px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 14px;
-        }
-
-        tr:hover {
-            background: #f9fafb;
-        }
-
-        /* =========================
-           STATUS
-        ========================== */
-
-        .status {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .status-unpaid {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .status-partial {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-paid {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        /* =========================
-           AMOUNT
-        ========================== */
-
-        .amount {
-            font-weight: bold;
-        }
-
-        /* =========================
-           ACTION LINKS
-        ========================== */
-
-        .action-link {
-            text-decoration: none;
-            color: #2563eb;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .action-link:hover {
-            text-decoration: underline;
-        }
-
-        /* =========================
-           PRINT LINK
-        ========================== */
-
-        .print-link {
-            text-decoration: none;
-            color: #059669;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .print-link:hover {
-            text-decoration: underline;
-        }
-
-        /* =========================
-           DELETE BUTTON
-        ========================== */
-
-        .delete-btn {
-            border: none;
-            background: #dc2626;
-            color: white;
-            padding: 7px 11px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .delete-btn:hover {
-            background: #b91c1c;
-        }
-
-        /* =========================
-           NO RESULTS
-        ========================== */
-
-        .no-results {
-            display: none;
-            text-align: center;
-            padding: 25px;
-            color: #6b7280;
-            font-size: 14px;
-        }
 
         /* =========================
            RESPONSIVE
@@ -333,39 +323,57 @@
 
             .navbar {
                 padding: 15px 20px;
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 5px;
             }
+
 
             .navbar h1 {
                 font-size: 18px;
             }
 
+
             .navbar span {
                 font-size: 12px;
             }
 
+
             .container {
                 width: 94%;
-                margin: 20px auto;
+
+                margin: 25px auto;
             }
+
+
+            .card {
+                padding: 20px;
+            }
+
 
             .form-grid {
                 grid-template-columns: 1fr;
             }
 
+
             .form-group.full-width {
                 grid-column: span 1;
             }
 
-            .page-header h2 {
-                font-size: 24px;
+
+            .button-row {
+                flex-direction: column;
             }
 
-            .card {
-                padding: 18px;
-            }
 
-            .search-box {
-                max-width: 100%;
+            .update-btn,
+            .back-btn {
+                width: 100%;
+
+                text-align: center;
             }
 
         }
@@ -373,6 +381,7 @@
     </style>
 
 </head>
+
 
 <body>
 
@@ -383,9 +392,13 @@
 
 <div class="navbar">
 
-    <h1>Dahamdi Pilgrims & Tours</h1>
+    <h1>
+        Dahamdi Pilgrims & Tours
+    </h1>
 
-    <span>Admin Operations & Billing</span>
+    <span>
+        Admin Operations & Billing
+    </span>
 
 </div>
 
@@ -403,10 +416,12 @@
 
     <div class="page-header">
 
-        <h2>Invoice Management</h2>
+        <h2>
+            Edit Payment
+        </h2>
 
         <p>
-            Create, view, update and manage customer invoices.
+            Update payment information and payment details.
         </p>
 
     </div>
@@ -420,66 +435,58 @@
             th:if="${errorMessage}"
             class="alert">
 
-        <strong th:text="${errorMessage}"></strong>
+        <strong
+                th:text="${errorMessage}">
+        </strong>
 
     </div>
 
 
     <!-- =========================
-         CREATE INVOICE
+         EDIT PAYMENT CARD
     ========================== -->
 
     <div class="card">
 
-        <h3>Create New Invoice</h3>
+        <h3>
+            Payment Details
+        </h3>
+
 
         <form
-                action="/invoices/add"
+                th:action="@{/payments/update/{id}(id=${payment.paymentId})}"
                 method="post">
+
 
             <div class="form-grid">
 
 
-                <!-- Invoice Number -->
+                <!-- =========================
+                     INVOICE
+                ========================== -->
 
-                <div class="form-group">
+                <div class="form-group full-width">
 
-                    <label for="invoiceNumber">
-                        Invoice Number
-                    </label>
-
-                    <input
-                            type="text"
-                            id="invoiceNumber"
-                            name="invoiceNumber"
-                            placeholder="e.g. INV-0001"
-                            required>
-
-                </div>
-
-
-                <!-- Booking -->
-
-                <div class="form-group">
-
-                    <label for="bookingId">
-                        Booking
+                    <label for="invoiceId">
+                        Invoice
                     </label>
 
                     <select
-                            id="bookingId"
-                            name="bookingId"
+                            id="invoiceId"
+                            name="invoiceId"
                             required>
 
-                        <option value="">
-                            -- Select Booking --
+                        <option
+                                value="">
+                            -- Select Invoice --
                         </option>
 
-                        <option
-                                th:each="booking : ${bookings}"
-                                th:value="${booking.id}"
-                                th:text="${'Booking #' + booking.id + ' - ' + booking.customerName + ' - ' + booking.totalAmount}">
 
+                        <option
+                                th:each="invoice : ${invoices}"
+                                th:value="${invoice.invoiceId}"
+                                th:text="${invoice.invoiceNumber + ' - ' + invoice.customerName + ' (Total: LKR ' + invoice.totalAmount + ' | Remaining: LKR ' + outstandingBalances[invoice.invoiceId] + ' [' + calculatedStatuses[invoice.invoiceId] + '])'}"
+                                th:selected="${payment.invoice != null and payment.invoice.invoiceId == invoice.invoiceId}">
                         </option>
 
                     </select>
@@ -487,82 +494,148 @@
                 </div>
 
 
-                <!-- Customer Name -->
+                <!-- =========================
+                     PAYMENT DATE
+                ========================== -->
 
                 <div class="form-group">
 
-                    <label for="customerName">
-                        Customer Name
-                    </label>
-
-                    <input
-                            type="text"
-                            id="customerName"
-                            placeholder="Customer name will appear here"
-                            readonly>
-
-                </div>
-
-
-                <!-- Invoice Date -->
-
-                <div class="form-group">
-
-                    <label for="invoiceDate">
-                        Invoice Date
+                    <label for="paymentDate">
+                        Payment Date
                     </label>
 
                     <input
                             type="datetime-local"
-                            id="invoiceDate"
-                            name="invoiceDate"
+                            id="paymentDate"
+                            name="paymentDate"
+
+                            th:value="${#temporals.format(payment.paymentDate, 'yyyy-MM-dd''T''HH:mm')}"
+
                             required>
 
                 </div>
 
 
-                <!-- Total Amount -->
+                <!-- =========================
+                     PAYMENT AMOUNT
+                ========================== -->
 
                 <div class="form-group">
 
-                    <label for="totalAmount">
-                        Total Amount
+                    <label for="amount">
+                        Payment Amount
                     </label>
 
                     <input
                             type="number"
-                            id="totalAmount"
+                            id="amount"
+                            name="amount"
+
                             step="0.01"
+                            min="0.01"
                             min="0"
-                            placeholder="Booking amount"
-                            readonly>
+
+                            th:value="${payment.amount}"
+
+                            placeholder="0.00"
+
+                            required>
 
                 </div>
 
 
-                <!-- Invoice Status -->
+                <!-- =========================
+                     PAYMENT METHOD
+                ========================== -->
 
                 <div class="form-group">
 
-                    <label for="invoiceStatus">
-                        Invoice Status
+                    <label for="paymentMethod">
+                        Payment Method
                     </label>
 
                     <select
-                            id="invoiceStatus"
-                            name="invoiceStatus"
+                            id="paymentMethod"
+                            name="paymentMethod"
                             required>
 
-                        <option value="UNPAID">
-                            UNPAID
+                        <option
+                                value="">
+                            -- Select Method --
                         </option>
 
-                        <option value="PARTIAL">
-                            PARTIAL
+
+                        <option
+                                value="CASH"
+                                th:selected="${payment.paymentMethod == 'CASH'}">
+                            Cash
                         </option>
 
-                        <option value="PAID">
-                            PAID
+
+                        <option
+                                value="CARD"
+                                th:selected="${payment.paymentMethod == 'CARD'}">
+                            Card
+                        </option>
+
+
+                        <option
+                                value="BANK_TRANSFER"
+                                th:selected="${payment.paymentMethod == 'BANK_TRANSFER'}">
+                            Bank Transfer
+                        </option>
+
+
+                        <option
+                                value="ONLINE"
+                                th:selected="${payment.paymentMethod == 'ONLINE'}">
+                            Online Payment
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================
+                     PAYMENT STATUS
+                ========================== -->
+
+                <div class="form-group">
+
+                    <label for="paymentStatus">
+                        Payment Status
+                    </label>
+
+                    <select
+                            id="paymentStatus"
+                            name="paymentStatus"
+                            required>
+
+                        <option
+                                value="">
+                            -- Select Status --
+                        </option>
+
+
+                        <option
+                                value="COMPLETED"
+                                th:selected="${payment.paymentStatus == 'COMPLETED'}">
+                            Completed
+                        </option>
+
+
+                        <option
+                                value="PENDING"
+                                th:selected="${payment.paymentStatus == 'PENDING'}">
+                            Pending
+                        </option>
+
+
+                        <option
+                                value="FAILED"
+                                th:selected="${payment.paymentStatus == 'FAILED'}">
+                            Failed
                         </option>
 
                     </select>
@@ -572,377 +645,54 @@
             </div>
 
 
-            <!-- CREATE BUTTON -->
+            <!-- =========================
+                 BUTTONS
+            ========================== -->
 
-            <button
-                    type="submit"
-                    class="btn">
+            <div class="button-row">
 
-                + Create Invoice
+                <button
+                        type="submit"
+                        class="update-btn">
 
-            </button>
+                    Update Payment
+
+                </button>
+
+
+                <a
+                        href="/payments"
+                        class="back-btn">
+
+                    Back to Payments
+
+                </a>
+
+            </div>
 
         </form>
 
-    </div>
-
-
-    <!-- =========================
-         INVOICE LIST
-    ========================== -->
-
-    <div class="card">
-
-        <h3>All Invoices</h3>
-
 
         <!-- =========================
-             SEARCH
+             INFORMATION
         ========================== -->
 
-        <div class="search-container">
+        <div class="info-box">
 
-            <label
-                    for="invoiceSearch"
-                    class="search-label">
+            <strong>Payment Validation:</strong>
 
-                Search Invoices
+            The payment amount cannot be greater than
+            the outstanding balance of the selected invoice.
 
-            </label>
-
-            <input
-                    type="text"
-                    id="invoiceSearch"
-                    class="search-box"
-                    placeholder="Search by ID, invoice number, customer, date, amount or status..."
-                    autocomplete="off">
-
-        </div>
-
-
-        <!-- =========================
-             TABLE
-        ========================== -->
-
-        <div class="table-container">
-
-            <table>
-
-                <thead>
-
-                <tr>
-
-                    <th>ID</th>
-
-                    <th>Invoice Number</th>
-
-                    <th>Customer</th>
-
-                    <th>Date</th>
-
-                    <th>Total</th>
-
-                    <th>Paid</th>
-
-                    <th>Outstanding</th>
-
-                    <th>Status</th>
-
-                    <th>Actions</th>
-
-                </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                <tr
-                        th:each="invoice : ${invoices}"
-                        class="invoice-row">
-
-
-                    <!-- ID -->
-
-                    <td
-                            th:text="${invoice.invoiceId}">
-                    </td>
-
-
-                    <!-- Invoice Number -->
-
-                    <td
-                            th:text="${invoice.invoiceNumber}">
-                    </td>
-
-
-                    <!-- Customer -->
-
-                    <td
-                            th:text="${invoice.customerName}">
-                    </td>
-
-
-                    <!-- Date -->
-
-                    <td
-                            th:text="${invoice.invoiceDate}">
-                    </td>
-
-
-                    <!-- Total -->
-
-                    <td
-                            class="amount"
-                            th:text="${invoice.totalAmount}">
-                    </td>
-
-
-                    <!-- Paid -->
-
-                    <td
-                            class="amount"
-                            th:text="${paidAmounts[invoice.invoiceId]}">
-                    </td>
-
-
-                    <!-- Outstanding -->
-
-                    <td
-                            class="amount"
-                            th:text="${outstandingBalances[invoice.invoiceId]}">
-                    </td>
-
-
-                    <!-- Status -->
-
-                    <td>
-
-                        <span
-                                class="status"
-                                th:classappend="${calculatedStatuses[invoice.invoiceId] == 'PAID'
-                                    ? ' status-paid'
-                                    : calculatedStatuses[invoice.invoiceId] == 'PARTIAL'
-                                    ? ' status-partial'
-                                    : ' status-unpaid'}"
-                                th:text="${calculatedStatuses[invoice.invoiceId]}">
-
-                        </span>
-
-                    </td>
-
-
-                    <!-- ACTIONS -->
-
-                    <td>
-
-
-                        <!-- EDIT -->
-
-                        <a
-                                class="action-link"
-                                th:href="@{/invoices/edit/{id}(id=${invoice.invoiceId})}">
-
-                            Edit
-
-                        </a>
-
-
-                        <!-- PRINT -->
-
-                        <a
-                                class="print-link"
-                                th:href="@{/invoices/print/{id}(id=${invoice.invoiceId})}"
-                                target="_blank">
-
-                            Print
-
-                        </a>
-
-
-                        <!-- DELETE -->
-
-                        <form
-                                th:action="@{/invoices/delete/{id}(id=${invoice.invoiceId})}"
-                                method="post"
-                                style="display:inline;">
-
-                            <button
-                                    type="submit"
-                                    class="delete-btn"
-                                    onclick="return confirm('Are you sure you want to delete this invoice?')">
-
-                                Delete
-
-                            </button>
-
-                        </form>
-
-
-                    </td>
-
-                </tr>
-
-                </tbody>
-
-            </table>
-
-
-            <!-- NO SEARCH RESULTS -->
-
-            <div
-                    id="noResults"
-                    class="no-results">
-
-                No invoices found matching your search.
-
-            </div>
+            When editing an existing payment, the current
+            payment is excluded from the outstanding-balance
+            calculation.
 
         </div>
 
     </div>
 
 </div>
-
-
-<!-- =========================
-     BOOKING DETAILS JAVASCRIPT
-========================== -->
-
-<script>
-
-    const bookingSelect =
-        document.getElementById("bookingId");
-
-    const customerNameInput =
-        document.getElementById("customerName");
-
-    const totalAmountInput =
-        document.getElementById("totalAmount");
-
-
-    bookingSelect.addEventListener("change", function () {
-
-        const bookingId = this.value;
-
-
-        if (!bookingId) {
-
-            customerNameInput.value = "";
-            totalAmountInput.value = "";
-
-            return;
-        }
-
-
-        fetch("/api/airline/bookings/" + bookingId)
-
-            .then(response => {
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        "Booking could not be loaded."
-                    );
-
-                }
-
-                return response.json();
-
-            })
-
-            .then(booking => {
-
-                customerNameInput.value =
-                    booking.customerName;
-
-                totalAmountInput.value =
-                    booking.totalAmount;
-
-            })
-
-            .catch(error => {
-
-                console.error(
-                    "Error loading booking:",
-                    error
-                );
-
-                alert(
-                    "Unable to load booking information."
-                );
-
-                customerNameInput.value = "";
-                totalAmountInput.value = "";
-
-            });
-
-    });
-
-</script>
-
-
-<!-- =========================
-     INVOICE SEARCH JAVASCRIPT
-========================== -->
-
-<script>
-
-    const invoiceSearch =
-        document.getElementById("invoiceSearch");
-
-    const invoiceRows =
-        document.querySelectorAll(".invoice-row");
-
-    const noResults =
-        document.getElementById("noResults");
-
-
-    invoiceSearch.addEventListener("input", function () {
-
-        const searchText =
-            this.value.toLowerCase().trim();
-
-        let visibleRows = 0;
-
-
-        invoiceRows.forEach(function (row) {
-
-            const rowText =
-                row.textContent.toLowerCase();
-
-
-            if (rowText.includes(searchText)) {
-
-                row.style.display = "";
-
-                visibleRows++;
-
-            } else {
-
-                row.style.display = "none";
-
-            }
-
-        });
-
-
-        if (
-            visibleRows === 0
-            && searchText !== ""
-        ) {
-
-            noResults.style.display = "block";
-
-        } else {
-
-            noResults.style.display = "none";
-
-        }
-
-    });
-
-</script>
 
 
 </body>

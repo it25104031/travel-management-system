@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Something went wrong</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', Arial, Helvetica, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+        }
+        .code { font-size: 56px; font-weight: 800; color: #8b5cf6; }
+        h1 { font-size: 22px; margin: 8px 0 12px; }
+        p { color: #94a3b8; margin-bottom: 24px; line-height: 1.5; }
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="code" th:text="${status}">500</div>
+    <h1 th:switch="${status}">
+        <span th:case="404">Page or record not found</span>
+        <span th:case="400">Invalid request</span>
+        <span th:case="403">Access denied</span>
+        <span th:case="*">Something went wrong</span>
+    </h1>
+    <p th:switch="${status}">
+        <span th:case="404">The page or record you're looking for doesn't exist or was removed.</span>
+        <span th:case="400">Some of the submitted data was missing or in the wrong format. Please go back and check the form.</span>
+        <span th:case="*">An unexpected error happened. Please go back and try again.</span>
+    </p>
+    <a href="/">Back to dashboard</a>
+</div>
+</body>
+</html>

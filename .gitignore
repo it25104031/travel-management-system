@@ -1,0 +1,14 @@
+# Uploaded payment slips are user data - don't commit them
+uploads/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Build output
+target/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/

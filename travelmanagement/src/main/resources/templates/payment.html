@@ -238,19 +238,26 @@
 
 <body>
 
-<!-- Navigation -->
 <div class="navbar">
 
     <h1>Dahamdi Pilgrims & Tours</h1>
 
-    <span>Admin Operations & Billing</span>
+    <div style="display:flex; align-items:center; gap:18px;">
+        <a href="/admin/dashboard"
+           style="color:#93c5fd; text-decoration:none; font-size:14px; font-weight:bold;">
+            ← Dashboard
+        </a>
+        <span>Admin Operations & Billing</span>
+        <a href="/logout"
+           style="color:#fca5a5; text-decoration:none; font-size:13px; font-weight:bold;">
+            Logout
+        </a>
+    </div>
 
 </div>
 
-
 <div class="container">
 
-    <!-- Page Header -->
     <div class="page-header">
 
         <h2>Payment Management</h2>
@@ -261,8 +268,6 @@
 
     </div>
 
-
-    <!-- Error Message -->
     <div
             th:if="${errorMessage}"
             class="alert">
@@ -271,8 +276,6 @@
 
     </div>
 
-
-    <!-- Add Payment -->
     <div class="card">
 
         <h3>Record New Payment</h3>
@@ -281,11 +284,10 @@
 
             <div class="form-grid">
 
-                <!-- Invoice -->
-                <div class="form-group">
+                <div class="form-group full-width">
 
                     <label for="invoiceId">
-                        Invoice
+                        Select Invoice
                     </label>
 
                     <select
@@ -300,15 +302,38 @@
                         <option
                                 th:each="invoice : ${invoices}"
                                 th:value="${invoice.invoiceId}"
-                                th:text="${invoice.invoiceNumber + ' - ' + invoice.customerName}">
+                                th:data-total="${invoice.totalAmount}"
+                                th:data-paid="${paidAmounts[invoice.invoiceId]}"
+                                th:data-remaining="${outstandingBalances[invoice.invoiceId]}"
+                                th:data-status="${calculatedStatuses[invoice.invoiceId]}"
+                                th:text="${invoice.invoiceNumber + ' - ' + invoice.customerName + ' (Total: LKR ' + invoice.totalAmount + ' | Remaining: LKR ' + outstandingBalances[invoice.invoiceId] + ' [' + calculatedStatuses[invoice.invoiceId] + '])'}">
                         </option>
 
                     </select>
 
                 </div>
 
+                <div id="paymentSummaryBox" class="form-group full-width" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <div>
+                            <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Total Invoice Amount</span>
+                            <div id="summaryTotal" style="font-size: 16px; font-weight: 700; color: #1e293b;">LKR 0.00</div>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Paid So Far</span>
+                            <div id="summaryPaid" style="font-size: 16px; font-weight: 700; color: #16a34a;">LKR 0.00</div>
+                        </div>
+                        <div style="background: #fef2f2; padding: 8px 14px; border-radius: 6px; border: 1px solid #fecaca;">
+                            <span style="font-size: 12px; color: #991b1b; font-weight: 700; text-transform: uppercase;">Remaining Payment</span>
+                            <div id="summaryRemaining" style="font-size: 18px; font-weight: 800; color: #dc2626;">LKR 0.00</div>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Invoice Status</span>
+                            <div><span id="summaryStatusBadge" class="status">UNPAID</span></div>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Payment Date -->
                 <div class="form-group">
 
                     <label for="paymentDate">
@@ -323,12 +348,10 @@
 
                 </div>
 
-
-                <!-- Amount -->
                 <div class="form-group">
 
                     <label for="amount">
-                        Payment Amount
+                        Payment Amount (LKR)
                     </label>
 
                     <input
@@ -336,14 +359,12 @@
                             id="amount"
                             name="amount"
                             step="0.01"
-                            min="0"
+                            min="0.01"
                             placeholder="0.00"
                             required>
 
                 </div>
 
-
-                <!-- Payment Method -->
                 <div class="form-group">
 
                     <label for="paymentMethod">
@@ -379,8 +400,6 @@
 
                 </div>
 
-
-                <!-- Payment Status -->
                 <div class="form-group">
 
                     <label for="paymentStatus">
@@ -410,7 +429,6 @@
 
             </div>
 
-
             <button
                     type="submit"
                     class="btn">
@@ -423,8 +441,6 @@
 
     </div>
 
-
-    <!-- Payment List -->
     <div class="card">
 
         <h3>All Payments</h3>
@@ -445,11 +461,13 @@
 
                     <th>Date</th>
 
-                    <th>Amount</th>
+                    <th>Paid Amount</th>
+
+                    <th>Invoice Remaining</th>
 
                     <th>Method</th>
 
-                    <th>Status</th>
+                    <th>Payment Status</th>
 
                     <th>Actions</th>
 
@@ -479,7 +497,13 @@
 
                     <td
                             class="amount"
-                            th:text="${payment.amount}">
+                            th:text="${'LKR ' + payment.amount}">
+                    </td>
+
+                    <td
+                            class="amount"
+                            style="font-weight: bold; color: #dc2626;"
+                            th:text="${'LKR ' + outstandingBalances[payment.invoice.invoiceId]}">
                     </td>
 
                     <td
@@ -541,6 +565,56 @@
     </div>
 
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const invoiceSelect = document.getElementById("invoiceId");
+        const summaryBox = document.getElementById("paymentSummaryBox");
+        const summaryTotal = document.getElementById("summaryTotal");
+        const summaryPaid = document.getElementById("summaryPaid");
+        const summaryRemaining = document.getElementById("summaryRemaining");
+        const summaryStatusBadge = document.getElementById("summaryStatusBadge");
+        const amountInput = document.getElementById("amount");
+
+        // Set default payment date to now
+        const paymentDateInput = document.getElementById("paymentDate");
+        if (paymentDateInput && !paymentDateInput.value) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            paymentDateInput.value = now.toISOString().slice(0, 16);
+        }
+
+        invoiceSelect.addEventListener("change", function () {
+            const selectedOpt = this.options[this.selectedIndex];
+            if (!selectedOpt || !selectedOpt.value) {
+                summaryBox.style.display = "none";
+                amountInput.value = "";
+                amountInput.removeAttribute("max");
+                return;
+            }
+
+            const total = parseFloat(selectedOpt.getAttribute("data-total")) || 0;
+            const paid = parseFloat(selectedOpt.getAttribute("data-paid")) || 0;
+            const remaining = parseFloat(selectedOpt.getAttribute("data-remaining")) || 0;
+            const status = selectedOpt.getAttribute("data-status") || "UNPAID";
+
+            summaryTotal.textContent = "LKR " + total.toFixed(2);
+            summaryPaid.textContent = "LKR " + paid.toFixed(2);
+            summaryRemaining.textContent = "LKR " + remaining.toFixed(2);
+            
+            summaryStatusBadge.textContent = status;
+            summaryStatusBadge.className = "status " + (
+                status === "PAID" ? "status-paid" : (status === "PARTIAL" ? "status-partial" : "status-unpaid")
+            );
+
+            summaryBox.style.display = "block";
+
+            // Autofill the remaining amount in payment input field
+            amountInput.value = remaining > 0 ? remaining.toFixed(2) : "0.00";
+            amountInput.setAttribute("max", remaining);
+        });
+    });
+</script>
 
 </body>
 
