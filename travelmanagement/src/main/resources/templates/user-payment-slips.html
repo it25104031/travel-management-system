@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Payment Slips — Dahamdi Pilgrims & Tours</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', Arial, Helvetica, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-logo {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #22c55e, #14b8a6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .nav-subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-dash {
+            color: #93c5fd;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            background: rgba(147, 197, 253, 0.1);
+            border: 1px solid rgba(147, 197, 253, 0.2);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-dash:hover {
+            background: rgba(147, 197, 253, 0.2);
+            color: #bfdbfe;
+        }
+
+        .btn-logout {
+            padding: 8px 18px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 10px;
+            color: #fca5a5;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fecaca;
+        }
+
+        /* CONTAINER */
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding-bottom: 60px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h2 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #f1f5f9;
+            letter-spacing: -0.02em;
+        }
+
+        .page-header p {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 6px;
+        }
+
+        /* ALERTS */
+        .alert-success {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+            padding: 14px 20px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 14px 20px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* CARD */
+        .card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 36px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 19px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* FORM */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="datetime-local"],
+        select {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #f8fafc;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"] {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px dashed rgba(148, 163, 184, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            color: #94a3b8;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        input:focus, select:focus {
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            padding: 13px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        /* TABLE */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 900px;
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.6);
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background: rgba(30, 41, 59, 0.4);
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .badge-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        .badge-approved {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .badge-rejected {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .action-link {
+            color: #38bdf8;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            margin-right: 12px;
+            transition: color 0.2s;
+        }
+
+        .action-link:hover {
+            color: #7dd3fc;
+            text-decoration: underline;
+        }
+
+        .no-records {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 14px 20px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .container {
+                width: 94%;
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="nav-brand">
+        <div class="nav-logo">📄</div>
+        <div>
+            <div class="nav-title">Dahamdi Pilgrims & Tours</div>
+            <div class="nav-subtitle">Upload & View Payment Slips</div>
+        </div>
+    </div>
+
+    <div class="nav-actions">
+        <a href="/user/dashboard" class="btn-dash">← Back to Dashboard</a>
+        <a href="/logout" class="btn-logout">⎋ Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h2>Payment Slips</h2>
+        <p>Submit bank transfer or deposit receipts for your invoice bookings and track approval status.</p>
+    </div>
+
+    <div th:if="${successMessage}" class="alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert-error" th:text="${errorMessage}"></div>
+
+    <!-- UPLOAD FORM CARD -->
+    <div class="card">
+        <div class="card-title">
+            <span>📤</span> Upload New Payment Slip
+        </div>
+
+        <form action="/user/payment-slips/upload" method="post" enctype="multipart/form-data">
+            <div class="form-grid">
+                
+                <div class="form-group">
+                    <label for="invoiceNumber">Invoice Number *</label>
+                    <input type="text" id="invoiceNumber" name="invoiceNumber" placeholder="e.g. INV-0001" required>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="amountPaid">Amount Paid (LKR) *</label>
+                    <input type="number" id="amountPaid" name="amountPaid" step="0.01" min="0.01" placeholder="e.g. 50000.00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentDate">Payment Date & Time *</label>
+                    <input type="datetime-local" id="paymentDate" name="paymentDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="bankReference">Bank Reference / Transaction ID (Optional)</label>
+                    <input type="text" id="bankReference" name="bankReference" placeholder="e.g. TRX-987654321">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="file">Slip Document / Image (JPG, PNG, PDF — Max 5 MB) *</label>
+                    <input type="file" id="file" name="file" accept=".jpg,.jpeg,.png,.pdf" required>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit">
+                📤 Submit Payment Slip
+            </button>
+        </form>
+    </div>
+
+    <!-- SLIPS HISTORY CARD -->
+    <div class="card">
+        <div class="card-title">
+            <span>📋</span> My Uploaded Payment Slips
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>Slip ID</th>
+                    <th>Invoice</th>
+                    <th>Amount Paid</th>
+                    <th>Payment Date</th>
+                    <th>Bank Reference</th>
+                    <th>Document</th>
+                    <th>Status</th>
+                    <th>Admin Remark</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="slip : ${slips}">
+                    <td th:text="'#' + ${slip.slipId}">#1</td>
+                    <td th:text="${slip.invoice != null ? slip.invoice.invoiceNumber : 'N/A'}">INV-0001</td>
+                    <td style="font-weight: 700; color: #4ade80;" th:text="'LKR ' + ${#numbers.formatDecimal(slip.amountPaid, 1, 2)}">LKR 50,000.00</td>
+                    <td th:text="${#temporals.format(slip.paymentDate, 'yyyy-MM-dd HH:mm')}">2026-10-07 14:00</td>
+                    <td th:text="${slip.bankReference != null && !slip.bankReference.empty ? slip.bankReference : '—'}">—</td>
+                    <td>
+                        <a th:href="@{/payment-slips/file/{id}(id=${slip.slipId})}" target="_blank" class="action-link">🔍 View</a>
+                        <a th:href="@{/payment-slips/file/{id}/download(id=${slip.slipId})}" class="action-link">⬇ Download</a>
+                    </td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${slip.status == 'APPROVED' ? ' badge-approved' : (slip.status == 'REJECTED' ? ' badge-rejected' : ' badge-pending')}"
+                              th:text="${slip.status}">
+                            PENDING
+                        </span>
+                    </td>
+                    <td style="color: #94a3b8; font-style: italic;" th:text="${slip.adminRemark != null && !slip.adminRemark.empty ? slip.adminRemark : '—'}">—</td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(slips)}">
+                    <td colspan="8" class="no-records">No payment slips uploaded yet. Use the form above to upload your first slip.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

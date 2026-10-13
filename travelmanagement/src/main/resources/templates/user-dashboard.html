@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Dashboard — Dahamdi Pilgrims & Tours</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', Arial, Helvetica, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================== */
+
+        .navbar {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-logo {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #22c55e, #14b8a6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .nav-subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+        }
+
+        .nav-user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #22c55e, #14b8a6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .nav-user-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        .nav-user-role {
+            font-size: 11px;
+            color: #22c55e;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-logout {
+            padding: 8px 18px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 10px;
+            color: #fca5a5;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fecaca;
+        }
+
+        /* =========================
+           CONTAINER
+        ========================== */
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding-bottom: 60px;
+        }
+
+        /* =========================
+           WELCOME BANNER
+        ========================== */
+
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(14, 165, 233, 0.08));
+            border: 1px solid rgba(34, 197, 94, 0.15);
+            border-radius: 24px;
+            padding: 40px 36px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::after {
+            content: '✈';
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 80px;
+            opacity: 0.08;
+        }
+
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #4ade80;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 12px;
+        }
+
+        .welcome-banner h2 {
+            font-size: 30px;
+            font-weight: 800;
+            color: #f1f5f9;
+            letter-spacing: -0.03em;
+            margin-bottom: 6px;
+        }
+
+        .welcome-banner p {
+            font-size: 15px;
+            color: #94a3b8;
+            max-width: 500px;
+        }
+
+        /* =========================
+           ACTION CARDS
+        ========================== */
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .action-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 20px;
+            padding: 32px 28px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 20px 20px 0 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .action-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(148, 163, 184, 0.2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .action-card:hover::before {
+            opacity: 1;
+        }
+
+        .action-card.card-search::before {
+            background: linear-gradient(90deg, #0ea5e9, #3b82f6);
+        }
+
+        .action-card.card-bookings::before {
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+        }
+
+        .action-card.card-pay::before {
+            background: linear-gradient(90deg, #8b5cf6, #ec4899);
+        }
+
+        .action-card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+
+        .card-search .action-card-icon {
+            background: rgba(14, 165, 233, 0.15);
+        }
+
+        .card-bookings .action-card-icon {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .card-pay .action-card-icon {
+            background: rgba(139, 92, 246, 0.15);
+        }
+
+        .action-card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+        }
+
+        .action-card-desc {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .action-card-arrow {
+            position: absolute;
+            bottom: 28px;
+            right: 28px;
+            font-size: 20px;
+            color: #475569;
+            transition: all 0.3s;
+        }
+
+        .action-card:hover .action-card-arrow {
+            color: #94a3b8;
+            transform: translateX(4px);
+        }
+
+        /* =========================
+           TRAVEL TIPS SECTION
+        ========================== */
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .tip-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(148, 163, 184, 0.08);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .tip-emoji {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .tip-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 6px;
+        }
+
+        .tip-desc {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 768px) {
+
+            .navbar {
+                padding: 14px 20px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .container {
+                width: 94%;
+                margin: 24px auto;
+            }
+
+            .welcome-banner h2 {
+                font-size: 24px;
+            }
+
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<div class="navbar">
+
+    <div class="nav-brand">
+
+        <div class="nav-logo">✈</div>
+
+        <div>
+            <div class="nav-title">Dahamdi Pilgrims & Tours</div>
+            <div class="nav-subtitle">Travel Portal</div>
+        </div>
+
+    </div>
+
+    <div class="nav-actions">
+
+        <div class="nav-user">
+
+            <div class="nav-user-avatar"
+                 th:text="${user.fullName != null ? user.fullName.substring(0,1).toUpperCase() : 'U'}">
+                U
+            </div>
+
+            <div>
+                <div class="nav-user-name"
+                     th:text="${user.fullName}">
+                    User
+                </div>
+
+                <div class="nav-user-role">
+                    Traveler
+                </div>
+            </div>
+
+        </div>
+
+        <a href="/logout" class="btn-logout">
+            ⎋ Logout
+        </a>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="welcome-banner">
+
+        <div class="user-badge">
+            👤 Traveler Account
+        </div>
+
+        <h2 th:text="'Welcome, ' + ${user.fullName} + '!'">
+            Welcome, Traveler!
+        </h2>
+
+        <p>
+            Make secure payments and manage your travel invoice receipts easily.
+        </p>
+
+    </div>
+
+    <div class="action-grid">
+
+        <a href="/payment-gateway" class="action-card card-pay">
+
+            <div class="action-card-icon">💳</div>
+
+            <div class="action-card-title">Make Payment</div>
+
+            <div class="action-card-desc">
+                Securely pay for your bookings using our
+                integrated payment gateway.
+            </div>
+
+            <div class="action-card-arrow">→</div>
+
+        </a>
+
+        <a href="/user/payment-slips" class="action-card card-bookings">
+
+            <div class="action-card-icon">📄</div>
+
+            <div class="action-card-title">Payment Slips</div>
+
+            <div class="action-card-desc">
+                Upload bank deposit receipts, view approval status,
+                and track admin remarks.
+            </div>
+
+            <div class="action-card-arrow">→</div>
+
+        </a>
+
+    </div>
+
+
+    <div class="section-title">
+        <span>💡</span> Quick Tips
+    </div>
+
+    <div class="tips-grid">
+
+        <div class="tip-card">
+            <div class="tip-emoji">📅</div>
+            <div class="tip-title">Book Early</div>
+            <div class="tip-desc">
+                Book your flights in advance to get the best prices
+                and seat availability.
+            </div>
+        </div>
+
+        <div class="tip-card">
+            <div class="tip-emoji">📱</div>
+            <div class="tip-title">Keep Records</div>
+            <div class="tip-desc">
+                Save your booking confirmation and payment
+                receipts for reference.
+            </div>
+        </div>
+
+        <div class="tip-card">
+            <div class="tip-emoji">🌍</div>
+            <div class="tip-title">Travel Prepared</div>
+            <div class="tip-desc">
+                Check visa requirements and travel advisories
+                before your departure.
+            </div>
+        </div>
+
+        <div class="tip-card">
+            <div class="tip-emoji">📞</div>
+            <div class="tip-title">Need Help?</div>
+            <div class="tip-desc">
+                Call us at <strong style="color:#e2e8f0;">+94 11 234 5678</strong><br>
+                Mon–Sat, 8:00 AM – 6:00 PM
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

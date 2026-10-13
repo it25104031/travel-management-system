@@ -6,344 +6,615 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Payment Management</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        .navbar {
+            background: #1f2937;
+            color: white;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            font-size: 22px;
+        }
+
+        .navbar span {
+            font-size: 14px;
+            color: #d1d5db;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 35px auto;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .card h3 {
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #1f2937;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 7px;
+            font-size: 14px;
+        }
+
+        input,
+        select {
+            padding: 11px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 11px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .alert {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: #1f2937;
+            color: white;
+            padding: 13px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .action-link {
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .action-link:hover {
+            text-decoration: underline;
+        }
+
+        .delete-btn {
+            border: none;
+            background: #dc2626;
+            color: white;
+            padding: 7px 11px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #b91c1c;
+        }
+
+        .amount {
+            font-weight: bold;
+        }
+
+        .invoice-info {
+            margin-top: 8px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 6px;
+            color: #4b5563;
+            font-size: 13px;
+        }
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .container {
+                width: 94%;
+                margin: 20px auto;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<h1>Payment Management</h1>
+<div class="navbar">
 
-<p>Admin Operations & Billing</p>
+    <h1>Dahamdi Pilgrims & Tours</h1>
 
-
-<!-- Add Payment Form -->
-
-<h2>Add New Payment</h2>
-
-<div th:if="${errorMessage}"
-     style="color: red; margin-bottom: 15px;">
-
-    <strong th:text="${errorMessage}"></strong>
+    <div style="display:flex; align-items:center; gap:18px;">
+        <a href="/admin/dashboard"
+           style="color:#93c5fd; text-decoration:none; font-size:14px; font-weight:bold;">
+            ← Dashboard
+        </a>
+        <span>Admin Operations & Billing</span>
+        <a href="/logout"
+           style="color:#fca5a5; text-decoration:none; font-size:13px; font-weight:bold;">
+            Logout
+        </a>
+    </div>
 
 </div>
 
-<form action="/payments/add" method="post">
+<div class="container">
 
-    <!-- Select Invoice -->
+    <div class="page-header">
 
-    <label for="invoiceId">Invoice:</label>
-
-    <select id="invoiceId" name="invoiceId" required>
-
-        <option value="">-- Select Invoice --</option>
-
-        <option
-                th:each="invoice : ${invoices}"
-                th:value="${invoice.invoiceId}"
-                th:text="${invoice.invoiceNumber + ' - ' + invoice.customerName}">
-        </option>
-
-    </select>
-
-    <br><br>
-
-
-    <!-- Invoice Billing Information -->
-
-    <div id="invoiceBalance">
+        <h2>Payment Management</h2>
 
         <p>
-            <strong>Invoice Total:</strong>
-            <span id="invoiceTotal">-</span>
-        </p>
-
-        <p>
-            <strong>Outstanding Balance:</strong>
-            <span id="outstandingBalance">-</span>
+            Record, view, update and manage customer payments.
         </p>
 
     </div>
 
-    <br>
+    <div
+            th:if="${errorMessage}"
+            class="alert">
+
+        <strong th:text="${errorMessage}"></strong>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Record New Payment</h3>
+
+        <form action="/payments/add" method="post">
+
+            <div class="form-grid">
+
+                <div class="form-group full-width">
+
+                    <label for="invoiceId">
+                        Select Invoice
+                    </label>
+
+                    <select
+                            id="invoiceId"
+                            name="invoiceId"
+                            required>
+
+                        <option value="">
+                            -- Select Invoice --
+                        </option>
+
+                        <option
+                                th:each="invoice : ${invoices}"
+                                th:value="${invoice.invoiceId}"
+                                th:data-total="${invoice.totalAmount}"
+                                th:data-paid="${paidAmounts[invoice.invoiceId]}"
+                                th:data-remaining="${outstandingBalances[invoice.invoiceId]}"
+                                th:data-status="${calculatedStatuses[invoice.invoiceId]}"
+                                th:text="${invoice.invoiceNumber + ' - ' + invoice.customerName + ' (Total: LKR ' + invoice.totalAmount + ' | Remaining: LKR ' + outstandingBalances[invoice.invoiceId] + ' [' + calculatedStatuses[invoice.invoiceId] + '])'}">
+                        </option>
 
+                    </select>
+
+                </div>
 
-    <!-- Payment Date -->
+                <div id="paymentSummaryBox" class="form-group full-width" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <div>
+                            <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Total Invoice Amount</span>
+                            <div id="summaryTotal" style="font-size: 16px; font-weight: 700; color: #1e293b;">LKR 0.00</div>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Paid So Far</span>
+                            <div id="summaryPaid" style="font-size: 16px; font-weight: 700; color: #16a34a;">LKR 0.00</div>
+                        </div>
+                        <div style="background: #fef2f2; padding: 8px 14px; border-radius: 6px; border: 1px solid #fecaca;">
+                            <span style="font-size: 12px; color: #991b1b; font-weight: 700; text-transform: uppercase;">Remaining Payment</span>
+                            <div id="summaryRemaining" style="font-size: 18px; font-weight: 800; color: #dc2626;">LKR 0.00</div>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Invoice Status</span>
+                            <div><span id="summaryStatusBadge" class="status">UNPAID</span></div>
+                        </div>
+                    </div>
+                </div>
 
-    <label for="paymentDate">Payment Date:</label>
+                <div class="form-group">
 
-    <input
-            type="datetime-local"
-            id="paymentDate"
-            name="paymentDate"
-            required>
+                    <label for="paymentDate">
+                        Payment Date
+                    </label>
 
-    <br><br>
+                    <input
+                            type="datetime-local"
+                            id="paymentDate"
+                            name="paymentDate"
+                            required>
 
+                </div>
 
-    <!-- Payment Amount -->
+                <div class="form-group">
 
-    <label for="amount">Amount:</label>
+                    <label for="amount">
+                        Payment Amount (LKR)
+                    </label>
 
-    <input
-            type="number"
-            id="amount"
-            name="amount"
-            step="0.01"
-            min="0"
-            required>
+                    <input
+                            type="number"
+                            id="amount"
+                            name="amount"
+                            step="0.01"
+                            min="0.01"
+                            placeholder="0.00"
+                            required>
 
-    <p id="amountError"
-       style="color: red; display: none;">
-        Payment amount cannot be greater than the outstanding balance.
-    </p>
+                </div>
 
-    <br><br>
+                <div class="form-group">
 
+                    <label for="paymentMethod">
+                        Payment Method
+                    </label>
 
-    <!-- Payment Method -->
+                    <select
+                            id="paymentMethod"
+                            name="paymentMethod"
+                            required>
 
-    <label for="paymentMethod">Payment Method:</label>
+                        <option value="">
+                            -- Select Method --
+                        </option>
 
-    <select
-            id="paymentMethod"
-            name="paymentMethod"
-            required>
+                        <option value="CASH">
+                            Cash
+                        </option>
 
-        <option value="">-- Select Method --</option>
+                        <option value="CARD">
+                            Card
+                        </option>
 
-        <option value="CASH">CASH</option>
+                        <option value="BANK_TRANSFER">
+                            Bank Transfer
+                        </option>
 
-        <option value="CARD">CARD</option>
+                        <option value="ONLINE">
+                            Online Payment
+                        </option>
 
-        <option value="BANK_TRANSFER">BANK TRANSFER</option>
+                    </select>
 
-    </select>
+                </div>
 
-    <br><br>
+                <div class="form-group">
 
+                    <label for="paymentStatus">
+                        Payment Status
+                    </label>
 
-    <!-- Payment Status -->
+                    <select
+                            id="paymentStatus"
+                            name="paymentStatus"
+                            required>
 
-    <label for="paymentStatus">Payment Status:</label>
+                        <option value="COMPLETED">
+                            COMPLETED
+                        </option>
 
-    <select
-            id="paymentStatus"
-            name="paymentStatus"
-            required>
+                        <option value="PENDING">
+                            PENDING
+                        </option>
 
-        <option value="COMPLETED">COMPLETED</option>
+                        <option value="FAILED">
+                            FAILED
+                        </option>
 
-        <option value="PENDING">PENDING</option>
+                    </select>
 
-        <option value="FAILED">FAILED</option>
+                </div>
 
-    </select>
+            </div>
 
-    <br><br>
+            <button
+                    type="submit"
+                    class="btn">
 
+                + Record Payment
 
-    <button type="submit">Add Payment</button>
+            </button>
 
-</form>
+        </form>
 
+    </div>
 
-<hr>
+    <div class="card">
 
+        <h3>All Payments</h3>
 
-<!-- Payment Table -->
+        <div class="table-container">
 
-<h2>All Payments</h2>
+            <table>
 
-<table border="1">
+                <thead>
 
-    <thead>
+                <tr>
 
-    <tr>
-        <th>Payment ID</th>
-        <th>Invoice</th>
-        <th>Payment Date</th>
-        <th>Amount</th>
-        <th>Payment Method</th>
-        <th>Payment Status</th>
-        <th>Actions</th>
-    </tr>
+                    <th>ID</th>
 
-    </thead>
+                    <th>Invoice</th>
 
+                    <th>Customer</th>
 
-    <tbody>
+                    <th>Date</th>
 
-    <tr th:each="payment : ${payments}">
+                    <th>Paid Amount</th>
 
-        <td th:text="${payment.paymentId}"></td>
+                    <th>Invoice Remaining</th>
 
-        <td th:text="${payment.invoice.invoiceNumber}"></td>
+                    <th>Method</th>
 
-        <td th:text="${payment.paymentDate}"></td>
+                    <th>Payment Status</th>
 
-        <td th:text="${payment.amount}"></td>
+                    <th>Actions</th>
 
-        <td th:text="${payment.paymentMethod}"></td>
+                </tr>
 
-        <td th:text="${payment.paymentStatus}"></td>
+                </thead>
 
-        <td>
 
-            <a th:href="@{/payments/edit/{id}(id=${payment.paymentId})}">
-                Edit
-            </a>
+                <tbody>
 
-            <form
-                    th:action="@{/payments/delete/{id}(id=${payment.paymentId})}"
-                    method="post"
-                    style="display:inline;">
+                <tr th:each="payment : ${payments}">
 
-                <button
-                        type="submit"
-                        onclick="return confirm('Are you sure you want to delete this payment?')">
+                    <td th:text="${payment.paymentId}">
+                    </td>
 
-                    Delete
+                    <td
+                            th:text="${payment.invoice.invoiceNumber}">
+                    </td>
 
-                </button>
+                    <td
+                            th:text="${payment.invoice.customerName}">
+                    </td>
 
-            </form>
+                    <td
+                            th:text="${payment.paymentDate}">
+                    </td>
 
-        </td>
+                    <td
+                            class="amount"
+                            th:text="${'LKR ' + payment.amount}">
+                    </td>
 
-    </tr>
+                    <td
+                            class="amount"
+                            style="font-weight: bold; color: #dc2626;"
+                            th:text="${'LKR ' + outstandingBalances[payment.invoice.invoiceId]}">
+                    </td>
 
-    </tbody>
+                    <td
+                            th:text="${payment.paymentMethod}">
+                    </td>
 
-</table>
+                    <td>
 
+                        <span
+                                class="status"
+                                th:classappend="${payment.paymentStatus == 'COMPLETED'
+                                    ? ' status-completed'
+                                    : payment.paymentStatus == 'PENDING'
+                                    ? ' status-pending'
+                                    : ' status-failed'}"
+                                th:text="${payment.paymentStatus}">
 
-<!-- JavaScript for Invoice Billing Information -->
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <a
+                                class="action-link"
+                                th:href="@{/payments/edit/{id}(id=${payment.paymentId})}">
+
+                            Edit
+
+                        </a>
+
+
+                        <form
+                                th:action="@{/payments/delete/{id}(id=${payment.paymentId})}"
+                                method="post"
+                                style="display:inline;">
+
+                            <button
+                                    type="submit"
+                                    class="delete-btn"
+                                    onclick="return confirm('Are you sure you want to delete this payment?')">
+
+                                Delete
+
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const invoiceSelect = document.getElementById("invoiceId");
+        const summaryBox = document.getElementById("paymentSummaryBox");
+        const summaryTotal = document.getElementById("summaryTotal");
+        const summaryPaid = document.getElementById("summaryPaid");
+        const summaryRemaining = document.getElementById("summaryRemaining");
+        const summaryStatusBadge = document.getElementById("summaryStatusBadge");
+        const amountInput = document.getElementById("amount");
 
-    document.getElementById("invoiceId").addEventListener("change", function () {
-
-        const invoiceId = this.value;
-
-        const invoiceTotalElement =
-            document.getElementById("invoiceTotal");
-
-        const outstandingBalanceElement =
-            document.getElementById("outstandingBalance");
-
-
-        // Reset values when no invoice is selected
-
-        if (!invoiceId) {
-
-            invoiceTotalElement.textContent = "-";
-
-            outstandingBalanceElement.textContent = "-";
-
-            return;
+        // Set default payment date to now
+        const paymentDateInput = document.getElementById("paymentDate");
+        if (paymentDateInput && !paymentDateInput.value) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            paymentDateInput.value = now.toISOString().slice(0, 16);
         }
 
+        invoiceSelect.addEventListener("change", function () {
+            const selectedOpt = this.options[this.selectedIndex];
+            if (!selectedOpt || !selectedOpt.value) {
+                summaryBox.style.display = "none";
+                amountInput.value = "";
+                amountInput.removeAttribute("max");
+                return;
+            }
 
-        // Get invoice information
+            const total = parseFloat(selectedOpt.getAttribute("data-total")) || 0;
+            const paid = parseFloat(selectedOpt.getAttribute("data-paid")) || 0;
+            const remaining = parseFloat(selectedOpt.getAttribute("data-remaining")) || 0;
+            const status = selectedOpt.getAttribute("data-status") || "UNPAID";
 
-        fetch("/api/invoices/" + invoiceId)
+            summaryTotal.textContent = "LKR " + total.toFixed(2);
+            summaryPaid.textContent = "LKR " + paid.toFixed(2);
+            summaryRemaining.textContent = "LKR " + remaining.toFixed(2);
+            
+            summaryStatusBadge.textContent = status;
+            summaryStatusBadge.className = "status " + (
+                status === "PAID" ? "status-paid" : (status === "PARTIAL" ? "status-partial" : "status-unpaid")
+            );
 
-            .then(response => {
+            summaryBox.style.display = "block";
 
-                if (!response.ok) {
-                    throw new Error("Could not load invoice");
-                }
-
-                return response.json();
-
-            })
-
-            .then(invoice => {
-
-                invoiceTotalElement.textContent =
-                    invoice.totalAmount;
-
-            })
-
-            .catch(error => {
-
-                console.error("Error loading invoice:", error);
-
-                invoiceTotalElement.textContent = "Error";
-
-            });
-
-
-        // Get outstanding balance
-
-        fetch(
-            "/api/payments/invoice/"
-            + invoiceId
-            + "/outstanding-balance"
-        )
-
-            .then(response => {
-
-                if (!response.ok) {
-                    throw new Error("Could not load balance");
-                }
-
-                return response.json();
-
-            })
-
-            .then(balance => {
-
-                outstandingBalanceElement.textContent =
-                    balance;
-
-            })
-
-            .catch(error => {
-
-                console.error(
-                    "Error loading outstanding balance:",
-                    error
-                );
-
-                outstandingBalanceElement.textContent =
-                    "Error";
-
-            });
-
+            // Autofill the remaining amount in payment input field
+            amountInput.value = remaining > 0 ? remaining.toFixed(2) : "0.00";
+            amountInput.setAttribute("max", remaining);
+        });
     });
-    const paymentForm = document.querySelector("form[action='/payments/add']");
-const paymentAmount = document.getElementById("amount");
-const amountError = document.getElementById("amountError");
-
-paymentForm.addEventListener("submit", function (event) {
-
-    const outstandingText =
-        document.getElementById("outstandingBalance").textContent;
-
-    const outstandingBalance =
-        parseFloat(outstandingText);
-
-    const amount =
-        parseFloat(paymentAmount.value);
-
-    if (!isNaN(outstandingBalance)
-            && !isNaN(amount)
-            && amount > outstandingBalance) {
-
-        event.preventDefault();
-
-        amountError.style.display = "block";
-
-        paymentAmount.focus();
-
-        return;
-    }
-
-    amountError.style.display = "none";
-});
-
 </script>
-
 
 </body>
 

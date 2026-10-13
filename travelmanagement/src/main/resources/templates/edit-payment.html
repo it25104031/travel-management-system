@@ -1,142 +1,699 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Edit Payment</title>]
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <div th:if="${errorMessage}"
-         style="color: red; margin-bottom: 15px;">
+    <title>Edit Payment | Dahamdi Pilgrims & Tours</title>
 
-        <strong th:text="${errorMessage}"></strong>
 
-    </div>
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f8;
+            color: #1f2937;
+        }
+
+
+        /* =========================
+           NAVBAR
+        ========================== */
+
+        .navbar {
+            background: #111827;
+            color: white;
+
+            padding: 18px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+
+        .navbar span {
+            font-size: 14px;
+            color: #d1d5db;
+        }
+
+
+        /* =========================
+           CONTAINER
+        ========================== */
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+
+            margin: 40px auto;
+        }
+
+
+        /* =========================
+           PAGE HEADER
+        ========================== */
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+
+        .page-header h2 {
+            margin: 0 0 8px 0;
+
+            font-size: 28px;
+            color: #111827;
+        }
+
+
+        .page-header p {
+            margin: 0;
+
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           ALERT
+        ========================== */
+
+        .alert {
+            background: #fee2e2;
+
+            border-left: 5px solid #dc2626;
+
+            color: #991b1b;
+
+            padding: 14px 16px;
+
+            margin-bottom: 25px;
+
+            border-radius: 6px;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           CARD
+        ========================== */
+
+        .card {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 10px;
+
+            box-shadow:
+                    0 2px 10px rgba(0,0,0,0.08);
+        }
+
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 25px;
+
+            font-size: 20px;
+
+            color: #111827;
+        }
+
+
+        /* =========================
+           FORM
+        ========================== */
+
+        .form-grid {
+            display: grid;
+
+            grid-template-columns:
+                    repeat(2, 1fr);
+
+            gap: 22px;
+        }
+
+
+        .form-group {
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+
+        label {
+            margin-bottom: 8px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            color: #374151;
+        }
+
+
+        input,
+        select {
+            width: 100%;
+
+            padding: 12px 13px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 6px;
+
+            font-size: 14px;
+
+            background: white;
+
+            color: #111827;
+
+            outline: none;
+
+            transition:
+                    border-color 0.2s,
+                    box-shadow 0.2s;
+        }
+
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                    0 0 0 3px rgba(37,99,235,0.12);
+        }
+
+
+        /* =========================
+           READONLY
+        ========================== */
+
+        input[readonly] {
+            background: #f3f4f6;
+
+            color: #6b7280;
+
+            cursor: not-allowed;
+        }
+
+
+        /* =========================
+           BUTTON ROW
+        ========================== */
+
+        .button-row {
+            display: flex;
+
+            gap: 12px;
+
+            margin-top: 30px;
+        }
+
+
+        .update-btn {
+            padding: 12px 22px;
+
+            border: none;
+
+            border-radius: 6px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+            transition: background 0.2s;
+        }
+
+
+        .update-btn:hover {
+            background: #1d4ed8;
+        }
+
+
+        .back-btn {
+            display: inline-block;
+
+            padding: 12px 22px;
+
+            border-radius: 6px;
+
+            background: #6b7280;
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            transition: background 0.2s;
+        }
+
+
+        .back-btn:hover {
+            background: #4b5563;
+        }
+
+
+        /* =========================
+           INFORMATION BOX
+        ========================== */
+
+        .info-box {
+            margin-top: 25px;
+
+            padding: 15px;
+
+            background: #eff6ff;
+
+            border-left: 4px solid #2563eb;
+
+            border-radius: 6px;
+
+            color: #1e40af;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                padding: 15px 20px;
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 5px;
+            }
+
+
+            .navbar h1 {
+                font-size: 18px;
+            }
+
+
+            .navbar span {
+                font-size: 12px;
+            }
+
+
+            .container {
+                width: 94%;
+
+                margin: 25px auto;
+            }
+
+
+            .card {
+                padding: 20px;
+            }
+
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+
+
+            .button-row {
+                flex-direction: column;
+            }
+
+
+            .update-btn,
+            .back-btn {
+                width: 100%;
+
+                text-align: center;
+            }
+
+        }
+
+    </style>
 
 </head>
 
+
 <body>
 
-<h1>Edit Payment</h1>
 
-<form th:action="@{/payments/update/{id}(id=${payment.paymentId})}"
-      method="post">
+<!-- =========================
+     NAVIGATION
+========================== -->
 
-    <!-- Invoice -->
+<div class="navbar">
 
-    <label for="invoiceId">Invoice:</label>
+    <h1>
+        Dahamdi Pilgrims & Tours
+    </h1>
 
-    <select id="invoiceId"
-            name="invoiceId"
-            required>
+    <span>
+        Admin Operations & Billing
+    </span>
 
-        <option
-                th:each="invoice : ${invoices}"
-                th:value="${invoice.invoiceId}"
-                th:text="${invoice.invoiceNumber + ' - ' + invoice.customerName}"
-                th:selected="${invoice.invoiceId == payment.invoice.invoiceId}">
-        </option>
-
-    </select>
-
-    <br><br>
+</div>
 
 
-    <!-- Payment Date -->
+<!-- =========================
+     MAIN CONTAINER
+========================== -->
 
-    <label for="paymentDate">Payment Date:</label>
-
-    <input
-            type="datetime-local"
-            id="paymentDate"
-            name="paymentDate"
-            th:value="${#temporals.format(payment.paymentDate, 'yyyy-MM-dd''T''HH:mm')}"
-            required>
-
-    <br><br>
+<div class="container">
 
 
-    <!-- Amount -->
+    <!-- =========================
+         PAGE HEADER
+    ========================== -->
 
-    <label for="amount">Amount:</label>
+    <div class="page-header">
 
-    <input
-            type="number"
-            id="amount"
-            name="amount"
-            step="0.01"
-            th:value="${payment.amount}"
-            required>
+        <h2>
+            Edit Payment
+        </h2>
 
-    <br><br>
+        <p>
+            Update payment information and payment details.
+        </p>
 
-
-    <!-- Payment Method -->
-
-    <label for="paymentMethod">Payment Method:</label>
-
-    <select
-            id="paymentMethod"
-            name="paymentMethod"
-            required>
-
-        <option value="CASH"
-                th:selected="${payment.paymentMethod == 'CASH'}">
-            CASH
-        </option>
-
-        <option value="CARD"
-                th:selected="${payment.paymentMethod == 'CARD'}">
-            CARD
-        </option>
-
-        <option value="BANK_TRANSFER"
-                th:selected="${payment.paymentMethod == 'BANK_TRANSFER'}">
-            BANK TRANSFER
-        </option>
-
-    </select>
-
-    <br><br>
+    </div>
 
 
-    <!-- Payment Status -->
+    <!-- =========================
+         ERROR MESSAGE
+    ========================== -->
 
-    <label for="paymentStatus">Payment Status:</label>
+    <div
+            th:if="${errorMessage}"
+            class="alert">
 
-    <select
-            id="paymentStatus"
-            name="paymentStatus"
-            required>
+        <strong
+                th:text="${errorMessage}">
+        </strong>
 
-        <option value="COMPLETED"
-                th:selected="${payment.paymentStatus == 'COMPLETED'}">
-            COMPLETED
-        </option>
-
-        <option value="PENDING"
-                th:selected="${payment.paymentStatus == 'PENDING'}">
-            PENDING
-        </option>
-
-        <option value="FAILED"
-                th:selected="${payment.paymentStatus == 'FAILED'}">
-            FAILED
-        </option>
-
-    </select>
-
-    <br><br>
+    </div>
 
 
-    <button type="submit">Update Payment</button>
+    <!-- =========================
+         EDIT PAYMENT CARD
+    ========================== -->
 
-</form>
+    <div class="card">
 
-<br>
+        <h3>
+            Payment Details
+        </h3>
 
-<a href="/payments">Back to Payments</a>
+
+        <form
+                th:action="@{/payments/update/{id}(id=${payment.paymentId})}"
+                method="post">
+
+
+            <div class="form-grid">
+
+
+                <!-- =========================
+                     INVOICE
+                ========================== -->
+
+                <div class="form-group full-width">
+
+                    <label for="invoiceId">
+                        Invoice
+                    </label>
+
+                    <select
+                            id="invoiceId"
+                            name="invoiceId"
+                            required>
+
+                        <option
+                                value="">
+                            -- Select Invoice --
+                        </option>
+
+
+                        <option
+                                th:each="invoice : ${invoices}"
+                                th:value="${invoice.invoiceId}"
+                                th:text="${invoice.invoiceNumber + ' - ' + invoice.customerName + ' (Total: LKR ' + invoice.totalAmount + ' | Remaining: LKR ' + outstandingBalances[invoice.invoiceId] + ' [' + calculatedStatuses[invoice.invoiceId] + '])'}"
+                                th:selected="${payment.invoice != null and payment.invoice.invoiceId == invoice.invoiceId}">
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================
+                     PAYMENT DATE
+                ========================== -->
+
+                <div class="form-group">
+
+                    <label for="paymentDate">
+                        Payment Date
+                    </label>
+
+                    <input
+                            type="datetime-local"
+                            id="paymentDate"
+                            name="paymentDate"
+
+                            th:value="${#temporals.format(payment.paymentDate, 'yyyy-MM-dd''T''HH:mm')}"
+
+                            required>
+
+                </div>
+
+
+                <!-- =========================
+                     PAYMENT AMOUNT
+                ========================== -->
+
+                <div class="form-group">
+
+                    <label for="amount">
+                        Payment Amount
+                    </label>
+
+                    <input
+                            type="number"
+                            id="amount"
+                            name="amount"
+
+                            step="0.01"
+                            min="0.01"
+                            min="0"
+
+                            th:value="${payment.amount}"
+
+                            placeholder="0.00"
+
+                            required>
+
+                </div>
+
+
+                <!-- =========================
+                     PAYMENT METHOD
+                ========================== -->
+
+                <div class="form-group">
+
+                    <label for="paymentMethod">
+                        Payment Method
+                    </label>
+
+                    <select
+                            id="paymentMethod"
+                            name="paymentMethod"
+                            required>
+
+                        <option
+                                value="">
+                            -- Select Method --
+                        </option>
+
+
+                        <option
+                                value="CASH"
+                                th:selected="${payment.paymentMethod == 'CASH'}">
+                            Cash
+                        </option>
+
+
+                        <option
+                                value="CARD"
+                                th:selected="${payment.paymentMethod == 'CARD'}">
+                            Card
+                        </option>
+
+
+                        <option
+                                value="BANK_TRANSFER"
+                                th:selected="${payment.paymentMethod == 'BANK_TRANSFER'}">
+                            Bank Transfer
+                        </option>
+
+
+                        <option
+                                value="ONLINE"
+                                th:selected="${payment.paymentMethod == 'ONLINE'}">
+                            Online Payment
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================
+                     PAYMENT STATUS
+                ========================== -->
+
+                <div class="form-group">
+
+                    <label for="paymentStatus">
+                        Payment Status
+                    </label>
+
+                    <select
+                            id="paymentStatus"
+                            name="paymentStatus"
+                            required>
+
+                        <option
+                                value="">
+                            -- Select Status --
+                        </option>
+
+
+                        <option
+                                value="COMPLETED"
+                                th:selected="${payment.paymentStatus == 'COMPLETED'}">
+                            Completed
+                        </option>
+
+
+                        <option
+                                value="PENDING"
+                                th:selected="${payment.paymentStatus == 'PENDING'}">
+                            Pending
+                        </option>
+
+
+                        <option
+                                value="FAILED"
+                                th:selected="${payment.paymentStatus == 'FAILED'}">
+                            Failed
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 BUTTONS
+            ========================== -->
+
+            <div class="button-row">
+
+                <button
+                        type="submit"
+                        class="update-btn">
+
+                    Update Payment
+
+                </button>
+
+
+                <a
+                        href="/payments"
+                        class="back-btn">
+
+                    Back to Payments
+
+                </a>
+
+            </div>
+
+        </form>
+
+
+        <!-- =========================
+             INFORMATION
+        ========================== -->
+
+        <div class="info-box">
+
+            <strong>Payment Validation:</strong>
+
+            The payment amount cannot be greater than
+            the outstanding balance of the selected invoice.
+
+            When editing an existing payment, the current
+            payment is excluded from the outstanding-balance
+            calculation.
+
+        </div>
+
+    </div>
+
+</div>
+
 
 </body>
 
