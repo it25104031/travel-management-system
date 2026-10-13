@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Payments')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Payments</h1><p>Every payment is checked against the invoice balance, and the invoice status updates straight away.</p></div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+
+    <details class="box" open>
+        <summary>Record a payment</summary>
+        <div class="box-body">
+            <form th:action="@{/billing/payments/add}" method="post">
+                <div class="field"><label for="invoiceId">Invoice</label>
+                    <select id="invoiceId" name="invoiceId" required>
+                        <option value="">Choose an invoice...</option>
+                        <option th:each="invoice : ${invoices}" th:value="${invoice.invoiceId}"
+                                th:attr="data-total=${invoice.totalAmount},data-paid=${paidAmounts[invoice.invoiceId]},data-remaining=${outstandingBalances[invoice.invoiceId]},data-status=${calculatedStatuses[invoice.invoiceId]}"
+                                th:text="${invoice.invoiceNumber} + ' - ' + ${invoice.customerName} + ' (balance LKR ' + ${#numbers.formatDecimal(outstandingBalances[invoice.invoiceId], 1, 'COMMA', 2, 'POINT')} + ')'"></option>
+                    </select></div>
+                <div class="stat-grid" id="paymentSummaryBox" hidden>
+                    <div class="stat-tile"><div class="stat" id="summaryTotal">0</div><div class="stat-label">Invoice total (LKR)</div></div>
+                    <div class="stat-tile"><div class="stat" id="summaryPaid">0</div><div class="stat-label">Paid so far (LKR)</div></div>
+                    <div class="stat-tile attention"><div class="stat" id="summaryRemaining">0</div><div class="stat-label">Balance (LKR)</div></div>
+                    <div class="stat-tile"><div style="margin-top:6px"><span id="summaryStatusBadge" class="badge">UNPAID</span></div><div class="stat-label">Status</div></div>
+                </div>
+                <div class="form-grid">
+                    <div><label for="paymentDate">Payment date</label><input type="datetime-local" id="paymentDate" name="paymentDate" required></div>
+                    <div><label for="amount">Amount (LKR)</label><input type="number" id="amount" name="amount" step="0.01" min="0.01" required></div>
+                    <div><label for="paymentMethod">Method</label>
+                        <select id="paymentMethod" name="paymentMethod" required>
+                            <option value="CASH">Cash</option>
+                            <option value="CARD">Card</option>
+                            <option value="BANK_TRANSFER">Bank transfer</option>
+                            <option value="ONLINE">Online payment</option>
+                        </select></div>
+                    <div><label for="paymentStatus">Status</label>
+                        <select id="paymentStatus" name="paymentStatus" required>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="FAILED">Failed</option>
+                        </select></div>
+                </div>
+                <button type="submit" class="btn">Record payment</button>
+            </form>
+        </div>
+    </details>
+
+    <div class="toolbar"><div class="grow"><label for="q">Search</label><input id="q" type="search" data-filter="#paymentTable" placeholder="Invoice, customer or method"></div></div>
+    <div class="table-wrap">
+        <table id="paymentTable">
+            <thead><tr><th>#</th><th>Invoice</th><th>Customer</th><th>Date</th><th class="num">Amount</th><th class="num">Invoice balance</th><th>Method</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="payment : ${payments}">
+                <td th:text="${payment.paymentId}">1</td>
+                <td class="nowrap" th:text="${payment.invoice.invoiceNumber}">INV</td>
+                <td th:text="${payment.invoice.customerName}">customer</td>
+                <td class="nowrap" th:text="${#temporals.format(payment.paymentDate, 'd MMM yyyy, HH:mm')}">date</td>
+                <td class="num" th:text="${#numbers.formatDecimal(payment.amount, 1, 'COMMA', 2, 'POINT')}">0</td>
+                <td class="num" th:text="${#numbers.formatDecimal(outstandingBalances[payment.invoice.invoiceId], 1, 'COMMA', 2, 'POINT')}">0</td>
+                <td th:text="${payment.paymentMethod == 'SLIP_TRANSFER'} ? 'Bank slip' : ${#strings.capitalize(#strings.toLowerCase(#strings.replace(payment.paymentMethod, '_', ' ')))}">Cash</td>
+                <td><span class="badge" th:classappend="'badge-' + ${payment.paymentStatus}" th:text="${payment.paymentStatus}">COMPLETED</span></td>
+                <td class="nowrap">
+                    <a class="btn btn-outline btn-sm" th:href="@{/billing/payments/edit/{id}(id=${payment.paymentId})}">Edit</a>
+                    <form th:if="${isAdmin}" th:action="@{/billing/payments/delete/{id}(id=${payment.paymentId})}" method="post" class="inline"
+                          data-confirm="Delete this payment? The invoice balance will go back up.">
+                        <button type="submit" class="btn btn-red btn-sm">Delete</button></form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(payments)}" data-empty><td colspan="9" class="empty">No payments recorded yet.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+<script>
+    (function () {
+        var select = document.getElementById('invoiceId'), box = document.getElementById('paymentSummaryBox'),
+            amount = document.getElementById('amount'), date = document.getElementById('paymentDate'),
+            badge = document.getElementById('summaryStatusBadge');
+        var fmt = function (n) { return n.toLocaleString('en-LK', {minimumFractionDigits: 2, maximumFractionDigits: 2}); };
+        if (date && !date.value) {
+            var now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            date.value = now.toISOString().slice(0, 16);
+        }
+        select.addEventListener('change', function () {
+            var o = select.options[select.selectedIndex];
+            if (!o || !o.value) { box.hidden = true; amount.value = ''; amount.removeAttribute('max'); return; }
+            var total = parseFloat(o.dataset.total) || 0, paid = parseFloat(o.dataset.paid) || 0,
+                remaining = parseFloat(o.dataset.remaining) || 0, status = o.dataset.status || 'UNPAID';
+            document.getElementById('summaryTotal').textContent = fmt(total);
+            document.getElementById('summaryPaid').textContent = fmt(paid);
+            document.getElementById('summaryRemaining').textContent = fmt(remaining);
+            badge.textContent = status; badge.className = 'badge badge-' + status;
+            box.hidden = false;
+            amount.value = remaining > 0 ? remaining.toFixed(2) : '0.00';
+            amount.max = remaining;
+        });
+    })();
+</script>
+</body>
+</html>

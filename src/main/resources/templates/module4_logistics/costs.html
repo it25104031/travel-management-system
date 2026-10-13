@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Departure costs')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Departure costs</h1><p>What each trip costs in hotels, transport and staff, what has been paid to suppliers, and what is still owed.</p></div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Departure</th><th>Destination</th><th>Dates</th><th class="num">Supplier cost (LKR)</th><th class="num">Paid (LKR)</th><th class="num">Still owed (LKR)</th><th style="width:160px">Paid so far</th></tr></thead>
+            <tbody>
+            <tr th:each="d : ${departures}" th:with="c=${costs[d.id]}, p=${paid[d.id]}, o=${costs[d.id].subtract(paid[d.id])}">
+                <td><b th:text="${d.reference}">REF</b><div class="muted" th:text="${d.packageName}">pkg</div></td>
+                <td th:text="${d.destination}">dest</td>
+                <td class="nowrap" th:text="${#temporals.format(d.startDate, 'd MMM')} + ' - ' + ${#temporals.format(d.endDate, 'd MMM yyyy')}">dates</td>
+                <td class="num" th:text="${#numbers.formatDecimal(c, 1, 'COMMA', 2, 'POINT')}">0</td>
+                <td class="num" th:text="${#numbers.formatDecimal(p, 1, 'COMMA', 2, 'POINT')}">0</td>
+                <td class="num" th:text="${#numbers.formatDecimal(o, 1, 'COMMA', 2, 'POINT')}">0</td>
+                <td th:with="pct=${c.signum() > 0 ? p.multiply(100).divide(c, 0, T(java.math.RoundingMode).DOWN) : 100}">
+                    <div class="progress" th:classappend="${pct < 100} ? 'low'"><div th:style="'width:' + ${pct} + '%'" th:text="${pct} + '%'">0%</div></div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(departures)}" data-empty><td colspan="7" class="empty">Add a trip on the <a href="/logistics/departures">Trip departures</a> page first.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

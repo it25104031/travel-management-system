@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Travellers')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Travellers</h1><p>People who created an account on the website. Deactivating an account stops them signing in; their bookings stay.</p></div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+    <div class="toolbar"><div class="grow"><label for="q">Search</label><input id="q" type="search" data-filter="#customerTable" placeholder="Name, email or phone"></div></div>
+    <div class="table-wrap">
+        <table id="customerTable">
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Last sign-in</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="c : ${customers}">
+                <td><b th:text="${c.fullName}">name</b></td>
+                <td th:text="${c.email}">email</td>
+                <td th:text="${c.phone ?: '-'}">phone</td>
+                <td class="nowrap" th:text="${c.createdAt != null} ? ${#temporals.format(c.createdAt, 'd MMM yyyy')} : '-'">date</td>
+                <td class="nowrap" th:text="${c.lastLoginAt != null} ? ${#temporals.format(c.lastLoginAt, 'd MMM yyyy, HH:mm')} : '-'">date</td>
+                <td><span class="badge" th:classappend="${c.activeAccount} ? 'badge-green' : 'badge-gray'" th:text="${c.activeAccount} ? 'Active' : 'Deactivated'">Active</span></td>
+                <td>
+                    <form th:if="${c.activeAccount}" th:action="@{/admin/customers/{id}/deactivate(id=${c.id})}" method="post" class="inline" data-confirm="Deactivate this traveller account?">
+                        <button class="btn btn-red btn-sm" type="submit">Deactivate</button></form>
+                    <form th:unless="${c.activeAccount}" th:action="@{/admin/customers/{id}/activate(id=${c.id})}" method="post" class="inline">
+                        <button class="btn btn-outline btn-sm" type="submit">Reactivate</button></form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(customers)}" data-empty><td colspan="7" class="empty">No one has signed up on the website yet.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

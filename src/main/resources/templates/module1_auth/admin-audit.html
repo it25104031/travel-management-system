@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Authentication Audit Log')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="panel">
+        <h2>Authentication Audit Log</h2>
+        <form method="get" action="/admin/audit" class="row">
+            <div><label>Filter by username / reference number</label><input type="text" name="username" th:value="${username}"></div>
+            <div style="flex:0;"><button type="submit" class="btn">Filter</button></div>
+            <div style="flex:0;"><a href="/admin/audit" class="btn btn-gray">Clear</a></div>
+        </form>
+        <p class="muted">Most recent 300 events.</p>
+        <table>
+            <thead><tr><th>Time</th><th>Username / Ref</th><th>Event</th><th>IP address</th><th>Details</th></tr></thead>
+            <tbody>
+            <tr th:each="e : ${entries}">
+                <td th:text="${#temporals.format(e.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td th:text="${e.username}"></td>
+                <td><span class="badge" th:classappend="${#strings.contains(e.eventType.name(), 'FAILURE')} ? 'badge-red' : (${#strings.contains(e.eventType.name(), 'SUCCESS')} ? 'badge-green' : '')"
+                          th:text="${e.eventType}"></span></td>
+                <td th:text="${e.ipAddress}"></td>
+                <td th:text="${e.details}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(entries)}"><td colspan="5" class="muted">No events.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

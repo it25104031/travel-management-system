@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Reports')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="panel">
+        <h2>Visa Processing Reports</h2>
+        <div class="cards">
+            <div class="card"><div class="muted">Applications</div><div class="stat" th:text="${summary.total}">0</div></div>
+            <div class="card"><div class="muted">Approval rate (of decided)</div><div class="stat" th:text="${summary.approvalRate} + '%'">0%</div></div>
+            <div class="card"><div class="muted">Average processing time</div><div class="stat" th:text="${summary.avgProcessingDays} + ' days'">0</div></div>
+        </div>
+    </div>
+    <div class="grid-2">
+        <div class="panel">
+            <h3>By status</h3>
+            <table><tr th:each="e : ${summary.byStatus}"><td><span class="badge" th:classappend="'badge-' + ${e.key}" th:text="${e.key}"></span></td><td th:text="${e.value}"></td></tr></table>
+            <h3>By visa type</h3>
+            <table><tr th:each="e : ${summary.byVisaService}"><td th:text="${e.key}"></td><td th:text="${e.value}"></td></tr></table>
+        </div>
+        <div class="panel">
+            <h3>Approval rate by destination</h3>
+            <table>
+                <tr><th>Country</th><th>Applications</th><th>Approved</th><th>Rejected</th><th>Approval rate</th></tr>
+                <tr th:each="c : ${summary.byCountry}"><td th:text="${c.countryCode}"></td><td th:text="${c.total}"></td>
+                    <td th:text="${c.approved}"></td><td th:text="${c.rejected}"></td><td th:text="${c.approvalRate} + '%'"></td></tr>
+            </table>
+            <h3>Incidents by type</h3>
+            <table>
+                <tr th:each="e : ${summary.incidentsByType}"><td th:text="${e.key}"></td><td th:text="${e.value}"></td></tr>
+                <tr th:if="${summary.incidentsByType.isEmpty()}"><td class="muted">No incidents recorded.</td></tr>
+            </table>
+        </div>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

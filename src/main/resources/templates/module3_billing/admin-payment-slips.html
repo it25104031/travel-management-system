@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Bank slips')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Bank slips</h1><p>Transfer slips uploaded by travellers. Accepting a slip records a completed payment on its invoice.</p></div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+    <nav class="tabs" aria-label="Filter slips">
+        <a th:href="@{/billing/slips(status='PENDING')}" th:classappend="${selectedStatus == 'PENDING'} ? 'active'">Waiting for review</a>
+        <a th:href="@{/billing/slips(status='APPROVED')}" th:classappend="${selectedStatus == 'APPROVED'} ? 'active'">Accepted</a>
+        <a th:href="@{/billing/slips(status='REJECTED')}" th:classappend="${selectedStatus == 'REJECTED'} ? 'active'">Rejected</a>
+        <a th:href="@{/billing/slips(status='ALL')}" th:classappend="${selectedStatus == 'ALL'} ? 'active'">All</a>
+    </nav>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Slip</th><th>Uploaded by</th><th>Invoice</th><th class="num">Amount (LKR)</th><th>Transfer date</th><th>Bank ref</th><th>File</th><th>Status</th><th style="min-width:300px">Review</th></tr></thead>
+            <tbody>
+            <tr th:each="slip : ${slips}">
+                <td class="nowrap"><b th:text="'#' + ${slip.slipId}">#1</b><div class="muted" th:text="${#temporals.format(slip.createdAt, 'd MMM, HH:mm')}">date</div></td>
+                <td><span th:text="${slip.uploaderName}">name</span><div class="muted" th:text="${slip.uploaderEmail}">email</div></td>
+                <td class="nowrap"><a th:if="${slip.invoice != null}" th:href="@{/billing/invoices/edit/{id}(id=${slip.invoice.invoiceId})}" th:text="${slip.invoice.invoiceNumber}">INV</a></td>
+                <td class="num" th:text="${#numbers.formatDecimal(slip.amountPaid, 1, 'COMMA', 2, 'POINT')}">0</td>
+                <td class="nowrap" th:text="${#temporals.format(slip.paymentDate, 'd MMM yyyy')}">date</td>
+                <td th:text="${!#strings.isEmpty(slip.bankReference)} ? ${slip.bankReference} : '-'">-</td>
+                <td class="nowrap"><a th:href="@{/billing/slips/file/{id}(id=${slip.slipId})}" target="_blank" rel="noopener">View</a>
+                    <span class="muted">/</span> <a th:href="@{/billing/slips/file/{id}/download(id=${slip.slipId})}">Download</a></td>
+                <td><span class="badge" th:classappend="'badge-' + ${slip.status}" th:text="${slip.status == 'PENDING'} ? 'Waiting' : (${slip.status == 'APPROVED'} ? 'Accepted' : 'Rejected')">x</span></td>
+                <td>
+                    <th:block th:if="${slip.status == 'PENDING'}">
+                        <form th:action="@{/billing/slips/{id}/approve(id=${slip.slipId})}" method="post" class="actions" style="margin-bottom:6px"
+                              data-confirm="Accept this slip? A completed payment will be added to the invoice.">
+                            <input type="hidden" name="currentStatus" th:value="${selectedStatus}">
+                            <input type="text" name="adminRemark" placeholder="Note (optional)" style="flex:1;min-width:120px" aria-label="Note">
+                            <button type="submit" class="btn btn-green btn-sm">Accept</button>
+                        </form>
+                        <form th:action="@{/billing/slips/{id}/reject(id=${slip.slipId})}" method="post" class="actions"
+                              data-confirm="Reject this slip?">
+                            <input type="hidden" name="currentStatus" th:value="${selectedStatus}">
+                            <input type="text" name="adminRemark" placeholder="Reason the traveller will see" style="flex:1;min-width:120px" aria-label="Reason">
+                            <button type="submit" class="btn btn-red btn-sm">Reject</button>
+                        </form>
+                    </th:block>
+                    <span th:unless="${slip.status == 'PENDING'}" class="muted" th:text="${slip.adminRemark ?: 'No note'}">note</span>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(slips)}" data-empty><td colspan="9" class="empty">No slips in this view.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

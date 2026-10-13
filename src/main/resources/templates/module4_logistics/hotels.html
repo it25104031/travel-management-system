@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Hotels')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Hotels</h1><p>Rooms allocated to each departure. Room numbers are checked against the hotel’s agreed capacity.</p></div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+
+    <form class="panel" method="post" th:action="${editing != null ? '/logistics/hotels/' + editing.id + '/edit' : '/logistics/hotels'}" id="recordForm">
+        <h2 th:text="${editing != null ? 'Edit room allocation' : 'Allocate hotel rooms'}">Allocate hotel rooms</h2>
+        <div class="form-grid">
+                <div><label for="f-supplierId">Hotel</label><select id="f-supplierId" name="supplierId" required><option value="" th:selected="${editing == null}" disabled>Choose...</option><option th:each="supplier : ${suppliers}" th:if="${supplier.type == 'HOTEL'}" th:value="${supplier.id}" th:text="${supplier.name}" th:selected="${editing != null and #strings.toString(editing.supplierId) == #strings.toString(supplier.id)}"></option></select></div>
+                <div><label for="f-departureId">Departure</label><select id="f-departureId" name="departureId" required><option value="" th:selected="${editing == null}" disabled>Choose a departure...</option><option th:each="departure : ${departures}" th:value="${departure.id}" th:text="${departure.reference + ' - ' + departure.destination}" th:selected="${editing != null and #strings.toString(editing.departureId) == #strings.toString(departure.id)}"></option></select></div>
+                <div><label for="f-checkIn">Check-in</label><input id="f-checkIn" type="date" name="checkIn" required th:value="${editing != null ? editing.checkIn : ''}"></div>
+                <div><label for="f-checkOut">Check-out</label><input id="f-checkOut" type="date" name="checkOut" required th:value="${editing != null ? editing.checkOut : ''}"></div>
+                <div><label for="f-rooms">Rooms</label><input id="f-rooms" type="number" name="rooms" required min="1" th:value="${editing != null ? editing.rooms : ''}"></div>
+                <div><label for="f-cost">Total cost (LKR)</label><input id="f-cost" type="number" name="cost" required min="0" step="0.01" th:value="${editing != null ? editing.cost : ''}"></div>
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn" th:text="${editing != null ? 'Save changes' : 'Allocate rooms'}">Allocate rooms</button>
+            <a class="btn btn-ghost" th:if="${editing != null}" href="/logistics/hotels">Cancel</a>
+        </div>
+    </form>
+
+    <form method="post" action="/logistics/hotels/delete" data-bulk>
+        <div class="toolbar">
+            <div class="grow"><label for="q">Search</label><input id="q" type="search" data-filter="#recordTable" placeholder="Departure or hotel"></div>
+            <div th:if="${!#lists.isEmpty(hotels)}">
+                <button type="button" class="btn btn-red" data-bulk-start>Delete records</button>
+                <span class="actions" data-bulk-bar hidden>
+                    <button type="submit" class="btn btn-red" data-bulk-delete disabled>Delete selected (0)</button>
+                    <button type="button" class="btn btn-ghost" data-bulk-cancel>Cancel</button>
+                </span>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table id="recordTable">
+                <thead><tr><th class="sel-col" hidden><span class="sr-only">Select</span></th><th>Departure</th><th>Hotel</th><th>Stay</th><th class="num">Rooms</th><th class="num">Cost (LKR)</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="r : ${hotels}">
+                    <td class="sel-col" hidden><input type="checkbox" name="ids" th:value="${r.id}" aria-label="Select record" disabled></td>
+                    <td th:text="${r.departure.reference}"></td><td th:text="${r.supplier.name}"></td><td class="nowrap" th:text="${#temporals.format(r.checkIn, 'd MMM')} + ' - ' + ${#temporals.format(r.checkOut, 'd MMM yyyy')}"></td><td class="num" th:text="${r.rooms}"></td><td class="num" th:text="${#numbers.formatDecimal(r.cost, 1, 'COMMA', 2, 'POINT')}"></td>
+                    <td><a class="btn btn-outline btn-sm" th:href="@{/logistics/hotels/{id}/edit(id=${r.id})}">Edit</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(hotels)}" data-empty><td th:colspan="7" class="empty">No rooms allocated yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

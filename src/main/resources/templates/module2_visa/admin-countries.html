@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Manage Destination Countries')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="panel">
+        <h2>Destination Countries</h2>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+
+        <h3>Add New Destination Country</h3>
+        <form th:action="@{/admin/countries/add}" method="post" class="row">
+            <div><label>Country name</label><input type="text" name="countryName" placeholder="e.g. Sri Lanka" required></div>
+            <div><label>Code</label><input type="text" name="countryCode" placeholder="e.g. LK" required></div>
+            <div><label>Form route</label><input type="text" name="formRoute" placeholder="e.g. /visas/apply/srilanka" required></div>
+            <div style="flex:0;"><button type="submit" class="btn btn-green">Add Country</button></div>
+        </form>
+
+        <h3 style="margin-top: 30px;">Supported Countries</h3>
+        <table>
+            <thead><tr><th>Country</th><th>Code</th><th>Form Route</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+            <tr th:each="c : ${countries}">
+                <td th:text="${c.countryName}"></td>
+                <td th:text="${c.countryCode}"></td>
+                <td th:text="${c.formRoute}"></td>
+                <td><span class="badge" th:classappend="${c.isActive} ? 'badge-green' : 'badge-gray'" th:text="${c.isActive} ? 'Active' : 'Inactive'"></span></td>
+                <td>
+                    <form th:action="@{/admin/countries/{id}/toggle(id=${c.id})}" method="post" class="inline">
+                        <button type="submit" class="btn btn-sm" th:classappend="${c.isActive} ? 'btn-red' : 'btn-green'"
+                                th:text="${c.isActive} ? 'Deactivate' : 'Activate'"></button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="muted">Inactive destinations are hidden from the applicant country selector.</p>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('My visa application')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: portalNav}"></header>
+<main id="main" class="page" style="max-width: 900px;">
+    <div class="panel">
+        <h2>Hello, <span th:text="${app.fullName}"></span></h2>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+        <dl class="kv">
+            <dt>Reference number</dt><dd th:text="${account.referenceNo}"></dd>
+            <dt>Visa</dt><dd th:text="${app.visaService}"></dd>
+            <dt>Status</dt><dd><span class="badge" th:classappend="'badge-' + ${app.statusEnum}" th:text="${app.statusEnum.label}"></span></dd>
+            <dt>Passport</dt><dd><span th:text="${passportMasked}"></span>
+                <span class="badge" th:classappend="${passport.badgeClass}" th:text="${passport.label}"></span></dd>
+            <dt th:if="${app.departure != null}">Departure</dt>
+            <dd th:if="${app.departure != null}" th:text="${app.departure.tourName} + ' · ' + ${app.departure.departureDate} + ' to ' + ${app.departure.returnDate}"></dd>
+            <dt>Portal access until</dt><dd th:text="${#temporals.format(account.expiresAt, 'dd MMM yyyy')}"></dd>
+        </dl>
+        <div th:if="${app.statusEnum.name() == 'APPROVED'}" style="margin-top: 15px;">
+            <div class="alert alert-success">Your visa has been approved
+                <span th:if="${app.visaValidTo != null}" th:text="' (valid ' + ${app.visaValidFrom} + ' to ' + ${app.visaValidTo} + ', ' + ${app.entryType} + ' entry)'"></span>.</div>
+            <a th:if="${app.approvedVisaPath != null}" href="/portal/approved-visa" class="btn btn-green" target="_blank">Download your visa (PDF)</a>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3 style="margin-top:0;">Your documents</h3>
+        <table>
+            <thead><tr><th>Document</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+            <tr th:each="slot : ${slots}">
+                <td><strong th:text="${slot.label}"></strong>
+                    <div th:if="${slot.current != null}" class="muted">
+                        <a th:href="@{/portal/documents/{d}/file(d=${slot.current.id})}" target="_blank" th:text="${slot.current.fileName}"></a>
+                        <span th:text="' · version ' + ${slot.current.version}"></span>
+                    </div></td>
+                <td>
+                    <span th:if="${slot.current == null}" class="badge badge-red">MISSING</span>
+                    <span th:if="${slot.current != null}" class="badge" th:classappend="'badge-' + ${slot.current.statusEnum}"
+                          th:text="${slot.current.statusEnum.name() == 'UPLOADED'} ? 'UNDER REVIEW' : ${slot.current.statusEnum}"></span>
+                    <div th:if="${slot.current != null and slot.current.rejectionReason != null}" class="muted" style="color:#721c24;"
+                         th:text="${slot.current.rejectionReason}"></div>
+                </td>
+                <td>
+                    <form th:if="${slot.needsUpload() and slot.rule != null}" th:action="@{/portal/documents}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="docCode" th:value="${slot.docCode}">
+                        <input type="file" name="file" th:attr="accept=${slot.rule.acceptAttribute}" required>
+                        <button type="submit" class="btn btn-sm">Upload replacement</button>
+                        <div class="muted" th:text="'Formats: ' + ${slot.rule.allowedFormats} + ' · max ' + ${slot.rule.maxSizeMb} + ' MB'"></div>
+                    </form>
+                    <span th:unless="${slot.needsUpload()}" class="muted">No action needed</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel">
+        <h3 style="margin-top:0;">Travel clearance
+            <span class="badge" th:classappend="${readiness.cleared} ? 'badge-green' : 'badge-yellow'"
+                  th:text="${readiness.cleared} ? 'CLEARED' : ${readiness.satisfied} + ' of ' + ${readiness.total} + ' complete'"></span></h3>
+        <div th:each="item : ${readiness.items}" style="margin-bottom: 6px;">
+            <span th:class="${item.ok} ? 'check-ok' : 'check-no'" th:text="${item.name}"></span>
+            <span class="muted" th:text="' · ' + ${item.detail}"></span>
+        </div>
+        <a href="/portal/compliance" class="btn" style="margin-top: 10px;">Complete pre-departure checklist</a>
+    </div>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

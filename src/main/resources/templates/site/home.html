@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Pilgrimages, holidays and visas')}"></head>
+<body class="site home">
+<header th:replace="~{layout/fragments :: siteHeader('home')}"></header>
+
+<main id="main">
+    <!-- Hero: the logo fades away as the visitor scrolls -->
+    <section class="hero">
+        <div class="hero-sky" aria-hidden="true">
+            <div class="hero-sun"></div>
+            <div class="hero-sea"></div>
+        </div>
+        <div class="wrap hero-inner">
+            <div class="hero-logo" data-hero-logo>
+                <svg th:replace="~{layout/fragments :: mark}"></svg>
+                <h1 class="hero-word" th:with="parts=${#strings.arraySplit(site.name, ' ')}">
+                    <th:block th:text="${parts[0]}">Serendib</th:block>
+                    <span th:if="${#arrays.length(parts) > 1}" th:text="${#strings.substringAfter(site.name, parts[0] + ' ')}">Journeys</span>
+                </h1>
+            </div>
+            <p class="hero-copy" th:text="${site.tagline}">Pilgrimages, holidays and visas - planned end to end.</p>
+            <div class="hero-cta">
+                <a class="btn btn-accent btn-lg" href="/tours">Browse tours</a>
+                <a class="btn btn-outline btn-lg" href="/visas/select-country">Apply for a visa</a>
+            </div>
+            <ul class="route" aria-label="Where we travel">
+                <li><b></b>Bodh Gaya</li>
+                <li><b></b>Agra</li>
+                <li><b></b>Kochi</li>
+                <li><b></b>Kandy</li>
+                <li><b></b>Dubai</li>
+                <li><b></b>Phuket</li>
+            </ul>
+        </div>
+    </section>
+
+    <div th:if="${param.signedout}" class="wrap" style="margin-top:24px"><div class="alert alert-info">You have signed out. See you on your next trip.</div></div>
+
+    <!-- About -->
+    <section class="section" id="about">
+        <div class="wrap about-grid">
+            <div>
+                <h2>A Sri Lankan travel desk that handles the whole trip</h2>
+                <p class="lead" th:text="${site.name} + ' looks after families, temple societies and first-time travellers. We plan the route, book the hotels and coaches, prepare your visa papers and travel with you.'">About text</p>
+                <a class="btn btn-outline" href="/about">More about us</a>
+            </div>
+            <ul class="promise">
+                <li><h3>Guides who speak your language</h3><p>Sinhala- and Tamil-speaking tour leaders on every group departure.</p></li>
+                <li><h3>Visas prepared in-house</h3><p>We check your documents before they go to the embassy, and you can follow the status online.</p></li>
+                <li><h3>Simple payments</h3><p>Transfer to our bank and upload the slip from your profile. Online card payments are coming soon.</p></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Services -->
+    <section class="section tint" id="services">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>What we can do for you</h2>
+                <p>Book a ready-made tour, start a visa application, or ask us to arrange travel for your group.</p>
+            </div>
+            <div class="services">
+                <div class="service feature">
+                    <div class="ico"><svg th:replace="~{layout/icons :: map}"></svg></div>
+                    <h3>Tour packages</h3>
+                    <p th:text="${packageCount} + ' tours with day-by-day plans, hotels and transport included. Choose your dates and add them to your cart.'">tours</p>
+                    <form action="/tours" method="get" th:if="${!#lists.isEmpty(featured)}">
+                        <label for="quickPkg" class="sr-only">Choose a package</label>
+                        <select id="quickPkg" onchange="if(this.value) location.href='/tours/'+this.value">
+                            <option value="">Choose a package...</option>
+                            <option th:each="p : ${featured}" th:value="${p.packageId}" th:text="${p.packageName}">pkg</option>
+                        </select>
+                    </form>
+                    <a class="btn btn-accent" href="/tours">See all tours</a>
+                </div>
+                <div class="service">
+                    <div class="ico"><svg th:replace="~{layout/icons :: passport}"></svg></div>
+                    <h3>Visa applications</h3>
+                    <p>Apply for an Indian or Sri Lankan visa online. Upload your documents once and track every step from your profile.</p>
+                    <a class="btn btn-outline" href="/visas/select-country">Start an application</a>
+                    <span class="muted">You'll be asked to sign in first.</span>
+                </div>
+                <div class="service">
+                    <div class="ico"><svg th:replace="~{layout/icons :: bus}"></svg></div>
+                    <h3>Group travel</h3>
+                    <p>Temple societies, schools and family groups: we arrange hotels, coaches, guides and drivers for your own dates.</p>
+                    <a class="btn btn-outline" href="#contact">Talk to us</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured tours -->
+    <section class="section" id="tours" th:if="${!#lists.isEmpty(featured)}">
+        <div class="wrap">
+            <div class="section-head">
+                <h2>Tours leaving soon</h2>
+                <a class="btn btn-outline" href="/tours">All tours</a>
+            </div>
+            <div class="postcards">
+                <a class="postcard" th:each="p : ${featured}" th:href="@{/tours/{id}(id=${p.packageId})}">
+                    <div th:replace="~{layout/fragments :: pkgArt(${p}, 'pc-art', true)}"></div>
+                    <span class="pc-tag" th:if="${p.category}" th:text="${p.category}">Cultural</span>
+                    <div class="pc-body">
+                        <h3 th:text="${p.packageName}">Package</h3>
+                        <p th:text="${p.description}">Description</p>
+                        <div class="pc-foot">
+                            <span class="pc-price"><small>From, per person</small><span th:text="'LKR ' + ${#numbers.formatDecimal(p.price, 1, 'COMMA', 0, 'POINT')}">LKR 95,000</span></span>
+                            <span class="pc-days" th:text="${p.duration} + ' days'">5 days</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section" id="contact" style="padding-top:0">
+        <div class="wrap">
+            <div class="contact">
+                <div>
+                    <h2>Plan your next trip with us</h2>
+                    <p>Call, send a WhatsApp message or visit our office in Pannipitiya.</p>
+                    <div class="socials" aria-label="Social media">
+                        <a th:href="${site.whatsapp}" target="_blank" rel="noopener" aria-label="WhatsApp"><svg th:replace="~{layout/icons :: whatsapp}"></svg></a>
+                        <a th:href="${site.facebook}" target="_blank" rel="noopener" aria-label="Facebook"><svg th:replace="~{layout/icons :: facebook}"></svg></a>
+                        <a th:if="${!#strings.isEmpty(site.instagram)}" th:href="${site.instagram}" target="_blank" rel="noopener" aria-label="Instagram"><svg th:replace="~{layout/icons :: instagram}"></svg></a>
+                        <a th:if="${!#strings.isEmpty(site.youtube)}" th:href="${site.youtube}" target="_blank" rel="noopener" aria-label="YouTube"><svg th:replace="~{layout/icons :: youtube}"></svg></a>
+                        <a th:if="${!#strings.isEmpty(site.tiktok)}" th:href="${site.tiktok}" target="_blank" rel="noopener" aria-label="TikTok"><svg th:replace="~{layout/icons :: tiktok}"></svg></a>
+                    </div>
+                </div>
+                <ul class="contact-list">
+                    <li><svg th:replace="~{layout/icons :: phone}"></svg><div><small>Call us</small><a th:href="${site.phoneLink}" th:text="${site.phone}">phone</a></div></li>
+                    <li><svg th:replace="~{layout/icons :: whatsapp}"></svg><div><small>WhatsApp</small><a th:href="${site.whatsapp}" target="_blank" rel="noopener" th:text="${site.whatsappNumber}">whatsapp</a></div></li>
+                    <li><svg th:replace="~{layout/icons :: mail}"></svg><div><small>Email</small><a th:href="'mailto:' + ${site.email}" th:text="${site.email}">email</a></div></li>
+                    <li><svg th:replace="~{layout/icons :: pin}"></svg><div><small>Visit</small><span th:text="${site.address}">address</span></div></li>
+                    <li th:if="${!#strings.isEmpty(site.hours)}"><svg th:replace="~{layout/icons :: clock}"></svg><div><small>Opening hours</small><span th:text="${site.hours}">hours</span></div></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

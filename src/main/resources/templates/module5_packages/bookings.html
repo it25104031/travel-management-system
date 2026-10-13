@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Website bookings')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Website bookings</h1><p>Tour packages travellers booked online. Payment status comes from each booking's invoice in Billing.</p></div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+    <div class="toolbar">
+        <div class="grow"><label for="q">Search</label><input id="q" type="search" data-filter="#bookingTable" placeholder="Booking, traveller or tour"></div>
+        <form method="get" action="/packages/bookings">
+            <label for="show">Show</label>
+            <select id="show" name="show" onchange="this.form.submit()">
+                <option value="ALL" th:selected="${show == 'ALL'}">All bookings</option>
+                <option value="UNPAID" th:selected="${show == 'UNPAID'}">Awaiting payment</option>
+                <option value="REVIEW" th:selected="${show == 'REVIEW'}">Payment in review</option>
+                <option value="PARTIAL" th:selected="${show == 'PARTIAL'}">Part paid</option>
+                <option value="PAID" th:selected="${show == 'PAID'}">Confirmed</option>
+                <option value="CANCELLED" th:selected="${show == 'CANCELLED'}">Cancelled</option>
+            </select>
+        </form>
+    </div>
+    <div class="table-wrap">
+        <table id="bookingTable">
+            <thead><tr><th>Booking</th><th>Traveller</th><th>Tour</th><th>Travel date</th><th class="num">Travellers</th><th class="num">Amount (LKR)</th><th>Invoice</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="v : ${bookings}" th:classappend="${v.booking.cancelled} ? 'is-muted'">
+                <td class="nowrap"><b th:text="${v.booking.bookingRef}">BK</b><div class="muted" th:text="'Booked ' + ${#temporals.format(v.booking.createdAt, 'd MMM yyyy')}">date</div></td>
+                <td><span th:text="${v.booking.customer.fullName}">name</span><div class="muted" th:text="${v.booking.customer.email}">email</div></td>
+                <td th:text="${v.booking.tourPackage.packageName}">tour</td>
+                <td class="nowrap" th:text="${#temporals.format(v.booking.travelDate, 'd MMM yyyy')}">date</td>
+                <td class="num" th:text="${v.booking.travellers}">2</td>
+                <td class="num" th:text="${#numbers.formatDecimal(v.booking.totalAmount, 1, 'COMMA', 2, 'POINT')}">0</td>
+                <td class="nowrap"><a th:if="${v.invoice != null}" th:href="@{/billing/invoices/edit/{id}(id=${v.invoice.invoiceId})}" th:text="${v.invoice.invoiceNumber}">INV</a>
+                    <span th:if="${v.invoice == null}" class="muted">-</span></td>
+                <td><span class="badge" th:classappend="${v.badge}" th:text="${v.label}">x</span>
+                    <div class="muted" th:if="${v.booking.notes}" th:text="${v.booking.notes}" style="max-width:220px">note</div></td>
+                <td>
+                    <form th:unless="${v.booking.cancelled}" th:action="@{/packages/bookings/{id}/cancel(id=${v.booking.bookingId})}" method="post" class="inline"
+                          data-confirm="Cancel this booking? The traveller will see it as cancelled.">
+                        <button class="btn btn-red btn-sm" type="submit">Cancel</button></form>
+                    <form th:if="${v.booking.cancelled}" th:action="@{/packages/bookings/{id}/restore(id=${v.booking.bookingId})}" method="post" class="inline">
+                        <button class="btn btn-outline btn-sm" type="submit">Restore</button></form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(bookings)}" data-empty><td colspan="9" class="empty">No bookings in this view.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Sign in')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('login')}"></header>
+<main id="main" class="auth">
+    <div class="auth-art" aria-hidden="true">
+        <div class="hero-sun"></div>
+        <div class="hero-sea"></div>
+        <div class="copy">
+            <h2 th:text="${staffMode} ? 'Staff workspace' : 'Your trips, payments and visas in one place'">x</h2>
+            <p th:text="${staffMode} ? 'Visas, billing, logistics and tour packages for the whole office.' : 'Sign in to check out, pay an invoice or follow a visa application.'">x</p>
+        </div>
+    </div>
+    <div class="auth-form">
+        <div class="inner">
+            <h1 th:text="${staffMode} ? 'Staff sign in' : 'Sign in'">Sign in</h1>
+            <p class="sub" th:text="${staffMode} ? 'Use the username your administrator gave you.' : 'Welcome back. Use the email you signed up with.'">x</p>
+
+            <div th:if="${param.error}" class="alert alert-error" role="alert">That email/username and password don't match. Check them and try again.</div>
+            <div th:if="${param.locked}" class="alert alert-error" role="alert">Too many failed attempts. This account is locked for 15 minutes.</div>
+            <div th:if="${param.disabled}" class="alert alert-error" role="alert">This account has been deactivated. Please contact us.</div>
+            <div th:if="${param.logout}" class="alert alert-success" role="status">You have signed out.</div>
+            <div th:if="${continueTo != null and #strings.startsWith(continueTo, '/checkout')}" class="alert alert-info">Sign in to finish your booking. Your cart is saved.</div>
+
+            <form th:action="@{/login}" method="post">
+                <input type="hidden" name="mode" th:value="${staffMode} ? 'staff' : 'traveller'">
+                <input type="hidden" name="continue" th:if="${continueTo}" th:value="${continueTo}">
+                <div class="field">
+                    <label for="username" th:text="${staffMode} ? 'Username' : 'Email'">Email</label>
+                    <input id="username" th:type="${staffMode} ? 'text' : 'text'" name="username" required autofocus
+                           th:attr="autocomplete=${staffMode} ? 'username' : 'email'"
+                           th:placeholder="${staffMode} ? 'e.g. operator' : 'you@example.com'">
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <div class="pw-wrap">
+                        <input id="password" type="password" name="password" required autocomplete="current-password">
+                        <button type="button" data-pw-toggle="password" aria-pressed="false">Show</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-block btn-lg">Sign in</button>
+            </form>
+            <p class="auth-switch" th:unless="${staffMode}">New here? <a th:href="@{/signup(continue=${continueTo})}">Create an account</a></p>
+            <p class="auth-switch" th:if="${staffMode}"><a href="/login">Traveller sign in</a></p>
+            <p class="auth-switch muted" th:unless="${staffMode}">Applied for a visa at our office? <a href="/portal/login">Use your reference number and passkey</a>.</p>
+        </div>
+    </div>
+</main>
+<script src="/js/site.js"></script>
+</body>
+</html>

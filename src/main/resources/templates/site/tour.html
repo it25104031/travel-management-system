@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head(${pkg.packageName})}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('tours')}"></header>
+<main id="main">
+    <section class="tour-hero" th:classappend="${pkg.imageUrl == null} ? 'art-' + ${pkg.themeIndex}"
+             th:style="${pkg.imageUrl != null} ? 'background:url(' + ${pkg.imageUrl} + ') center/cover' : ''">
+        <div class="wrap">
+            <div class="crumbs"><a href="/">Home</a> / <a href="/tours">Tours</a> / <span th:text="${pkg.packageName}">x</span></div>
+            <h1 th:text="${pkg.packageName}">Package name</h1>
+            <div class="facts">
+                <span class="fact" th:text="${pkg.duration} + ' days, ' + ${pkg.nights} + ' nights'">5 days</span>
+                <span class="fact" th:if="${pkg.destination}" th:text="${pkg.destination}">India</span>
+                <span class="fact" th:if="${pkg.category}" th:text="${pkg.category}">Cultural</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="wrap" style="padding-top:40px; padding-bottom:80px">
+        <div class="tour-layout">
+            <div>
+                <p class="lead" th:text="${pkg.description}">Description</p>
+                <h2 style="margin-top:36px">Day by day</h2>
+                <ol class="itinerary" th:if="${!#lists.isEmpty(pkg.itineraries)}">
+                    <li th:each="d : ${pkg.itineraries}">
+                        <span class="day-dot"><span><small>DAY</small><th:block th:text="${d.dayNumber}">1</th:block></span></span>
+                        <div>
+                            <h3 th:text="${d.destination}">Place</h3>
+                            <p th:text="${d.activities}">Activities</p>
+                            <div class="meta">
+                                <span th:if="${d.accommodation}" th:text="'Stay: ' + ${d.accommodation}">Hotel</span>
+                                <span th:if="${d.transport}" th:text="'Travel: ' + ${d.transport}">Coach</span>
+                            </div>
+                        </div>
+                    </li>
+                </ol>
+                <p class="muted" th:if="${#lists.isEmpty(pkg.itineraries)}">The detailed plan for this tour is being finalised. Contact us for the day-by-day schedule.</p>
+            </div>
+
+            <aside class="book-box" id="book">
+                <div class="price" th:text="'LKR ' + ${#numbers.formatDecimal(pkg.price, 1, 'COMMA', 0, 'POINT')}">LKR 95,000</div>
+                <div class="per">per person</div>
+                <div th:replace="~{layout/fragments :: messages}"></div>
+                <form th:action="@{/cart/add}" method="post" th:attr="data-price=${pkg.price}">
+                    <input type="hidden" name="packageId" th:value="${pkg.packageId}">
+                    <div class="field">
+                        <label for="travelDate">Travel date</label>
+                        <input id="travelDate" type="date" name="travelDate" required th:min="${earliestDate}" th:value="${earliestDate}">
+                        <div class="hint">Earliest departure is 3 days from today.</div>
+                    </div>
+                    <div class="field">
+                        <label for="travellers">Travellers</label>
+                        <input id="travellers" type="number" name="travellers" min="1" th:max="${maxTravellers}" value="2" required>
+                    </div>
+                    <div class="total-line"><span>Total</span><b data-total>-</b></div>
+                    <button class="btn btn-accent btn-block btn-lg" type="submit">Add to cart</button>
+                    <p class="muted" style="margin:12px 0 0">No payment yet. You'll sign in at checkout and pay by bank transfer.</p>
+                </form>
+            </aside>
+        </div>
+
+        <section th:if="${!#lists.isEmpty(related)}" style="margin-top:56px">
+            <h2>You might also like</h2>
+            <div class="postcards">
+                <a class="postcard" th:each="p : ${related}" th:href="@{/tours/{id}(id=${p.packageId})}">
+                    <div th:replace="~{layout/fragments :: pkgArt(${p}, 'pc-art', true)}"></div>
+                    <div class="pc-body">
+                        <h3 th:text="${p.packageName}">Package</h3>
+                        <div class="pc-foot">
+                            <span class="pc-price"><small>From, per person</small><span th:text="'LKR ' + ${#numbers.formatDecimal(p.price, 1, 'COMMA', 0, 'POINT')}">LKR</span></span>
+                            <span class="pc-days" th:text="${p.duration} + ' days'">5 days</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </div>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

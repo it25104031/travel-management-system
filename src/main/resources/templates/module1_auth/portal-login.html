@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Visa portal sign in')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('visas')}"></header>
+<main id="main" class="site-main">
+    <div class="wrap-narrow" style="max-width:480px">
+        <div class="page-title"><div><h1>Visa portal</h1>
+            <p>Sign in with the reference number and passkey we gave you when your application was submitted.</p></div></div>
+        <div class="panel">
+            <div th:if="${param.error}" class="alert alert-error" role="alert">That reference number and passkey don't match. Check them and try again.</div>
+            <div th:if="${param.locked}" class="alert alert-error" role="alert">Too many failed attempts. Please try again in 15 minutes.</div>
+            <div th:if="${param.expired}" class="alert alert-error" role="alert">Your passkey has expired. Request a new one below.</div>
+            <div th:if="${param.closed}" class="alert alert-info">Portal access for this application has been closed.</div>
+            <div th:if="${param.logout}" class="alert alert-success">You have signed out of the visa portal.</div>
+            <div th:replace="~{layout/fragments :: messages}"></div>
+            <form th:action="@{/portal/login}" method="post">
+                <div class="field"><label for="referenceNo">Reference number</label>
+                    <input id="referenceNo" type="text" name="referenceNo" placeholder="IN-2026-000001" required autofocus></div>
+                <div class="field"><label for="passkey">Passkey</label>
+                    <div class="pw-wrap"><input id="passkey" type="password" name="passkey" required>
+                        <button type="button" data-pw-toggle="passkey" aria-pressed="false">Show</button></div></div>
+                <button type="submit" class="btn btn-block btn-lg">Sign in</button>
+            </form>
+            <details style="margin-top:20px" th:open="${param.expired != null}">
+                <summary class="link-btn">Lost or expired passkey?</summary>
+                <form th:action="@{/portal/renew}" method="post" style="margin-top:12px">
+                    <div class="field"><label for="renewRef">Reference number</label><input id="renewRef" type="text" name="referenceNo" required></div>
+                    <div class="field"><label for="renewEmail">Email used in your application</label><input id="renewEmail" type="email" name="email" required></div>
+                    <button type="submit" class="btn btn-outline btn-sm">Email me a new passkey</button>
+                </form>
+            </details>
+        </div>
+        <p class="muted">Have a website account? <a href="/login">Sign in</a> to see all your applications in your profile.</p>
+    </div>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

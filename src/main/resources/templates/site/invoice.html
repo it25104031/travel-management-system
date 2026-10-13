@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Invoice ' + ${view.invoice.invoiceNumber})}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('my')}"></header>
+<main id="main" class="site-main">
+    <div class="wrap">
+        <div class="crumbs" style="color:var(--ink-3)"><a href="/my?tab=payments">Payments</a> / <span th:text="${view.invoice.invoiceNumber}">INV</span></div>
+        <div class="page-title">
+            <div><h1 th:text="'Invoice ' + ${view.invoice.invoiceNumber}">Invoice</h1>
+                <p th:text="'Issued ' + ${#temporals.format(view.invoice.invoiceDate, 'd MMMM yyyy')}">date</p></div>
+            <span class="badge" th:classappend="${view.badge}" th:text="${view.label}" style="font-size:14px; padding:4px 14px">Awaiting payment</span>
+        </div>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+
+        <div class="split">
+            <div class="stack">
+                <div class="status-hero ok" th:if="${view.state == 'PAID'}">
+                    <svg th:replace="~{layout/icons :: check}" style="width:30px;height:30px;color:var(--green)"></svg>
+                    <div><div class="big">Paid in full - your trip is confirmed</div><span>We'll send your final travel documents a week before departure.</span></div>
+                </div>
+                <div class="status-hero wait" th:if="${view.slipPending and view.state != 'PAID'}">
+                    <svg th:replace="~{layout/icons :: clock}" style="width:30px;height:30px;color:var(--saffron-deep)"></svg>
+                    <div><div class="big" style="color:var(--amber-ink)">Your bank slip is being checked</div><span>This usually takes one working day. You can pay any remaining balance after it's reviewed.</span></div>
+                </div>
+                <div class="alert alert-info" th:if="${allCancelled}">This booking was cancelled. Contact us about refunds for any amount already paid.</div>
+
+                <div class="panel">
+                    <h2>Booking</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Tour</th><th>Dates</th><th class="num">Travellers</th><th class="num">Amount (LKR)</th></tr></thead>
+                            <tbody>
+                            <tr th:each="b : ${bookings}" th:classappend="${b.cancelled} ? 'is-muted'">
+                                <td><b th:text="${b.tourPackage.packageName}">Tour</b><div class="muted" th:text="${b.bookingRef} + (${b.cancelled} ? ' (cancelled)' : '')">ref</div></td>
+                                <td class="nowrap" th:text="${#temporals.format(b.travelDate, 'd MMM')} + ' - ' + ${#temporals.format(b.returnDate, 'd MMM yyyy')}">dates</td>
+                                <td class="num" th:text="${b.travellers}">2</td>
+                                <td class="num" th:text="${#numbers.formatDecimal(b.totalAmount, 1, 'COMMA', 2, 'POINT')}">0</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel" th:if="${!#lists.isEmpty(payments) or !#lists.isEmpty(slips)}">
+                    <h2>Payment history</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Date</th><th>Method</th><th class="num">Amount (LKR)</th><th>Status</th></tr></thead>
+                            <tbody>
+                            <tr th:each="p : ${payments}">
+                                <td class="nowrap" th:text="${#temporals.format(p.paymentDate, 'd MMM yyyy, HH:mm')}">date</td>
+                                <td th:text="${p.paymentMethod == 'CARD'} ? 'Card' : (${p.paymentMethod == 'SLIP_TRANSFER'} ? 'Bank transfer' : ${#strings.capitalize(#strings.toLowerCase(p.paymentMethod))})">Card</td>
+                                <td class="num" th:text="${#numbers.formatDecimal(p.amount, 1, 'COMMA', 2, 'POINT')}">0</td>
+                                <td><span class="badge" th:classappend="'badge-' + ${p.paymentStatus}" th:text="${#strings.capitalize(#strings.toLowerCase(p.paymentStatus))}">Completed</span></td>
+                            </tr>
+                            <tr th:each="s : ${slips}" th:if="${s.status != 'APPROVED'}">
+                                <td class="nowrap" th:text="${#temporals.format(s.createdAt, 'd MMM yyyy, HH:mm')}">date</td>
+                                <td>Bank slip <a th:if="${s.customer != null and member != null and s.customer.id == member.id}" th:href="@{/my/slips/{id}/file(id=${s.slipId})}" target="_blank" rel="noopener">(view)</a></td>
+                                <td class="num" th:text="${#numbers.formatDecimal(s.amountPaid, 1, 'COMMA', 2, 'POINT')}">0</td>
+                                <td><span class="badge" th:classappend="'badge-' + ${s.status}" th:text="${s.status == 'PENDING'} ? 'In review' : 'Not accepted'">x</span>
+                                    <div class="muted" th:if="${s.adminRemark}" th:text="${s.adminRemark}">note</div></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="summary" id="pay">
+                <div class="row-sum"><span>Invoice total</span><span class="money" th:text="${#numbers.formatDecimal(view.invoice.totalAmount, 1, 'COMMA', 2, 'POINT')}">0</span></div>
+                <div class="row-sum"><span>Paid so far</span><span class="money" th:text="${#numbers.formatDecimal(view.paid, 1, 'COMMA', 2, 'POINT')}">0</span></div>
+                <div class="grand"><span>Balance (LKR)</span><b th:text="${#numbers.formatDecimal(view.outstanding, 1, 'COMMA', 2, 'POINT')}">0</b></div>
+
+                <th:block th:if="${view.payable and !allCancelled}">
+                    <h2 style="margin-top:22px">Pay now</h2>
+                    <div class="pay-tabs" role="tablist">
+                        <button type="button" class="pay-tab" role="tab" data-pay-tab="pane-bank" aria-selected="true"><b>Bank transfer</b><span>Upload your slip</span></button>
+                        <button type="button" class="pay-tab" role="tab" data-pay-tab="pane-card" aria-selected="false"><b>Card</b><span>Coming soon</span></button>
+                    </div>
+
+                    <div id="pane-card" class="pay-pane" role="tabpanel" hidden>
+                        <div class="coming-soon">
+                            <svg th:replace="~{layout/icons :: card}"></svg>
+                            <h3>Card payments are coming soon</h3>
+                            <p>We're setting up secure online card payments. For now, please pay by bank transfer and upload your slip - it takes a minute.</p>
+                        </div>
+                    </div>
+
+                    <div id="pane-bank" class="pay-pane" role="tabpanel">
+                        <div class="bank-box">
+                            <dl>
+                                <dt>Bank</dt><dd th:text="${site.bankName}">Bank</dd>
+                                <dt>Account name</dt><dd th:text="${site.bankAccountName}">name</dd>
+                                <dt>Account no.</dt><dd th:text="${site.bankAccountNumber}">no</dd>
+                                <dt>Branch</dt><dd th:text="${site.bankBranch}">branch</dd>
+                                <dt>Reference</dt><dd th:text="${view.invoice.invoiceNumber}">INV</dd>
+                            </dl>
+                        </div>
+                        <form th:action="@{/my/invoices/{id}/slip(id=${view.invoice.invoiceId})}" method="post" enctype="multipart/form-data">
+                            <div class="field"><label for="amountPaid">Amount you transferred (LKR)</label>
+                                <input id="amountPaid" type="number" name="amountPaid" step="0.01" min="1" th:max="${view.outstanding}" th:value="${view.outstanding}" required></div>
+                            <div class="field"><label for="paymentDate">Transfer date</label>
+                                <input id="paymentDate" type="date" name="paymentDate" th:max="${today}" th:value="${today}" required></div>
+                            <div class="field"><label for="bankReference">Bank reference (optional)</label>
+                                <input id="bankReference" name="bankReference" maxlength="100"></div>
+                            <div class="field"><label for="file">Slip or screenshot</label>
+                                <input id="file" type="file" name="file" accept=".jpg,.jpeg,.png,.pdf" required>
+                                <div class="hint">JPG, PNG or PDF, up to 5 MB.</div></div>
+                            <button class="btn btn-block btn-lg" type="submit">Upload slip</button>
+                        </form>
+                    </div>
+                </th:block>
+                <a class="btn btn-ghost btn-block" style="margin-top:12px" href="/my?tab=trips">Back to my trips</a>
+            </aside>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

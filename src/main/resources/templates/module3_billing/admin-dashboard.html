@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Billing overview')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Billing</h1><p>Invoices, payments and bank slips for every booking and service.</p></div>
+        <div class="actions">
+            <a class="btn btn-outline" href="/billing/invoices">New invoice</a>
+            <a class="btn btn-accent" href="/billing/payments">Record a payment</a>
+        </div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+    <div class="stat-grid">
+        <a class="stat-tile" href="/billing/invoices"><div class="stat" th:text="${totalInvoices}">0</div><div class="stat-label">Invoices</div></a>
+        <a class="stat-tile" href="/billing/payments"><div class="stat" th:text="${totalPayments}">0</div><div class="stat-label">Payments recorded</div></a>
+        <div class="stat-tile"><div class="stat" th:text="${totalRevenue}">0.00</div><div class="stat-label">Revenue collected (LKR)</div></div>
+        <a class="stat-tile" th:classappend="${pendingSlipCount != null and pendingSlipCount > 0} ? 'attention'" href="/billing/slips?status=PENDING">
+            <div class="stat" th:text="${pendingSlipCount ?: 0}">0</div><div class="stat-label">Bank slips to review</div></a>
+    </div>
+    <div class="cards">
+        <a href="/billing/invoices" class="card">
+            <h3>Invoices</h3>
+            <p>Create and edit invoices. Status (unpaid, part paid, paid) is worked out from the payments, so it is always up to date.</p>
+        </a>
+        <a href="/billing/payments" class="card">
+            <h3>Payments</h3>
+            <p>Record cash, card and transfer payments against an invoice. A payment can never be more than the balance due.</p>
+        </a>
+        <a href="/billing/slips" class="card">
+            <h3>Bank slips</h3>
+            <p>Check the transfer slips travellers upload from their profile, then accept or reject each one with a note.</p>
+        </a>
+        <a href="/billing/pay" class="card">
+            <h3>Card payments <span class="badge badge-amber">Coming soon</span></h3>
+            <p>Online card payments start once the LankaPay merchant account is approved. Until then travellers pay by bank transfer.</p>
+        </a>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

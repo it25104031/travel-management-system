@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Page not found')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('')}"></header>
+<main id="main" class="site-main">
+    <div class="wrap-narrow">
+        <div class="empty-state">
+            <h2>We couldn't find that page</h2>
+            <p>The link may be old, or the item was removed. Try the home page or browse our tours.</p>
+            <div class="actions" style="justify-content:center">
+                <a class="btn" href="/">Go to the home page</a>
+                <a class="btn btn-outline" href="/tours">Browse tours</a>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+</body>
+</html>

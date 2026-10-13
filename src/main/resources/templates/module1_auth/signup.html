@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Create an account')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('login')}"></header>
+<main id="main" class="auth">
+    <div class="auth-art" aria-hidden="true">
+        <div class="hero-sun"></div>
+        <div class="hero-sea"></div>
+        <div class="copy">
+            <h2>One account for every trip</h2>
+            <p>Book tours, pay your invoices and follow your visa applications - all from your profile.</p>
+        </div>
+    </div>
+    <div class="auth-form">
+        <div class="inner">
+            <h1>Create an account</h1>
+            <p class="sub">It takes a minute. We only use your details for your bookings.</p>
+            <div th:replace="~{layout/fragments :: messages}"></div>
+            <form th:action="@{/signup}" method="post">
+                <input type="hidden" name="continue" th:if="${continueTo}" th:value="${continueTo}">
+                <div class="field"><label for="fullName">Full name</label>
+                    <input id="fullName" name="fullName" th:value="${fullName}" required maxlength="120" autocomplete="name" autofocus></div>
+                <div class="field"><label for="email">Email</label>
+                    <input id="email" type="email" name="email" th:value="${email}" required maxlength="190" autocomplete="email"></div>
+                <div class="field"><label for="phone">Mobile number (optional)</label>
+                    <input id="phone" type="tel" name="phone" th:value="${phone}" maxlength="20" autocomplete="tel" placeholder="+94 77 123 4567"></div>
+                <div class="field"><label for="password">Password</label>
+                    <div class="pw-wrap">
+                        <input id="password" type="password" name="password" required minlength="8" autocomplete="new-password">
+                        <button type="button" data-pw-toggle="password" aria-pressed="false">Show</button>
+                    </div>
+                    <div class="hint">At least 8 characters, with a letter and a number.</div></div>
+                <div class="field"><label for="confirmPassword">Confirm password</label>
+                    <input id="confirmPassword" type="password" name="confirmPassword" required minlength="8" autocomplete="new-password"></div>
+                <button type="submit" class="btn btn-accent btn-block btn-lg">Create account</button>
+            </form>
+            <p class="auth-switch">Already have an account? <a th:href="@{/login(continue=${continueTo})}">Sign in</a></p>
+        </div>
+    </div>
+</main>
+<script src="/js/site.js"></script>
+</body>
+</html>

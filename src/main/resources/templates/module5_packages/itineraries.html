@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Itinerary')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page" style="max-width:1100px">
+    <div class="page-title">
+        <div><h1 th:text="${tourPackage.packageName}">Package</h1>
+            <p><a href="/packages">Tour packages</a> / Itinerary</p></div>
+        <a class="btn btn-outline" th:href="@{/packages/edit/{id}(id=${tourPackage.packageId})}">Edit package</a>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+
+    <div class="stat-grid" th:with="planned=${#lists.size(itineraries)}">
+        <div class="stat-tile"><div class="stat" th:text="${tourPackage.duration}">7</div><div class="stat-label">Days in the package</div></div>
+        <div class="stat-tile"><div class="stat" th:text="${planned}">0</div><div class="stat-label">Days planned</div></div>
+        <div class="stat-tile"><div class="stat" th:text="${#numbers.formatDecimal(tourPackage.price, 1, 'COMMA', 0, 'POINT')}">0</div><div class="stat-label">Price per person (LKR)</div></div>
+        <div class="stat-tile" th:with="pct=${tourPackage.duration > 0 ? planned * 100 / tourPackage.duration : 0}">
+            <div class="progress" th:classappend="${pct < 100} ? 'low'" style="margin-top:8px"><div th:style="'width:' + ${pct > 100 ? 100 : pct} + '%'" th:text="${pct} + '%'">0%</div></div>
+            <div class="stat-label">Itinerary complete</div></div>
+    </div>
+
+    <div class="split">
+        <section>
+            <h2>Day by day</h2>
+            <div class="panel" th:if="${!#lists.isEmpty(itineraries)}" style="padding-bottom:4px"><ol class="itinerary">
+                <li th:each="item : ${itineraries}">
+                    <span class="day-dot"><span><small>DAY</small><th:block th:text="${item.dayNumber}">1</th:block></span></span>
+                    <div>
+                        <h3 th:text="${item.destination}">Place</h3>
+                        <p th:text="${item.activities}">Activities</p>
+                        <div class="meta">
+                            <span th:text="'Stay: ' + (${#strings.isEmpty(item.accommodation)} ? 'not set' : ${item.accommodation})">Hotel</span>
+                            <span th:text="'Travel: ' + (${#strings.isEmpty(item.transport)} ? 'not set' : ${item.transport})">Coach</span>
+                        </div>
+                        <div class="actions" style="margin-top:8px">
+                            <a class="btn btn-outline btn-sm" th:href="@{/itineraries/edit/{id}(id=${item.itineraryId})}">Edit</a>
+                            <form th:action="@{/itineraries/delete/{id}(id=${item.itineraryId})}" method="post" class="inline" data-confirm="Delete this day?">
+                                <input type="hidden" name="packageId" th:value="${tourPackage.packageId}">
+                                <button type="submit" class="btn btn-red btn-sm">Delete</button></form>
+                        </div>
+                    </div>
+                </li>
+            </ol></div>
+            <div class="empty-state" th:if="${#lists.isEmpty(itineraries)}" style="padding:36px 20px">
+                <h2>No days planned yet</h2>
+                <p>Add day 1 with the form. Travellers see this plan on the tour page.</p>
+            </div>
+        </section>
+        <form class="summary" id="addDay" action="/itineraries/add" th:action="@{/itineraries/add}" method="post">
+            <h2>Add a day</h2>
+            <input type="hidden" name="packageId" th:value="${tourPackage.packageId}">
+            <div class="field"><label for="dayNumber">Day</label>
+                <input id="dayNumber" type="number" name="dayNumber" min="1" th:max="${tourPackage.duration}" th:value="${#lists.size(itineraries) + 1 <= tourPackage.duration ? #lists.size(itineraries) + 1 : ''}" required></div>
+            <div class="field"><label for="destination">Destination</label><input id="destination" type="text" name="destination" maxlength="100" required></div>
+            <div class="field"><label for="activities">Activities</label><textarea id="activities" name="activities" maxlength="1000" required></textarea></div>
+            <div class="field"><label for="accommodation">Accommodation</label><input id="accommodation" type="text" name="accommodation" maxlength="255"></div>
+            <div class="field"><label for="transport">Transport</label><input id="transport" type="text" name="transport" maxlength="255"></div>
+            <button type="submit" class="btn btn-block">Save day</button>
+        </form>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

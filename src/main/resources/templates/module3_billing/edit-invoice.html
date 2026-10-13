@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Edit invoice')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page" style="max-width:900px">
+    <div class="page-title">
+        <div><h1 th:text="'Invoice ' + ${invoice.invoiceNumber}">Invoice</h1>
+            <p><a href="/billing/invoices">Invoices</a> / Edit</p></div>
+        <span class="badge" th:classappend="'badge-' + ${summary.status()}" th:text="${summary.status()}" style="font-size:14px;padding:4px 14px">UNPAID</span>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+    <div class="stat-grid">
+        <div class="stat-tile"><div class="stat" th:text="${#numbers.formatDecimal(invoice.totalAmount, 1, 'COMMA', 2, 'POINT')}">0</div><div class="stat-label">Total (LKR)</div></div>
+        <div class="stat-tile"><div class="stat" th:text="${#numbers.formatDecimal(summary.paidAmount(), 1, 'COMMA', 2, 'POINT')}">0</div><div class="stat-label">Paid (LKR)</div></div>
+        <div class="stat-tile"><div class="stat" th:text="${#numbers.formatDecimal(summary.outstandingBalance(), 1, 'COMMA', 2, 'POINT')}">0</div><div class="stat-label">Balance (LKR)</div></div>
+    </div>
+    <form class="panel" th:action="@{/billing/invoices/update/{id}(id=${invoice.invoiceId})}" method="post">
+        <h2>Invoice details</h2>
+        <div class="form-grid">
+            <div><label for="invoiceNumber">Invoice number</label>
+                <input type="text" id="invoiceNumber" name="invoiceNumber" th:value="${invoice.invoiceNumber}" maxlength="30" required></div>
+            <div><label for="customerName">Customer name</label>
+                <input type="text" id="customerName" name="customerName" th:value="${invoice.customerName}" required></div>
+            <div><label for="invoiceDate">Invoice date</label>
+                <input type="datetime-local" id="invoiceDate" name="invoiceDate" th:value="${#temporals.format(invoice.invoiceDate, 'yyyy-MM-dd''T''HH:mm')}" required></div>
+            <div><label for="totalAmount">Total amount (LKR)</label>
+                <input type="number" id="totalAmount" name="totalAmount" step="0.01" min="0.01" th:value="${invoice.totalAmount}" required>
+                <div class="hint">Can't be lower than the amount already paid.</div></div>
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn">Save invoice</button>
+            <a th:href="@{/billing/invoices/print/{id}(id=${invoice.invoiceId})}" class="btn btn-outline" target="_blank" rel="noopener">Print</a>
+            <a href="/billing/invoices" class="btn btn-ghost">Back to invoices</a>
+        </div>
+    </form>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

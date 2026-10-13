@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Staff dashboard')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1 th:text="'Good to see you, ' + ${currentUser}">Dashboard</h1>
+            <p>Everything that needs attention across visas, billing, logistics and tour packages.</p></div>
+        <div class="actions">
+            <a class="btn btn-outline" href="/visas/select-country">New visa application</a>
+            <a class="btn btn-accent" href="/billing/payments">Record a payment</a>
+        </div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+
+    <div class="stat-grid">
+        <a class="stat-tile" href="/visas/dashboard"><div class="stat" th:text="${openVisas}">0</div><div class="stat-label">Open visa applications</div></a>
+        <a class="stat-tile" th:classappend="${pendingSlips > 0} ? 'attention'" href="/billing/slips?status=PENDING"><div class="stat" th:text="${pendingSlips}">0</div><div class="stat-label">Bank slips to review</div></a>
+        <a class="stat-tile" href="/billing/invoices"><div class="stat" th:text="${unpaidInvoices}">0</div><div class="stat-label">Invoices not fully paid</div></a>
+        <a class="stat-tile" href="/billing/invoices"><div class="stat" th:text="${outstanding}">0</div><div class="stat-label">Outstanding (LKR)</div></a>
+        <a class="stat-tile" href="/packages/bookings"><div class="stat" th:text="${activeBookings}">0</div><div class="stat-label">Active website bookings</div></a>
+        <a class="stat-tile" href="/packages"><div class="stat" th:text="${availablePackages} + '/' + ${packageCount}">0</div><div class="stat-label">Packages on the website</div></a>
+    </div>
+
+    <div class="grid-2">
+        <section class="panel">
+            <div class="panel-head"><h2>Latest website bookings</h2><a href="/packages/bookings">All bookings</a></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Booking</th><th>Traveller</th><th>Tour</th><th>Status</th></tr></thead>
+                    <tbody>
+                    <tr th:each="v : ${recentBookings}">
+                        <td class="nowrap"><b th:text="${v.booking.bookingRef}">BK</b><div class="muted" th:text="${#temporals.format(v.booking.travelDate, 'd MMM yyyy')}">date</div></td>
+                        <td th:text="${v.booking.customer.fullName}">name</td>
+                        <td th:text="${v.booking.tourPackage.packageName}">tour</td>
+                        <td><span class="badge" th:classappend="${v.badge}" th:text="${v.label}">x</span></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(recentBookings)}" data-empty><td colspan="4" class="empty">No website bookings yet.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="panel">
+            <div class="panel-head"><h2>Upcoming trip departures</h2><a href="/logistics/departures">Logistics</a></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Reference</th><th>Package</th><th>Dates</th></tr></thead>
+                    <tbody>
+                    <tr th:each="d : ${upcomingDepartures}">
+                        <td><b th:text="${d.reference}">REF</b><div class="muted" th:text="${d.destination}">dest</div></td>
+                        <td th:text="${d.packageName}">pkg</td>
+                        <td class="nowrap" th:text="${#temporals.format(d.startDate, 'd MMM')} + ' - ' + ${#temporals.format(d.endDate, 'd MMM yyyy')}">dates</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(upcomingDepartures)}" data-empty><td colspan="3" class="empty">No departures planned. <a href="/logistics/departures">Create one</a>.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="panel">
+            <div class="panel-head"><h2>Newest visa applications</h2><a href="/visas/dashboard">Visa queue</a></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>#</th><th>Applicant</th><th>Country</th><th>Status</th></tr></thead>
+                    <tbody>
+                    <tr th:each="a : ${recentVisas}">
+                        <td><a th:href="@{/visas/dashboard/{id}(id=${a.id})}" th:text="${a.id}">1</a></td>
+                        <td th:text="${a.fullName}">name</td>
+                        <td th:text="${a.countryCode}">IN</td>
+                        <td><span class="badge" th:classappend="'badge-' + ${a.statusEnum}" th:text="${a.statusEnum.label}">x</span></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(recentVisas)}" data-empty><td colspan="4" class="empty">No applications yet.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="panel">
+            <h2>At a glance</h2>
+            <dl class="kv">
+                <dt>Revenue collected</dt><dd th:text="'LKR ' + ${revenue}">LKR 0</dd>
+                <dt>Visa applications</dt><dd th:text="${totalVisas} + ' in total'">0</dd>
+                <dt>Suppliers</dt><dd><a href="/logistics/suppliers" th:text="${supplierCount} + ' on contract'">0</a></dd>
+                <dt>Website travellers</dt><dd><a th:if="${isAdmin}" href="/admin/customers" th:text="${travellerCount} + ' accounts'">0</a><span th:unless="${isAdmin}" th:text="${travellerCount} + ' accounts'">0</span></dd>
+            </dl>
+        </section>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

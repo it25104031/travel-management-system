@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Checkout')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('cart')}"></header>
+<main id="main" class="site-main">
+    <div class="wrap">
+        <div class="page-title"><div><h1>Checkout</h1><p>Confirm your booking. You'll choose how to pay on the next page.</p></div></div>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+        <form th:action="@{/checkout}" method="post" class="split">
+            <div class="stack">
+                <div class="panel">
+                    <h2>Traveller</h2>
+                    <dl class="kv">
+                        <dt>Booked by</dt><dd th:text="${member.fullName}">Name</dd>
+                        <dt>Email</dt><dd th:text="${member.email}">email</dd>
+                        <dt>Phone</dt><dd th:text="${member.phone ?: 'Not given'}">phone</dd>
+                    </dl>
+                    <p class="muted" style="margin:12px 0 0">Not right? <a href="/my?tab=settings">Update your details</a>.</p>
+                </div>
+                <div class="panel">
+                    <h2>Your tours</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Tour</th><th>Dates</th><th class="num">Travellers</th><th class="num">Amount (LKR)</th></tr></thead>
+                            <tbody>
+                            <tr th:each="l : ${lines}">
+                                <td th:text="${l.pkg.packageName}">Tour</td>
+                                <td class="nowrap" th:text="${#temporals.format(l.item.travelDate, 'd MMM yyyy')} + ' - ' + ${#temporals.format(l.item.travelDate.plusDays(l.pkg.duration - 1), 'd MMM yyyy')}">dates</td>
+                                <td class="num" th:text="${l.item.travellers}">2</td>
+                                <td class="num" th:text="${#numbers.formatDecimal(l.total, 1, 'COMMA', 2, 'POINT')}">0</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="field" style="margin-top:18px">
+                        <label for="notes">Anything we should know? (optional)</label>
+                        <textarea id="notes" name="notes" maxlength="500" placeholder="Dietary needs, wheelchair access, room sharing..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <aside class="summary">
+                <h2>Total</h2>
+                <div class="grand" style="border-top:0; margin-top:0; padding-top:0"><span>LKR</span><b th:text="${#numbers.formatDecimal(grandTotal, 1, 'COMMA', 2, 'POINT')}">0</b></div>
+                <p class="muted">An invoice is created when you place the booking. Your tour is confirmed once the invoice is paid.</p>
+                <label class="check"><input type="checkbox" name="agree" value="yes" required>
+                    <span>I agree to the booking terms: a booking is confirmed once paid in full, and prices are per person in LKR.</span></label>
+                <button class="btn btn-accent btn-block btn-lg" style="margin-top:16px" type="submit">Place booking</button>
+                <a class="btn btn-ghost btn-block" style="margin-top:6px" href="/cart">Back to cart</a>
+            </aside>
+        </form>
+    </div>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>
