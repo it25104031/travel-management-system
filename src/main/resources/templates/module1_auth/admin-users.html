@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Manage System Users')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="panel">
+        <h2>Staff Accounts</h2>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+
+        <h3>Provision New Operator Account</h3>
+        <form th:action="@{/admin/users/add}" method="post">
+            <div class="row">
+                <div><label>Username *</label><input type="text" name="username" required></div>
+                <div><label>Full name</label><input type="text" name="fullName"></div>
+                <div><label>Corporate email</label><input type="email" name="email"></div>
+            </div>
+            <div class="row">
+                <div><label>Initial password * (min 8 characters)</label><input type="password" name="password" minlength="8" required></div>
+                <div><label>Role</label>
+                    <select name="role">
+                        <option value="ROLE_USER">User / Office Operator</option>
+                        <option value="ROLE_ADMIN">Administrator</option>
+                    </select>
+                </div>
+                <div><button type="submit" class="btn btn-green">Create account</button></div>
+            </div>
+        </form>
+
+        <h3 style="margin-top: 30px;">Existing Accounts</h3>
+        <table>
+            <thead>
+            <tr><th>Username</th><th>Full name / email / role</th><th>Status</th><th>Created</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${users}">
+                <td><strong th:text="${u.username}"></strong>
+                    <div th:if="${u.mustChangePassword}" class="muted">must change password</div></td>
+                <td>
+                    <form th:action="@{/admin/users/{id}/update(id=${u.id})}" method="post" class="row" style="margin:0;">
+                        <div><input type="text" name="fullName" th:value="${u.fullName}" placeholder="Full name"></div>
+                        <div><input type="email" name="email" th:value="${u.email}" placeholder="Email"></div>
+                        <div style="min-width:120px;">
+                            <select name="role">
+                                <option value="ROLE_USER" th:selected="${!u.admin}">Operator</option>
+                                <option value="ROLE_ADMIN" th:selected="${u.admin}">Admin</option>
+                            </select>
+                        </div>
+                        <div style="flex:0;"><button type="submit" class="btn btn-sm">Save</button></div>
+                    </form>
+                </td>
+                <td><span class="badge" th:classappend="${u.activeAccount} ? 'badge-green' : 'badge-red'"
+                          th:text="${u.activeAccount} ? 'Active' : 'Deactivated'"></span></td>
+                <td class="muted" th:text="${u.createdAt != null} ? ${#temporals.format(u.createdAt, 'dd MMM yyyy')} : '-'"></td>
+                <td style="white-space: nowrap;">
+                    <form th:if="${u.activeAccount}" th:action="@{/admin/users/{id}/deactivate(id=${u.id})}" method="post" class="inline"
+                          onsubmit="return confirm('Deactivate this account? The user will no longer be able to sign in.');">
+                        <button type="submit" class="btn btn-red btn-sm">Deactivate</button>
+                    </form>
+                    <form th:unless="${u.activeAccount}" th:action="@{/admin/users/{id}/activate(id=${u.id})}" method="post" class="inline">
+                        <button type="submit" class="btn btn-green btn-sm">Reactivate</button>
+                    </form>
+                    <form th:action="@{/admin/users/{id}/reset-password(id=${u.id})}" method="post" class="inline"
+                          onsubmit="return confirm('Generate a temporary password for this user?');">
+                        <button type="submit" class="btn btn-yellow btn-sm">Reset password</button>
+                    </form>
+                    <a class="btn btn-gray btn-sm" th:href="@{/admin/audit(username=${u.username})}">Audit</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="muted">Accounts are deactivated rather than deleted so their audit history is preserved.</p>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

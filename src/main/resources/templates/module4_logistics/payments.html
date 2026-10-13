@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Supplier payments')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Supplier payments</h1><p>Payments already made to suppliers. A payment can’t be more than what is still owed to that supplier for the departure.</p></div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+
+    <form class="panel" method="post" th:action="${editing != null ? '/logistics/payments/' + editing.id + '/edit' : '/logistics/payments'}" id="recordForm">
+        <h2 th:text="${editing != null ? 'Edit supplier payment' : 'Record a supplier payment'}">Record a supplier payment</h2>
+        <div class="form-grid">
+                <div><label for="f-supplierId">Supplier</label><select id="f-supplierId" name="supplierId" required><option value="" th:selected="${editing == null}" disabled>Choose...</option><option th:each="supplier : ${suppliers}" th:value="${supplier.id}" th:text="${supplier.name}" th:selected="${editing != null and #strings.toString(editing.supplierId) == #strings.toString(supplier.id)}"></option></select></div>
+                <div><label for="f-departureId">Departure</label><select id="f-departureId" name="departureId" required><option value="" th:selected="${editing == null}" disabled>Choose a departure...</option><option th:each="departure : ${departures}" th:value="${departure.id}" th:text="${departure.reference + ' - ' + departure.destination}" th:selected="${editing != null and #strings.toString(editing.departureId) == #strings.toString(departure.id)}"></option></select></div>
+                <div><label for="f-paymentDate">Payment date</label><input id="f-paymentDate" type="date" name="paymentDate" required th:value="${editing != null ? editing.paymentDate : ''}"></div>
+                <div><label for="f-amount">Amount (LKR)</label><input id="f-amount" type="number" name="amount" required min="0.01" step="0.01" th:value="${editing != null ? editing.amount : ''}"></div>
+                <div><label for="f-reference">Reference</label><input id="f-reference" type="text" name="reference" maxlength="60" th:value="${editing != null ? editing.reference : ''}"></div>
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn" th:text="${editing != null ? 'Save changes' : 'Record payment'}">Record payment</button>
+            <a class="btn btn-ghost" th:if="${editing != null}" href="/logistics/payments">Cancel</a>
+        </div>
+    </form>
+
+    <form method="post" action="/logistics/payments/delete" data-bulk>
+        <div class="toolbar">
+            <div class="grow"><label for="q">Search</label><input id="q" type="search" data-filter="#recordTable" placeholder="Departure, supplier or reference"></div>
+            <div th:if="${!#lists.isEmpty(payments)}">
+                <button type="button" class="btn btn-red" data-bulk-start>Delete records</button>
+                <span class="actions" data-bulk-bar hidden>
+                    <button type="submit" class="btn btn-red" data-bulk-delete disabled>Delete selected (0)</button>
+                    <button type="button" class="btn btn-ghost" data-bulk-cancel>Cancel</button>
+                </span>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table id="recordTable">
+                <thead><tr><th class="sel-col" hidden><span class="sr-only">Select</span></th><th>Departure</th><th>Supplier</th><th>Date</th><th class="num">Amount (LKR)</th><th>Reference</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="r : ${payments}">
+                    <td class="sel-col" hidden><input type="checkbox" name="ids" th:value="${r.id}" aria-label="Select record" disabled></td>
+                    <td th:text="${r.departure.reference}"></td><td th:text="${r.supplier.name}"></td><td class="nowrap" th:text="${#temporals.format(r.paymentDate, 'd MMM yyyy')}"></td><td class="num" th:text="${#numbers.formatDecimal(r.amount, 1, 'COMMA', 2, 'POINT')}"></td><td th:text="${r.reference ?: '-'}"></td>
+                    <td><a class="btn btn-outline btn-sm" th:href="@{/logistics/payments/{id}/edit(id=${r.id})}">Edit</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(payments)}" data-empty><td th:colspan="7" class="empty">No supplier payments recorded yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

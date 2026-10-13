@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Apply for a visa')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('visas')}"></header>
+<main id="main" class="site-main">
+    <div class="wrap-narrow">
+        <div class="page-title"><div><h1>Apply for a visa</h1>
+            <p>Choose the country you are travelling to. We'll show you the visa types and the documents you need.</p></div></div>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+        <div class="alert alert-info" th:if="${isStaff}">You're signed in as staff, so this application will be entered for a walk-in customer.</div>
+        <div class="country-list">
+            <a th:each="c : ${countries}" th:href="${c.formRoute}" class="country-option">
+                <span th:text="${c.countryName}">India</span>
+                <span class="muted" th:text="${c.countryCode == 'IN'} ? 'e-Visa' : (${c.countryCode == 'LK'} ? 'Electronic Travel Authorization' : 'Visa')">e-Visa</span>
+            </a>
+        </div>
+        <p th:if="${#lists.isEmpty(countries)}" class="muted">No destinations are open for applications right now.</p>
+        <p class="muted" th:if="${member != null}">Your applications appear under <a href="/my?tab=visas">Visa applications</a> in your profile.</p>
+    </div>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

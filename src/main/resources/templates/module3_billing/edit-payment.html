@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Edit payment')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page" style="max-width:900px">
+    <div class="page-title">
+        <div><h1 th:text="'Payment #' + ${payment.paymentId}">Payment</h1><p><a href="/billing/payments">Payments</a> / Edit</p></div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+    <form class="panel" th:action="@{/billing/payments/update/{id}(id=${payment.paymentId})}" method="post">
+        <div class="field"><label for="invoiceId">Invoice</label>
+            <select id="invoiceId" name="invoiceId" required>
+                <option th:each="invoice : ${invoices}" th:value="${invoice.invoiceId}"
+                        th:text="${invoice.invoiceNumber} + ' - ' + ${invoice.customerName} + ' (balance LKR ' + ${#numbers.formatDecimal(outstandingBalances[invoice.invoiceId], 1, 'COMMA', 2, 'POINT')} + ')'"
+                        th:selected="${payment.invoice != null and payment.invoice.invoiceId == invoice.invoiceId}"></option>
+            </select></div>
+        <div class="form-grid">
+            <div><label for="paymentDate">Payment date</label>
+                <input type="datetime-local" id="paymentDate" name="paymentDate" th:value="${#temporals.format(payment.paymentDate, 'yyyy-MM-dd''T''HH:mm')}" required></div>
+            <div><label for="amount">Amount (LKR)</label>
+                <input type="number" id="amount" name="amount" step="0.01" min="0.01" th:value="${payment.amount}" required></div>
+            <div><label for="paymentMethod">Method</label>
+                <select id="paymentMethod" name="paymentMethod" required>
+                    <option value="CASH" th:selected="${payment.paymentMethod == 'CASH'}">Cash</option>
+                    <option value="CARD" th:selected="${payment.paymentMethod == 'CARD'}">Card</option>
+                    <option value="BANK_TRANSFER" th:selected="${payment.paymentMethod == 'BANK_TRANSFER'}">Bank transfer</option>
+                    <option value="SLIP_TRANSFER" th:selected="${payment.paymentMethod == 'SLIP_TRANSFER'}">Bank slip</option>
+                    <option value="ONLINE" th:selected="${payment.paymentMethod == 'ONLINE'}">Online payment</option>
+                </select></div>
+            <div><label for="paymentStatus">Status</label>
+                <select id="paymentStatus" name="paymentStatus" required>
+                    <option value="COMPLETED" th:selected="${payment.paymentStatus == 'COMPLETED'}">Completed</option>
+                    <option value="PENDING" th:selected="${payment.paymentStatus == 'PENDING'}">Pending</option>
+                    <option value="FAILED" th:selected="${payment.paymentStatus == 'FAILED'}">Failed</option>
+                </select></div>
+        </div>
+        <p class="muted">The amount can't be more than the invoice balance. This payment itself is left out when the balance is worked out.</p>
+        <div class="actions">
+            <button type="submit" class="btn">Save payment</button>
+            <a href="/billing/payments" class="btn btn-ghost">Back to payments</a>
+        </div>
+    </form>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

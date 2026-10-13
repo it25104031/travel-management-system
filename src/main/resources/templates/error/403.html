@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Access denied')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('')}"></header>
+<main id="main" class="site-main">
+    <div class="wrap-narrow">
+        <div class="empty-state">
+            <h2>You can't open this page</h2>
+            <p>Your account doesn't have access to it. Staff pages need a staff account, and some pages are for administrators only.</p>
+            <div class="actions" style="justify-content:center">
+                <a class="btn" href="/">Go to the home page</a>
+                <a class="btn btn-outline" th:if="${isStaff}" href="/staff">Staff workspace</a>
+                <a class="btn btn-outline" th:unless="${isStaff}" href="/login?staff">Staff sign in</a>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+</body>
+</html>

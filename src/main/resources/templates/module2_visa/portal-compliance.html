@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Pre-departure checklist')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: portalNav}"></header>
+<main id="main" class="page" style="max-width: 800px;">
+    <div class="panel">
+        <h2>Pre-departure checklist</h2>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+        <p class="muted">Your travel insurance must cover your whole trip, and we need a health declaration with an emergency contact.
+            Our team verifies both before you can be cleared for travel.</p>
+        <div th:if="${app.departure == null}" class="alert alert-info">These details can be added once our team has placed you on a tour departure.</div>
+    </div>
+
+    <th:block th:if="${app.departure != null}">
+    <div class="panel">
+        <h3 style="margin-top:0;">Travel insurance
+            <span th:if="${record != null and record.insuranceSubmitted}" class="badge" th:classappend="${record.insuranceVerified} ? 'badge-green' : 'badge-yellow'"
+                  th:text="${record.insuranceVerified} ? 'VERIFIED' : 'UNDER REVIEW'"></span></h3>
+        <div th:if="${record != null and record.insuranceRejectionReason != null}" class="alert alert-error" th:text="'Please update: ' + ${record.insuranceRejectionReason}"></div>
+        <form th:action="@{/portal/compliance/insurance}" method="post">
+            <div class="row">
+                <div><label>Insurance provider</label><input type="text" name="provider" th:value="${record?.insuranceProvider}" required></div>
+                <div><label>Policy number</label><input type="text" name="policyNumber" th:value="${record?.insurancePolicyNumber}" required></div>
+            </div>
+            <div class="row">
+                <div><label>Cover starts</label><input type="date" name="coverFrom" th:value="${record?.insuranceStartDate}" required></div>
+                <div><label>Cover ends</label><input type="date" name="coverTo" th:value="${record?.insuranceEndDate}" required></div>
+            </div>
+            <button type="submit" class="btn btn-green">Save insurance</button>
+        </form>
+    </div>
+
+    <div class="panel">
+        <h3 style="margin-top:0;">Health declaration &amp; emergency contact
+            <span th:if="${record != null and record.healthSubmitted}" class="badge" th:classappend="${record.healthVerified} ? 'badge-green' : 'badge-yellow'"
+                  th:text="${record.healthVerified} ? 'VERIFIED' : 'UNDER REVIEW'"></span></h3>
+        <div th:if="${record != null and record.healthRejectionReason != null}" class="alert alert-error" th:text="'Please update: ' + ${record.healthRejectionReason}"></div>
+        <form th:action="@{/portal/compliance/health}" method="post">
+            <div class="row"><div>
+                <label>Are you fit to travel?</label>
+                <label style="font-weight:normal; display:inline;"><input type="radio" name="fitToTravel" value="true" th:checked="${record?.fitToTravel == true}" required> Yes</label>
+                &nbsp;
+                <label style="font-weight:normal; display:inline;"><input type="radio" name="fitToTravel" value="false" th:checked="${record?.fitToTravel == false}"> No</label>
+            </div></div>
+            <div class="row"><div><label>Vaccinations (name and date)</label>
+                <textarea name="vaccinationDetails" th:text="${record?.vaccinationDetails}"></textarea></div></div>
+            <div class="row"><div><label>Special needs, medical conditions, allergies or medication we should know about</label>
+                <textarea name="specialNeedsDetails" th:text="${record?.specialNeedsDetails}"></textarea></div></div>
+            <div class="row">
+                <div><label>Emergency contact name</label><input type="text" name="emergencyContactName" th:value="${record?.emergencyContactName}" required></div>
+                <div><label>Phone</label><input type="text" name="emergencyContactPhone" th:value="${record?.emergencyContactPhone}" required></div>
+            </div>
+            <button type="submit" class="btn btn-green">Save declaration</button>
+        </form>
+    </div>
+    </th:block>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

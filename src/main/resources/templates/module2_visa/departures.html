@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Departures')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="panel">
+        <h2>Tour Departures</h2>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+        <h3>Create departure group</h3>
+        <form th:action="@{/visas/departures}" method="post" class="row">
+            <div><label>Code</label><input type="text" name="code" placeholder="IN-GT-2026-11" required></div>
+            <div><label>Tour name</label><input type="text" name="tourName" placeholder="Golden Triangle Pilgrimage" required></div>
+            <div><label>Destination</label>
+                <select name="destinationCountry" required>
+                    <option value="">Choose...</option>
+                    <option th:each="c : ${countries}" th:value="${c.countryName}" th:text="${c.countryName}"></option>
+                </select></div>
+            <div><label>Departure date</label><input type="date" name="departureDate" required></div>
+            <div><label>Return date</label><input type="date" name="returnDate" required></div>
+            <div style="flex:0;"><button type="submit" class="btn btn-green">Create</button></div>
+        </form>
+    </div>
+    <div class="panel">
+        <table>
+            <thead><tr><th>Code</th><th>Tour</th><th>Destination</th><th>Dates</th><th>Travellers</th><th>Readiness</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${departures}">
+                <td><strong th:text="${r.departure.code}"></strong></td>
+                <td th:text="${r.departure.tourName}"></td>
+                <td th:text="${r.departure.destinationCountry}"></td>
+                <td th:text="${r.departure.departureDate} + ' → ' + ${r.departure.returnDate}"></td>
+                <td th:text="${r.clearedTravellers} + ' / ' + ${#lists.size(r.travellers)} + ' cleared'"></td>
+                <td style="min-width: 160px;">
+                    <div class="progress" th:classappend="${r.complete} ? '' : 'low'">
+                        <div th:style="'width:' + ${r.percent} + '%'" th:text="${r.percent} + '%'"></div>
+                    </div>
+                </td>
+                <td><span class="badge" th:classappend="'badge-' + ${r.departure.status}" th:text="${r.departure.status}"></span></td>
+                <td><a th:href="@{/visas/departures/{id}(id=${r.departure.id})}" class="btn btn-blue btn-sm">Open</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(departures)}"><td colspan="8" class="muted">No departures yet.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

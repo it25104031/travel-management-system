@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Trip departures')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Trip departures</h1><p>The trips the company arranges services for. Hotels, transport, guides and supplier payments are all booked against a departure.</p></div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+    <datalist id="packageNames"><option th:each="n : ${packageNames}" th:value="${n}"></option></datalist>
+    <form class="panel" method="post" th:action="${editing != null ? '/logistics/departures/' + editing.id + '/edit' : '/logistics/departures'}" id="recordForm">
+        <h2 th:text="${editing != null ? 'Edit trip departure' : 'New trip departure'}">New trip departure</h2>
+        <div class="form-grid">
+                <div><label for="f-reference">Reference</label><input id="f-reference" type="text" name="reference" required maxlength="20" placeholder="TRIP-001" th:value="${editing != null ? editing.reference : ''}"></div>
+                <div><label for="f-packageName">Package</label><input id="f-packageName" type="text" name="packageName" required maxlength="100" list="packageNames" th:value="${editing != null ? editing.packageName : ''}"><div class="hint">Pick a tour package or type a custom group name.</div></div>
+                <div><label for="f-destination">Destination</label><input id="f-destination" type="text" name="destination" required maxlength="100" th:value="${editing != null ? editing.destination : ''}"></div>
+                <div><label for="f-startDate">Departure date</label><input id="f-startDate" type="date" name="startDate" required th:value="${editing != null ? editing.startDate : ''}"></div>
+                <div><label for="f-endDate">Return date</label><input id="f-endDate" type="date" name="endDate" required th:value="${editing != null ? editing.endDate : ''}"></div>
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn" th:text="${editing != null ? 'Save changes' : 'Save departure'}">Save departure</button>
+            <a class="btn btn-ghost" th:if="${editing != null}" href="/logistics/departures">Cancel</a>
+        </div>
+    </form>
+
+    <form method="post" action="/logistics/departures/delete" data-bulk>
+        <div class="toolbar">
+            <div class="grow"><label for="q">Search</label><input id="q" type="search" data-filter="#recordTable" placeholder="Reference, package or destination"></div>
+            <div th:if="${!#lists.isEmpty(departures)}">
+                <button type="button" class="btn btn-red" data-bulk-start>Delete records</button>
+                <span class="actions" data-bulk-bar hidden>
+                    <button type="submit" class="btn btn-red" data-bulk-delete disabled>Delete selected (0)</button>
+                    <button type="button" class="btn btn-ghost" data-bulk-cancel>Cancel</button>
+                </span>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table id="recordTable">
+                <thead><tr><th class="sel-col" hidden><span class="sr-only">Select</span></th><th>Reference</th><th>Package</th><th>Destination</th><th>Departure</th><th>Return</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="r : ${departures}">
+                    <td class="sel-col" hidden><input type="checkbox" name="ids" th:value="${r.id}" aria-label="Select record" disabled></td>
+                    <td th:text="${r.reference}"></td><td th:text="${r.packageName}"></td><td th:text="${r.destination}"></td><td class="nowrap" th:text="${#temporals.format(r.startDate, 'd MMM yyyy')}"></td><td class="nowrap" th:text="${#temporals.format(r.endDate, 'd MMM yyyy')}"></td>
+                    <td><a class="btn btn-outline btn-sm" th:href="@{/logistics/departures/{id}/edit(id=${r.id})}">Edit</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(departures)}" data-empty><td th:colspan="7" class="empty">No departures yet. Add the first trip above.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

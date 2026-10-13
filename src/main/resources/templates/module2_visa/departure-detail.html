@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Departure')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page" th:with="d=${readiness.departure}">
+    <div class="panel">
+        <div style="display:flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 10px;">
+            <h2 style="margin:0;"><span th:text="${d.code}"></span> &middot; <span th:text="${d.tourName}"></span></h2>
+            <span class="badge" th:classappend="'badge-' + ${d.status}" th:text="${d.status}"></span>
+        </div>
+        <p class="muted" th:text="'Departs ' + ${d.departureDate} + ' · returns ' + ${d.returnDate}"></p>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+
+        <h3>Departure readiness</h3>
+        <div class="progress" th:classappend="${readiness.complete} ? '' : 'low'" style="height: 26px;">
+            <div th:style="'width:' + ${readiness.percent} + '%; line-height: 26px;'" th:text="${readiness.percent} + '%'"></div>
+        </div>
+        <p class="muted" th:text="${readiness.satisfied} + ' of ' + ${readiness.total} + ' requirements verified · ' + ${readiness.clearedTravellers} + ' of ' + ${#lists.size(readiness.travellers)} + ' travellers cleared'"></p>
+
+        <div style="display:flex; gap: 8px; flex-wrap: wrap;">
+            <form th:if="${d.status == 'PENDING'}" th:action="@{/visas/departures/{id}/ready(id=${d.id})}" method="post" class="inline">
+                <button type="submit" class="btn" th:classappend="${readiness.complete} ? 'btn-green' : 'btn-gray'"
+                        th:text="${readiness.complete} ? 'Unlock booking gate (mark READY)' : 'Booking gate locked'">Mark ready</button>
+            </form>
+            <form th:if="${d.status == 'PENDING' and !readiness.complete}" th:action="@{/visas/departures/{id}/reminders(id=${d.id})}" method="post" class="inline">
+                <button type="submit" class="btn btn-yellow">Send reminders to pending travellers</button>
+            </form>
+            <form th:if="${d.status == 'READY'}" th:action="@{/visas/departures/{id}/reopen(id=${d.id})}" method="post" class="inline">
+                <button type="submit" class="btn btn-gray">Reopen</button>
+            </form>
+            <form th:if="${d.status == 'READY'}" th:action="@{/visas/departures/{id}/departed(id=${d.id})}" method="post" class="inline"
+                  onsubmit="return confirm('Mark as departed? Travellers\' temporary portal access will end.');">
+                <button type="submit" class="btn btn-blue">Mark departed</button>
+            </form>
+            <a class="btn btn-blue" th:href="@{/visas/departures/{id}/manifest.pdf(id=${d.id})}">Manifest PDF</a>
+            <a class="btn btn-blue" th:href="@{/visas/departures/{id}/manifest.csv(id=${d.id})}">Manifest CSV</a>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3 style="margin-top:0;">Travellers</h3>
+        <table>
+            <thead><tr><th>Traveller</th><th>Visa</th><th>Documents</th><th>Passport</th><th>Insurance</th><th>Health</th><th>Cleared</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="t : ${readiness.travellers}">
+                <td><a th:href="@{/visas/dashboard/{id}(id=${t.application.id})}" th:text="${t.application.fullName}"></a>
+                    <div class="muted" th:text="'#' + ${t.application.id}"></div></td>
+                <td th:each="item : ${t.items}" th:title="${item.detail}">
+                    <span th:class="${item.ok} ? 'check-ok' : 'check-no'"></span>
+                    <div class="muted" th:text="${item.detail}"></div>
+                </td>
+                <td><span class="badge" th:classappend="${t.cleared} ? 'badge-green' : 'badge-yellow'" th:text="${t.cleared} ? 'CLEARED' : ${t.satisfied} + '/' + ${t.total}"></span></td>
+                <td>
+                    <form th:if="${d.status == 'PENDING'}" th:action="@{/visas/departures/{id}/travellers/{a}/remove(id=${d.id},a=${t.application.id})}" method="post" class="inline">
+                        <button type="submit" class="btn btn-red btn-sm">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(readiness.travellers)}"><td colspan="8" class="muted">No travellers yet.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel" th:unless="${#lists.isEmpty(readiness.travellers)}">
+        <h3 style="margin-top:0;">Batch status change</h3>
+        <p class="muted">Moves every selected traveller at once. If any of them cannot move (for example documents not yet verified), nobody is changed and the reasons are listed.</p>
+        <form th:action="@{/visas/departures/{id}/batch-status(id=${d.id})}" method="post">
+            <div style="display:flex; flex-wrap: wrap; gap: 4px 18px; margin-bottom: 10px;">
+                <label style="font-weight:normal;"><input type="checkbox" onclick="document.querySelectorAll('.batch-cb').forEach(c => c.checked = this.checked)"> <strong>Select all</strong></label>
+                <label style="font-weight:normal;" th:each="t : ${readiness.travellers}">
+                    <input type="checkbox" class="batch-cb" name="applicationIds" th:value="${t.application.id}">
+                    <span th:text="${t.application.fullName} + ' (' + ${t.application.statusEnum.label} + ')'"></span></label>
+            </div>
+            <div class="row">
+                <div><label>New status</label><select name="status">
+                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}"></option></select></div>
+                <div><label>Reason (required to reject or reopen)</label><input type="text" name="reason"></div>
+                <div style="flex:0;"><button type="submit" class="btn">Apply to selected</button></div>
+            </div>
+        </form>
+    </div>
+
+    <div class="grid-2" th:if="${d.status == 'PENDING'}">
+        <div class="panel">
+            <h3 style="margin-top:0;">Add travellers</h3>
+            <form th:action="@{/visas/departures/{id}/travellers(id=${d.id})}" method="post">
+                <div th:each="a : ${unassigned}">
+                    <label style="font-weight:normal;"><input type="checkbox" name="applicationIds" th:value="${a.id}">
+                        <span th:text="'#' + ${a.id} + ' ' + ${a.fullName} + ' (' + ${a.statusEnum.label} + ')'"></span></label>
+                </div>
+                <p th:if="${#lists.isEmpty(unassigned)}" class="muted">Every application already belongs to a departure.</p>
+                <button th:unless="${#lists.isEmpty(unassigned)}" type="submit" class="btn btn-green btn-sm">Add selected</button>
+            </form>
+        </div>
+        <div class="panel">
+            <h3 style="margin-top:0;">Copy shared details</h3>
+            <p class="muted">Copies residential address and itinerary (port of arrival, dates, places to visit) from the lead traveller to everyone else in this group.</p>
+            <form th:action="@{/visas/departures/{id}/copy-details(id=${d.id})}" method="post" class="row"
+                  onsubmit="return confirm('Overwrite address and itinerary for all other travellers?');">
+                <div><select name="leadApplicationId">
+                    <option th:each="t : ${readiness.travellers}" th:value="${t.application.id}" th:text="${t.application.fullName}"></option>
+                </select></div>
+                <div style="flex:0;"><button type="submit" class="btn btn-sm">Copy</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3 style="margin-top:0;">Incidents</h3>
+        <form th:action="@{/visas/incidents}" method="post">
+            <input type="hidden" name="departureId" th:value="${d.id}">
+            <input type="hidden" name="returnTo" value="departure">
+            <div class="row">
+                <div><label>Traveller</label><select name="applicationId"><option value="">(whole group)</option>
+                    <option th:each="t : ${readiness.travellers}" th:value="${t.application.id}" th:text="${t.application.fullName}"></option></select></div>
+                <div><label>Type</label><select name="type"><option th:each="x : ${incidentTypes}" th:value="${x}" th:text="${x}"></option></select></div>
+                <div><label>Severity</label><select name="severity"><option th:each="x : ${severities}" th:value="${x}" th:text="${x}"></option></select></div>
+            </div>
+            <div class="row"><div><label>Description</label><input type="text" name="description" required></div>
+                <div style="flex:0;"><button type="submit" class="btn btn-red btn-sm">Log incident</button></div></div>
+        </form>
+        <table>
+            <tr th:each="i : ${incidents}">
+                <td th:text="${#temporals.format(i.createdAt, 'dd MMM HH:mm')}"></td>
+                <td><span class="badge" th:text="${i.type}"></span> <span class="badge" th:classappend="'badge-' + ${i.severity}" th:text="${i.severity}"></span></td>
+                <td th:text="${i.affectedPassportNumber != null} ? (${i.affectedTravellerName} ?: 'Traveller') : 'Group'"></td>
+                <td th:text="${i.description}"></td>
+                <td><span class="badge" th:classappend="'badge-' + ${i.status}" th:text="${i.status}"></span></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(incidents)}"><td class="muted">No incidents for this departure.</td></tr>
+        </table>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

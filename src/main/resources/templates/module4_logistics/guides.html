@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Guides & drivers')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Guides & drivers</h1><p>Tour leaders and drivers supplied by guide agencies, with their daily rates.</p></div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+
+    <form class="panel" method="post" th:action="${editing != null ? '/logistics/guides/' + editing.id + '/edit' : '/logistics/guides'}" id="recordForm">
+        <h2 th:text="${editing != null ? 'Edit guide or driver' : 'Add a guide or driver'}">Add a guide or driver</h2>
+        <div class="form-grid">
+                <div><label for="f-supplierId">Agency</label><select id="f-supplierId" name="supplierId" required><option value="" th:selected="${editing == null}" disabled>Choose...</option><option th:each="supplier : ${suppliers}" th:if="${supplier.type == 'GUIDE'}" th:value="${supplier.id}" th:text="${supplier.name}" th:selected="${editing != null and #strings.toString(editing.supplierId) == #strings.toString(supplier.id)}"></option></select></div>
+                <div><label for="f-name">Name</label><input id="f-name" type="text" name="name" required maxlength="100" th:value="${editing != null ? editing.name : ''}"></div>
+                <div><label for="f-role">Role</label><select id="f-role" name="role"><option value="GUIDE" th:selected="${editing != null and editing.role == 'GUIDE'}">Guide</option><option value="DRIVER" th:selected="${editing != null and editing.role == 'DRIVER'}">Driver</option></select></div>
+                <div><label for="f-phone">Phone</label><input id="f-phone" type="tel" name="phone" maxlength="30" th:value="${editing != null ? editing.phone : ''}"></div>
+                <div><label for="f-dailyRate">Daily rate (LKR)</label><input id="f-dailyRate" type="number" name="dailyRate" required min="0" step="0.01" th:value="${editing != null ? editing.dailyRate : ''}"></div>
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn" th:text="${editing != null ? 'Save changes' : 'Save person'}">Save person</button>
+            <a class="btn btn-ghost" th:if="${editing != null}" href="/logistics/guides">Cancel</a>
+        </div>
+    </form>
+
+    <form method="post" action="/logistics/guides/delete" data-bulk>
+        <div class="toolbar">
+            <div class="grow"><label for="q">Search</label><input id="q" type="search" data-filter="#recordTable" placeholder="Name, role or agency"></div>
+            <div th:if="${!#lists.isEmpty(guides)}">
+                <button type="button" class="btn btn-red" data-bulk-start>Delete records</button>
+                <span class="actions" data-bulk-bar hidden>
+                    <button type="submit" class="btn btn-red" data-bulk-delete disabled>Delete selected (0)</button>
+                    <button type="button" class="btn btn-ghost" data-bulk-cancel>Cancel</button>
+                </span>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table id="recordTable">
+                <thead><tr><th class="sel-col" hidden><span class="sr-only">Select</span></th><th>Name</th><th>Role</th><th>Agency</th><th>Phone</th><th class="num">Daily rate (LKR)</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="r : ${guides}">
+                    <td class="sel-col" hidden><input type="checkbox" name="ids" th:value="${r.id}" aria-label="Select record" disabled></td>
+                    <td th:text="${r.name}"></td><td th:text="${#strings.capitalize(#strings.toLowerCase(r.role))}"></td><td th:text="${r.supplier.name}"></td><td th:text="${r.phone ?: '-'}"></td><td class="num" th:text="${#numbers.formatDecimal(r.dailyRate, 1, 'COMMA', 2, 'POINT')}"></td>
+                    <td><a class="btn btn-outline btn-sm" th:href="@{/logistics/guides/{id}/edit(id=${r.id})}">Edit</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(guides)}" data-empty><td th:colspan="7" class="empty">No guides or drivers yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

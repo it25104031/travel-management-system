@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<!--/* Shared layout pieces for every page: <head>, staff sidebar, website header/footer, messages, logo. */-->
+
+<head th:fragment="head(title)">
+    <th:block th:replace="~{layout/fragments :: headLinks(${title})}"></th:block>
+</head>
+
+<!-- Same as head(title), for pages that add their own <style> -->
+<th:block th:fragment="headLinks(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' | ' + ${site != null ? site.name : 'Travel ERP'}">Travel ERP</title>
+    <link rel="icon" type="image/svg+xml" href="/img/mark.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/site.css">
+</th:block>
+
+
+<!-- Logo mark: a saffron sun rising over the Indian Ocean -->
+<svg th:fragment="mark" class="mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+    <circle cx="20" cy="20" r="19" fill="#1B2A4A" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>
+    <path d="M11.5 21.5a8.5 8.5 0 0 1 17 0z" fill="#E39A2D"/>
+    <path d="M8 24.5 Q11 22.8 14 24.5 T20 24.5 T26 24.5 T32 24.5" fill="none" stroke="#9FC3D6" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M11 29 Q14 27.3 17 29 T23 29 T29 29" fill="none" stroke="#9FC3D6" stroke-width="1.8" stroke-linecap="round" opacity=".7"/>
+</svg>
+
+<!-- ======================= Messages (all modules) ======================= -->
+<div th:fragment="messages" class="messages">
+    <div th:if="${success}" class="alert alert-success" role="status" th:text="${success}">ok</div>
+    <div th:if="${successMessage}" class="alert alert-success" role="status" th:text="${successMessage}">ok</div>
+    <div th:if="${notice}" class="alert alert-success" role="status" th:text="${notice}">ok</div>
+    <div th:if="${info}" class="alert alert-info" role="status" th:text="${info}">info</div>
+    <div th:if="${error}" class="alert alert-error" role="alert" th:text="${error}">error</div>
+    <div th:if="${errorMessage}" class="alert alert-error" role="alert" th:text="${errorMessage}">error</div>
+    <div th:if="${errors}" class="alert alert-error" role="alert">
+        Please fix the following:
+        <ul><li th:each="e : ${errors}" th:text="${e}">error</li></ul>
+    </div>
+</div>
+
+<!-- ======================= Staff workspace: sidebar + top bar ======================= -->
+<th:block th:fragment="staffNav">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <aside class="side" id="side" aria-label="Staff navigation">
+        <a class="side-brand" href="/staff">
+            <svg th:replace="~{layout/fragments :: mark}"></svg>
+            <span><strong th:text="${site.name}">Dahamde Pilgrims & Tours</strong><small>Staff workspace</small></span>
+        </a>
+        <nav th:with="p=${requestPath}">
+            <a class="side-link" href="/staff" th:classappend="${p == '/staff'} ? 'active'">
+                <svg th:replace="~{layout/icons :: home}"></svg>Dashboard</a>
+
+            <div class="side-group"><span>Visas <em>M2</em></span>
+                <a class="side-link" href="/visas/dashboard" th:classappend="${#strings.startsWith(p,'/visas/dashboard')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: passport}"></svg>Applications</a>
+                <a class="side-link" href="/visas/departures" th:classappend="${#strings.startsWith(p,'/visas/departures')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: users}"></svg>Groups &amp; compliance</a>
+                <a class="side-link" href="/visas/incidents" th:classappend="${#strings.startsWith(p,'/visas/incidents')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: alert}"></svg>Incidents</a>
+                <a class="side-link" href="/visas/select-country" th:classappend="${#strings.startsWith(p,'/visas/apply') or #strings.startsWith(p,'/visas/select')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: plus}"></svg>New application</a>
+            </div>
+
+            <div class="side-group"><span>Billing <em>M3</em></span>
+                <a class="side-link" href="/billing" th:classappend="${p == '/billing'} ? 'active'">
+                    <svg th:replace="~{layout/icons :: chart}"></svg>Overview</a>
+                <a class="side-link" href="/billing/invoices" th:classappend="${#strings.startsWith(p,'/billing/invoices')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: receipt}"></svg>Invoices</a>
+                <a class="side-link" href="/billing/payments" th:classappend="${#strings.startsWith(p,'/billing/payments')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: coins}"></svg>Payments</a>
+                <a class="side-link" href="/billing/slips" th:classappend="${#strings.startsWith(p,'/billing/slips')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: upload}"></svg>Bank slips
+                    <span class="count" th:if="${pendingSlipCount != null and pendingSlipCount > 0}" th:text="${pendingSlipCount}">2</span></a>
+                <a class="side-link" href="/billing/pay" th:classappend="${p == '/billing/pay'} ? 'active'">
+                    <svg th:replace="~{layout/icons :: card}"></svg>Card payments<span class="soon">Soon</span></a>
+            </div>
+
+            <div class="side-group"><span>Logistics <em>M4</em></span>
+                <a class="side-link" href="/logistics/departures" th:classappend="${p == '/logistics/departures'} ? 'active'">
+                    <svg th:replace="~{layout/icons :: calendar}"></svg>Trip departures</a>
+                <a class="side-link" href="/logistics/suppliers" th:classappend="${#strings.startsWith(p,'/logistics/suppliers')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: building}"></svg>Suppliers</a>
+                <a class="side-link" href="/logistics/hotels" th:classappend="${#strings.startsWith(p,'/logistics/hotels')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: bed}"></svg>Hotels</a>
+                <a class="side-link" href="/logistics/transports" th:classappend="${#strings.startsWith(p,'/logistics/transports')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: bus}"></svg>Transport</a>
+                <a class="side-link" href="/logistics/guides" th:classappend="${#strings.startsWith(p,'/logistics/guides')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: user}"></svg>Guides &amp; drivers</a>
+                <a class="side-link" href="/logistics/assignments" th:classappend="${#strings.startsWith(p,'/logistics/assignments')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: clipboard}"></svg>Assignments</a>
+                <a class="side-link" href="/logistics/payments" th:classappend="${#strings.startsWith(p,'/logistics/payments')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: coins}"></svg>Supplier payments</a>
+                <a class="side-link" href="/logistics/costs" th:classappend="${p == '/logistics/costs'} ? 'active'">
+                    <svg th:replace="~{layout/icons :: chart}"></svg>Departure costs</a>
+            </div>
+
+            <div class="side-group"><span>Packages <em>M5</em></span>
+                <a class="side-link" href="/packages" th:classappend="${p == '/packages' or #strings.startsWith(p,'/packages/edit') or #strings.startsWith(p,'/itineraries')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: map}"></svg>Tour packages</a>
+                <a class="side-link" href="/packages/bookings" th:classappend="${#strings.startsWith(p,'/packages/bookings')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: ticket}"></svg>Website bookings</a>
+            </div>
+
+            <div class="side-group" th:if="${isAdmin}"><span>Administration <em>M1</em></span>
+                <a class="side-link" href="/admin/users" th:classappend="${#strings.startsWith(p,'/admin/users')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: shield}"></svg>Staff accounts</a>
+                <a class="side-link" href="/admin/customers" th:classappend="${#strings.startsWith(p,'/admin/customers')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: users}"></svg>Travellers</a>
+                <a class="side-link" href="/admin/countries" th:classappend="${#strings.startsWith(p,'/admin/countries')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: globe}"></svg>Visa countries</a>
+                <a class="side-link" href="/admin/visa-rules" th:classappend="${#strings.startsWith(p,'/admin/visa-rules')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: clipboard}"></svg>Visa rules</a>
+                <a class="side-link" href="/admin/reports" th:classappend="${#strings.startsWith(p,'/admin/reports')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: chart}"></svg>Reports</a>
+                <a class="side-link" href="/admin/audit" th:classappend="${#strings.startsWith(p,'/admin/audit')} ? 'active'">
+                    <svg th:replace="~{layout/icons :: list}"></svg>Sign-in audit</a>
+            </div>
+        </nav>
+        <div class="side-foot">
+            <a class="side-link" href="/" target="_blank" rel="noopener"><svg th:replace="~{layout/icons :: globe}"></svg>View website</a>
+        </div>
+    </aside>
+    <div class="side-scrim" onclick="document.body.classList.remove('side-open')"></div>
+    <header class="topbar">
+        <button class="menu-toggle" type="button" aria-controls="side" aria-label="Open menu"
+                onclick="document.body.classList.toggle('side-open')"><svg th:replace="~{layout/icons :: menu}"></svg></button>
+        <span class="crumb" th:text="${isAdmin} ? 'Administrator' : 'Office staff'">Administrator</span>
+        <span class="spacer"></span>
+        <div class="who">
+            <span class="avatar" th:text="${currentUser != null ? #strings.toUpperCase(#strings.substring(currentUser,0,1)) : '?'}">A</span>
+            <span class="who-text"><b th:text="${currentUser}">admin</b><a href="/account/password">Change password</a></span>
+        </div>
+        <form th:action="@{/logout}" method="post"><button type="submit" class="btn btn-outline btn-sm">Sign out</button></form>
+    </header>
+</th:block>
+
+<!-- ======================= Visa portal (reference number + passkey) ======================= -->
+<header th:fragment="portalNav" class="site-header">
+    <div class="wrap">
+        <a class="brand" href="/"><svg th:replace="~{layout/fragments :: mark}"></svg><span class="brand-name" th:text="${site.name}">Dahamde Pilgrims & Tours</span></a>
+        <nav class="site-nav" aria-label="Visa portal">
+            <a href="/portal/case">My application</a>
+            <a href="/portal/compliance">Pre-departure checklist</a>
+        </nav>
+        <div class="header-tools">
+            <span class="muted" th:text="${currentUser}">REF</span>
+            <form th:action="@{/portal/logout}" method="post" class="inline"><button type="submit" class="btn btn-outline btn-sm">Sign out</button></form>
+        </div>
+    </div>
+</header>
+
+<!-- ======================= Public website header ======================= -->
+<header th:fragment="siteHeader(active)" class="site-header" id="siteHeader">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="wrap">
+        <a class="brand" href="/" aria-label="Home">
+            <svg th:replace="~{layout/fragments :: mark}"></svg>
+            <span class="brand-name" th:text="${site.name}">Dahamde Pilgrims & Tours</span>
+        </a>
+        <nav class="site-nav" id="siteNav" aria-label="Main">
+            <a href="/tours" th:classappend="${active == 'tours'} ? 'active'">Tours</a>
+            <a href="/visas/select-country" th:classappend="${active == 'visas'} ? 'active'">Visas</a>
+            <a href="/about" th:classappend="${active == 'about'} ? 'active'">About us</a>
+            <a href="/#contact">Contact</a>
+            <a th:if="${isStaff}" href="/staff">Staff workspace</a>
+        </nav>
+        <div class="header-tools">
+            <a class="icon-btn" href="/cart" aria-label="Cart">
+                <svg th:replace="~{layout/icons :: bag}"></svg>
+                <span class="count" th:if="${cartCount > 0}" th:text="${cartCount}">1</span>
+            </a>
+            <a class="signin-link" th:if="${member == null and !isStaff}" href="/login">
+                <svg th:replace="~{layout/icons :: user}"></svg><span>Sign in</span></a>
+            <details class="profile-menu" th:if="${member != null}">
+                <summary aria-label="Your account">
+                    <span class="avatar" th:text="${member.initials}">NP</span>
+                    <b th:text="${member.firstName}">Nimal</b>
+                </summary>
+                <div class="menu">
+                    <div class="menu-head"><b th:text="${member.fullName}">Nimal Perera</b><span th:text="${member.email}">x</span></div>
+                    <a href="/my?tab=trips">My trips</a>
+                    <a href="/my?tab=payments">Payments</a>
+                    <a href="/my?tab=visas">Visa applications</a>
+                    <a href="/my?tab=settings">Account settings</a>
+                    <form th:action="@{/logout}" method="post"><button type="submit">Sign out</button></form>
+                </div>
+            </details>
+            <form th:if="${isStaff}" th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="signin-link" style="background:none;cursor:pointer"><svg th:replace="~{layout/icons :: user}"></svg><span>Sign out</span></button>
+            </form>
+            <button class="icon-btn nav-toggle" type="button" aria-controls="siteNav" aria-label="Menu"
+                    onclick="document.getElementById('siteHeader').classList.toggle('nav-open')"><svg th:replace="~{layout/icons :: menu}"></svg></button>
+        </div>
+    </div>
+</header>
+
+<!-- ======================= Public website footer ======================= -->
+<footer th:fragment="siteFooter" class="site-footer">
+    <div class="wrap">
+        <div class="foot-grid">
+            <div class="foot-brand">
+                <a class="brand" href="/"><svg th:replace="~{layout/fragments :: mark}"></svg><span class="brand-name" th:text="${site.name}">Dahamde Pilgrims & Tours</span></a>
+                <p th:text="${site.tagline}">Tagline</p>
+            </div>
+            <div>
+                <h4>Travel</h4>
+                <ul>
+                    <li><a href="/tours">Tour packages</a></li>
+                    <li><a href="/visas/select-country">Visa applications</a></li>
+                    <li><a href="/cart">Your cart</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="/about">About us</a></li>
+                    <li><a href="/#contact">Contact</a></li>
+                    <li><a href="/portal/login">Track a visa with a reference number</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Get in touch</h4>
+                <ul>
+                    <li><a th:href="${site.phoneLink}" th:text="${site.phone}">phone</a></li>
+                    <li><a th:href="'mailto:' + ${site.email}" th:text="${site.email}">email</a></li>
+                    <li><a th:href="${site.whatsapp}" target="_blank" rel="noopener" th:text="'WhatsApp ' + ${site.whatsappNumber}">WhatsApp</a></li>
+                    <li><a th:href="${site.facebook}" target="_blank" rel="noopener">Facebook</a></li>
+                    <li th:if="${!#strings.isEmpty(site.hours)}" th:text="${site.hours}">hours</li>
+                </ul>
+            </div>
+        </div>
+        <div class="foot-base">
+            <span>&copy; <span th:text="${#temporals.year(#temporals.createNow())}">2026</span> <span th:text="${site.name}">name</span>. Travel Agency ERP - SLIIT Group 09.</span>
+            <a href="/login?staff">Staff sign in</a>
+        </div>
+    </div>
+</footer>
+
+<!-- Package art: photo if staff added one, otherwise a duotone postcard sky (art-0 .. art-5) -->
+<div th:fragment="pkgArt(pkg, cls, place)" th:class="${cls} + ' ' + (${pkg.imageUrl == null} ? 'art-' + ${pkg.themeIndex} : '')"
+     th:style="${pkg.imageUrl != null} ? 'background-image:url(' + ${pkg.imageUrl} + ')' : ''">
+    <span class="pc-place" th:if="${place and pkg.destination != null}" th:text="${pkg.destination}">Destination</span>
+</div>
+
+</html>

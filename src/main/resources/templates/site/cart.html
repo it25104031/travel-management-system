@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Your cart')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('cart')}"></header>
+<main id="main" class="site-main">
+    <div class="wrap">
+        <div class="page-title"><div><h1>Your cart</h1>
+            <p th:if="${!#lists.isEmpty(lines)}">Check your dates and travellers, then continue to checkout.</p></div></div>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+
+        <div class="empty-state" th:if="${#lists.isEmpty(lines)}">
+            <h2>Your cart is empty</h2>
+            <p>Pick a tour and choose your travel date to add it here.</p>
+            <a class="btn btn-accent" href="/tours">Browse tours</a>
+        </div>
+
+        <div class="split" th:if="${!#lists.isEmpty(lines)}">
+            <div>
+                <div class="cart-line" th:each="l : ${lines}" th:classappend="${!l.ok} ? 'has-problem'">
+                    <div th:replace="~{layout/fragments :: pkgArt(${l.pkg}, 'cart-thumb', false)}"></div>
+                    <div>
+                        <h3><a th:href="@{/tours/{id}(id=${l.pkg.packageId})}" th:text="${l.pkg.packageName}">Package</a></h3>
+                        <div class="muted" th:text="${l.pkg.duration} + ' days, LKR ' + ${#numbers.formatDecimal(l.pkg.price, 1, 'COMMA', 2, 'POINT')} + ' per person'">5 days</div>
+                        <ul class="alert alert-error" style="margin:10px 0 0; padding-left:30px" th:if="${!l.ok}">
+                            <li th:each="pr : ${l.problems}" th:text="${pr}">problem</li>
+                        </ul>
+                        <form class="edit" th:action="@{/cart/{id}/update(id=${l.item.id})}" method="post">
+                            <div><label th:for="'d-' + ${l.item.id}">Travel date</label>
+                                <input th:id="'d-' + ${l.item.id}" type="date" name="travelDate" th:value="${l.item.travelDate}" th:min="${earliestDate}" required></div>
+                            <div class="narrow"><label th:for="'t-' + ${l.item.id}">Travellers</label>
+                                <input th:id="'t-' + ${l.item.id}" type="number" name="travellers" min="1" th:max="${maxTravellers}" th:value="${l.item.travellers}" required></div>
+                            <button class="btn btn-outline btn-sm" type="submit">Update</button>
+                        </form>
+                    </div>
+                    <div>
+                        <div class="line-total" th:text="'LKR ' + ${#numbers.formatDecimal(l.total, 1, 'COMMA', 2, 'POINT')}">LKR</div>
+                        <form th:action="@{/cart/{id}/remove(id=${l.item.id})}" method="post" style="text-align:right; margin-top:10px">
+                            <button class="link-btn small" type="submit">Remove</button>
+                        </form>
+                    </div>
+                </div>
+                <a href="/tours" class="btn btn-ghost">Add another tour</a>
+            </div>
+            <aside class="summary">
+                <h2>Summary</h2>
+                <div class="row-sum" th:each="l : ${lines}">
+                    <span th:text="${l.pkg.packageName} + ' x ' + ${l.item.travellers}">x</span>
+                    <span class="money" th:text="${#numbers.formatDecimal(l.total, 1, 'COMMA', 2, 'POINT')}">0</span>
+                </div>
+                <div class="grand"><span>Total (LKR)</span><b th:text="${#numbers.formatDecimal(grandTotal, 1, 'COMMA', 2, 'POINT')}">0</b></div>
+                <a class="btn btn-accent btn-block btn-lg" style="margin-top:18px" th:href="${member != null} ? '/checkout' : '/login?continue=/checkout'"
+                   th:classappend="${!allOk} ? 'disabled'">Continue to checkout</a>
+                <p class="muted" style="margin:12px 0 0" th:if="${member == null}">You'll sign in or create an account on the next step. Your cart is kept.</p>
+            </aside>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

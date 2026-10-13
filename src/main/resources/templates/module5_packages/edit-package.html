@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Edit package')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page" style="max-width:960px">
+    <div class="page-title">
+        <div><h1 th:text="${tourPackage.packageName}">Package</h1><p><a href="/packages">Tour packages</a> / Edit</p></div>
+        <div class="actions">
+            <a class="btn btn-outline" th:href="@{/itineraries/{id}(id=${tourPackage.packageId})}">Itinerary</a>
+            <a class="btn btn-outline" th:if="${tourPackage.available}" th:href="@{/tours/{id}(id=${tourPackage.packageId})}" target="_blank" rel="noopener">View on website</a>
+        </div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+    <form class="panel" th:action="@{/packages/update/{id}(id=${tourPackage.packageId})}" method="post">
+        <div class="form-grid">
+            <div><label for="packageName">Package name</label><input id="packageName" type="text" name="packageName" maxlength="150" th:value="${tourPackage.packageName}" required></div>
+            <div><label for="duration">Days</label><input id="duration" type="number" name="duration" min="1" th:value="${tourPackage.duration}" required>
+                <div class="hint">Can't be shorter than the last planned itinerary day.</div></div>
+            <div><label for="price">Price per person (LKR)</label><input id="price" type="number" name="price" min="0" step="0.01" th:value="${tourPackage.price}" required></div>
+            <div><label for="status">Status</label>
+                <select id="status" name="status" required>
+                    <option value="AVAILABLE" th:selected="${tourPackage.status == 'AVAILABLE'}">Available (on the website)</option>
+                    <option value="UNAVAILABLE" th:selected="${tourPackage.status == 'UNAVAILABLE'}">Unavailable (hidden)</option>
+                </select></div>
+            <div><label for="destination">Destination (website)</label><input id="destination" type="text" name="destination" maxlength="100" th:value="${tourPackage.destination}"></div>
+            <div><label for="category">Category (website)</label><input id="category" type="text" name="category" maxlength="40" list="categories" th:value="${tourPackage.category}"></div>
+            <div class="span-all"><label for="imageUrl">Photo URL (optional)</label><input id="imageUrl" type="url" name="imageUrl" maxlength="500" th:value="${tourPackage.imageUrl}" placeholder="https://..."></div>
+            <div class="span-all"><label for="description">Description</label><textarea id="description" name="description" maxlength="1000" required th:text="${tourPackage.description}"></textarea></div>
+        </div>
+        <datalist id="categories"><option value="Pilgrimage"><option value="Cultural"><option value="Nature"><option value="Beach"><option value="City"><option value="Adventure"></datalist>
+        <div class="actions">
+            <button type="submit" class="btn">Save changes</button>
+            <a href="/packages" class="btn btn-ghost">Cancel</a>
+        </div>
+    </form>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

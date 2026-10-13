@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Suppliers')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Suppliers</h1><p>Hotels, transport companies and guide agencies on contract. Book their services for a trip on the Hotels, Transport and Assignments pages.</p></div>
+        <button type="button" class="btn btn-accent" id="addSupplierButton" aria-controls="supplierFormSection" aria-expanded="false">Add supplier</button>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+
+    <section id="supplierFormSection" class="panel" th:hidden="${editingSupplier == null and error == null}">
+        <h2 th:text="${editingSupplier != null ? 'Edit supplier' : 'Add supplier'}">Add supplier</h2>
+        <form method="post" id="supplierForm"
+              th:action="${editingSupplier != null ? '/logistics/suppliers/' + editingSupplier.id + '/edit' : '/logistics/suppliers'}">
+            <div class="form-grid">
+                <div><label for="supplierName">Business name</label>
+                    <input id="supplierName" name="name" required maxlength="100" th:value="${editingSupplier != null ? editingSupplier.name : ''}"></div>
+                <div><label for="supplierType">Service</label>
+                    <select id="supplierType" name="type" required>
+                        <option value="" th:selected="${editingSupplier == null}" disabled>Choose...</option>
+                        <option value="HOTEL" th:selected="${editingSupplier != null and editingSupplier.type == 'HOTEL'}">Hotel</option>
+                        <option value="TRANSPORT" th:selected="${editingSupplier != null and editingSupplier.type == 'TRANSPORT'}">Transport</option>
+                        <option value="GUIDE" th:selected="${editingSupplier != null and editingSupplier.type == 'GUIDE'}">Guide or driver agency</option>
+                    </select></div>
+                <div><label for="phone">Phone</label>
+                    <input id="phone" type="tel" name="phone" maxlength="30" th:value="${editingSupplier != null ? editingSupplier.contactPhone : ''}"></div>
+                <div><label for="contractStart">Contract from</label>
+                    <input id="contractStart" type="date" name="contractStart" required th:value="${editingSupplier != null ? editingSupplier.contractStart : ''}"></div>
+                <div><label for="contractEnd">Contract until</label>
+                    <input id="contractEnd" type="date" name="contractEnd" required th:value="${editingSupplier != null ? editingSupplier.contractEnd : ''}"></div>
+                <div id="hotelDetails" hidden><label for="roomCapacity">Rooms agreed with the hotel</label>
+                    <input id="roomCapacity" type="number" name="roomCapacity" min="1" step="1" disabled th:value="${editingSupplier != null ? editingSupplier.roomCapacity : ''}">
+                    <div class="hint">The most rooms that can be allocated across trips on the same nights.</div></div>
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn" th:text="${editingSupplier != null ? 'Save changes' : 'Save supplier'}">Save supplier</button>
+                <a th:if="${editingSupplier != null}" href="/logistics/suppliers" class="btn btn-ghost">Cancel</a>
+                <button th:unless="${editingSupplier != null}" type="button" id="cancelSupplierButton" class="btn btn-ghost">Cancel</button>
+            </div>
+        </form>
+    </section>
+
+    <form method="post" action="/logistics/suppliers/delete" data-bulk>
+        <div class="toolbar">
+            <div class="chips" role="group" aria-label="Filter by service" style="margin:0">
+                <button type="button" class="chip active" data-type-filter="ALL">All</button>
+                <button type="button" class="chip" data-type-filter="HOTEL">Hotels</button>
+                <button type="button" class="chip" data-type-filter="TRANSPORT">Transport</button>
+                <button type="button" class="chip" data-type-filter="GUIDE">Guide agencies</button>
+            </div>
+            <div class="grow"><label for="q" class="sr-only">Search</label><input id="q" type="search" data-filter="#recordTable" placeholder="Search suppliers"></div>
+            <div th:if="${!#lists.isEmpty(suppliers)}">
+                <button type="button" class="btn btn-red" data-bulk-start>Delete records</button>
+                <span class="actions" data-bulk-bar hidden>
+                    <button type="submit" class="btn btn-red" data-bulk-delete disabled>Delete selected (0)</button>
+                    <button type="button" class="btn btn-ghost" data-bulk-cancel>Cancel</button>
+                </span>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table id="recordTable">
+                <thead><tr><th class="sel-col" hidden><span class="sr-only">Select</span></th><th>Business</th><th>Service</th><th>Phone</th><th>Contract</th><th class="num">Room limit</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="supplier : ${suppliers}" th:attr="data-type=${supplier.type}">
+                    <td class="sel-col" hidden><input type="checkbox" name="ids" th:value="${supplier.id}" aria-label="Select supplier" disabled></td>
+                    <td><b th:text="${supplier.name}">name</b></td>
+                    <td><span class="badge" th:classappend="${supplier.type == 'HOTEL'} ? 'badge-blue' : (${supplier.type == 'TRANSPORT'} ? 'badge-amber' : 'badge-green')"
+                              th:text="${supplier.type == 'GUIDE'} ? 'Guide agency' : ${#strings.capitalize(#strings.toLowerCase(supplier.type))}">Hotel</span></td>
+                    <td th:text="${supplier.contactPhone ?: '-'}">phone</td>
+                    <td class="nowrap" th:text="${#temporals.format(supplier.contractStart, 'd MMM yyyy')} + ' - ' + ${#temporals.format(supplier.contractEnd, 'd MMM yyyy')}">dates</td>
+                    <td class="num" th:text="${supplier.roomCapacity ?: '-'}">-</td>
+                    <td><a class="btn btn-outline btn-sm" th:href="@{/logistics/suppliers/{id}/edit(id=${supplier.id})}">Edit</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(suppliers)}" data-empty><td colspan="7" class="empty">No suppliers yet. Use Add supplier to register the first one.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</main>
+<script src="/js/staff.js"></script>
+<script>
+(function () {
+    var section = document.getElementById('supplierFormSection'), add = document.getElementById('addSupplierButton'),
+        cancel = document.getElementById('cancelSupplierButton'), type = document.getElementById('supplierType'),
+        hotel = document.getElementById('hotelDetails'), rooms = document.getElementById('roomCapacity');
+    function syncType() {
+        var isHotel = type.value === 'HOTEL';
+        hotel.hidden = !isHotel; rooms.disabled = !isHotel; rooms.required = isHotel;
+        if (!isHotel) rooms.value = '';
+    }
+    add.addEventListener('click', function () { section.hidden = false; add.setAttribute('aria-expanded', 'true'); document.getElementById('supplierName').focus(); });
+    if (cancel) cancel.addEventListener('click', function () { section.hidden = true; add.setAttribute('aria-expanded', 'false'); });
+    type.addEventListener('change', syncType); syncType();
+    var chips = document.querySelectorAll('[data-type-filter]');
+    chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+            var t = chip.getAttribute('data-type-filter');
+            chips.forEach(function (c) { c.classList.toggle('active', c === chip); });
+            document.querySelectorAll('#recordTable tbody tr[data-type]').forEach(function (tr) {
+                tr.hidden = t !== 'ALL' && tr.getAttribute('data-type') !== t;
+                var box = tr.querySelector('input[name=ids]'); if (box) box.checked = false;
+            });
+        });
+    });
+})();
+</script>
+</body>
+</html>

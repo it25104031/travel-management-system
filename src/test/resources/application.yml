@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    # A fresh in-memory database per test context, created from the team's schema (team-schema.sql);
+    # Hibernate then only adds the extra columns/tables, exactly as it would on the real MySQL database.
+    url: jdbc:h2:mem:travel_${random.uuid};MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:team-schema.sql
+  jpa:
+    database-platform: com.travel.TeamSchemaH2Dialect
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+app:
+  upload-dir: target/test-uploads
+  customer:
+    passkey-validity-days: 30
+  scheduler:
+    daily-cron: "-"

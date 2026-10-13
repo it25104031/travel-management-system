@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Tour packages')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Tour packages</h1><p>Packages marked Available appear on the website, where travellers can book them.</p></div>
+        <div class="actions">
+            <a class="btn btn-outline" href="/tours" target="_blank" rel="noopener">See them on the website</a>
+            <a class="btn btn-accent" href="#createPackage">New package</a>
+        </div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+
+    <div class="stat-grid">
+        <div class="stat-tile"><div class="stat" th:text="${#lists.size(packages)}">0</div><div class="stat-label">Packages</div></div>
+        <div class="stat-tile"><div class="stat" th:text="${#lists.size(packages.?[status == 'AVAILABLE'])}">0</div><div class="stat-label">On the website</div></div>
+        <div class="stat-tile"><div class="stat" th:text="${#lists.size(packages.?[status == 'UNAVAILABLE'])}">0</div><div class="stat-label">Hidden (unavailable)</div></div>
+        <a class="stat-tile" href="/packages/bookings"><div class="stat">&rarr;</div><div class="stat-label">Website bookings</div></a>
+    </div>
+
+    <div class="panel">
+        <div class="toolbar">
+            <div class="grow"><label for="searchInput">Search</label><input type="search" id="searchInput" placeholder="Package name or description"></div>
+            <div><label for="statusFilter">Status</label>
+                <select id="statusFilter">
+                    <option value="">All</option>
+                    <option value="AVAILABLE">Available</option>
+                    <option value="UNAVAILABLE">Unavailable</option>
+                </select></div>
+        </div>
+        <div class="table-wrap">
+            <table id="packageTable">
+                <thead><tr><th>#</th><th>Package</th><th>Days</th><th style="width:190px">Itinerary planned</th><th class="num">Price (LKR)</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                <tr class="package-row" th:each="pkg : ${packages}" th:attr="data-status=${pkg.status}">
+                    <td th:text="${pkg.packageId}">1</td>
+                    <td><b th:text="${pkg.packageName}">Package</b>
+                        <div class="muted" th:text="${(pkg.destination != null ? pkg.destination : '') + (pkg.category != null ? ' (' + pkg.category + ')' : '')}">dest</div></td>
+                    <td th:text="${pkg.duration}">7</td>
+                    <td th:with="pct=${pkg.duration > 0 ? (#lists.size(pkg.itineraries) * 100 / pkg.duration) : 0}">
+                        <div class="progress" th:classappend="${pct < 100} ? 'low'"><div th:style="'width:' + ${pct > 100 ? 100 : pct} + '%'" th:text="${#lists.size(pkg.itineraries)} + '/' + ${pkg.duration}">0/7</div></div>
+                    </td>
+                    <td class="num" th:text="${#numbers.formatDecimal(pkg.price, 1, 'COMMA', 2, 'POINT')}">0</td>
+                    <td><span class="badge" th:classappend="'badge-' + ${pkg.status}" th:text="${pkg.status == 'AVAILABLE'} ? 'Available' : 'Unavailable'">Available</span></td>
+                    <td class="nowrap">
+                        <a class="btn btn-outline btn-sm" th:href="@{/packages/edit/{id}(id=${pkg.packageId})}">Edit</a>
+                        <a class="btn btn-outline btn-sm" th:href="@{/itineraries/{id}(id=${pkg.packageId})}">Itinerary</a>
+                        <form th:action="@{/packages/delete/{id}(id=${pkg.packageId})}" method="post" class="inline" data-confirm="Delete this package and its itinerary?">
+                            <button type="submit" class="btn btn-red btn-sm">Delete</button></form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(packages)}" data-empty><td colspan="7" class="empty">No packages yet. Create the first one below.</td></tr>
+                <tr id="noMatchingPackages" data-empty hidden><td colspan="7" class="empty">No packages match. Try another search or status.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pager">
+            <button type="button" id="prevPage" class="btn btn-outline btn-sm">Previous</button>
+            <span id="pageInfo">Page 1 of 1</span>
+            <button type="button" id="nextPage" class="btn btn-outline btn-sm">Next</button>
+        </div>
+    </div>
+
+    <form class="panel" id="createPackage" action="/packages/add" th:action="@{/packages/add}" method="post">
+        <h2>New package</h2>
+        <div class="form-grid">
+            <div><label for="packageName">Package name</label><input id="packageName" type="text" name="packageName" maxlength="150" required></div>
+            <div><label for="duration">Days</label><input id="duration" type="number" name="duration" min="1" required></div>
+            <div><label for="price">Price per person (LKR)</label><input id="price" type="number" name="price" min="0" step="0.01" required></div>
+            <div><label for="status">Status</label><select id="status" name="status" required><option value="AVAILABLE">Available (on the website)</option><option value="UNAVAILABLE">Unavailable (hidden)</option></select></div>
+            <div><label for="destination">Destination (website)</label><input id="destination" type="text" name="destination" maxlength="100" placeholder="e.g. North India"></div>
+            <div><label for="category">Category (website)</label><input id="category" type="text" name="category" maxlength="40" list="categories" placeholder="e.g. Pilgrimage"></div>
+            <div class="span-all"><label for="imageUrl">Photo URL (optional)</label><input id="imageUrl" type="url" name="imageUrl" maxlength="500" placeholder="https://...">
+                <div class="hint">Without a photo, the website shows a coloured postcard with the destination.</div></div>
+            <div class="span-all"><label for="description">Description</label><textarea id="description" name="description" maxlength="1000" required></textarea></div>
+        </div>
+        <datalist id="categories"><option value="Pilgrimage"><option value="Cultural"><option value="Nature"><option value="Beach"><option value="City"><option value="Adventure"></datalist>
+        <button type="submit" class="btn">Create package</button>
+    </form>
+</main>
+<script src="/js/staff.js"></script>
+<script>
+(function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#packageTable tbody tr.package-row'));
+    var perPage = 10, page = 1;
+    var search = document.getElementById('searchInput'), status = document.getElementById('statusFilter');
+    function render() {
+        var q = search.value.trim().toLowerCase(), s = status.value;
+        var shown = rows.filter(function (r) {
+            return (!q || r.textContent.toLowerCase().indexOf(q) !== -1) && (!s || r.dataset.status === s);
+        });
+        var pages = Math.max(1, Math.ceil(shown.length / perPage));
+        page = Math.min(page, pages);
+        rows.forEach(function (r) { r.hidden = true; });
+        shown.slice((page - 1) * perPage, page * perPage).forEach(function (r) { r.hidden = false; });
+        document.getElementById('noMatchingPackages').hidden = !(rows.length > 0 && shown.length === 0);
+        document.getElementById('pageInfo').textContent = 'Page ' + page + ' of ' + pages;
+        document.getElementById('prevPage').disabled = page <= 1;
+        document.getElementById('nextPage').disabled = page >= pages;
+    }
+    search.addEventListener('input', function () { page = 1; render(); });
+    status.addEventListener('change', function () { page = 1; render(); });
+    document.getElementById('prevPage').addEventListener('click', function () { page--; render(); });
+    document.getElementById('nextPage').addEventListener('click', function () { page++; render(); });
+    render();
+})();
+</script>
+</body>
+</html>

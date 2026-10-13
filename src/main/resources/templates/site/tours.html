@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Tour packages')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('tours')}"></header>
+<main id="main">
+    <section class="page-hero">
+        <div class="wrap">
+            <div class="crumbs"><a href="/">Home</a> / Tours</div>
+            <h1>Tour packages</h1>
+            <p>Every package includes a day-by-day plan. Prices are per person; choose your travel date on the next page.</p>
+        </div>
+    </section>
+    <div class="wrap" style="padding-top:32px; padding-bottom:72px">
+        <div th:replace="~{layout/fragments :: messages}"></div>
+        <form class="filters" method="get" action="/tours">
+            <div class="grow"><label for="q">Search</label>
+                <input id="q" type="search" name="q" th:value="${q}" placeholder="Place or tour name, e.g. Kerala"></div>
+            <div><label for="sort">Sort by</label>
+                <select id="sort" name="sort" onchange="this.form.submit()">
+                    <option value="recommended" th:selected="${sort == 'recommended'}">Recommended</option>
+                    <option value="price-asc" th:selected="${sort == 'price-asc'}">Price: low to high</option>
+                    <option value="price-desc" th:selected="${sort == 'price-desc'}">Price: high to low</option>
+                    <option value="days" th:selected="${sort == 'days'}">Shortest first</option>
+                </select></div>
+            <input type="hidden" name="category" th:value="${category}">
+            <button class="btn" type="submit">Search</button>
+        </form>
+        <div class="chips" th:if="${!#sets.isEmpty(categories)}">
+            <a class="chip" th:href="@{/tours(q=${q},sort=${sort})}" th:classappend="${#strings.isEmpty(category)} ? 'active'">All</a>
+            <a class="chip" th:each="c : ${categories}" th:href="@{/tours(category=${c},q=${q},sort=${sort})}"
+               th:classappend="${c == category} ? 'active'" th:text="${c}">Cultural</a>
+        </div>
+        <p class="muted" th:text="${#lists.size(packages)} + (${#lists.size(packages) == 1} ? ' tour' : ' tours')">6 tours</p>
+        <div class="postcards">
+            <a class="postcard" th:each="p : ${packages}" th:href="@{/tours/{id}(id=${p.packageId})}">
+                <div th:replace="~{layout/fragments :: pkgArt(${p}, 'pc-art', true)}"></div>
+                <span class="pc-tag" th:if="${p.category}" th:text="${p.category}">Cultural</span>
+                <div class="pc-body">
+                    <h3 th:text="${p.packageName}">Package</h3>
+                    <p th:text="${p.description}">Description</p>
+                    <div class="pc-foot">
+                        <span class="pc-price"><small>From, per person</small><span th:text="'LKR ' + ${#numbers.formatDecimal(p.price, 1, 'COMMA', 0, 'POINT')}">LKR 95,000</span></span>
+                        <span class="pc-days" th:text="${p.duration} + ' days'">5 days</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="empty-state" th:if="${#lists.isEmpty(packages)}">
+            <h2>No tours match your search</h2>
+            <p>Try another place name, or clear the filters to see every tour.</p>
+            <a class="btn btn-outline" href="/tours">Show all tours</a>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

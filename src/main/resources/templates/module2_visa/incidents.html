@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Incidents')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="panel">
+        <h2>Tour Incidents &amp; Emergencies</h2>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+        <form th:action="@{/visas/incidents}" method="post">
+            <div class="row">
+                <div><label>Departure</label><select name="departureId"><option value="">(the traveller's departure)</option>
+                    <option th:each="d : ${departures}" th:value="${d.id}" th:text="${d.code}"></option></select></div>
+                <div><label>Traveller</label><select name="applicationId"><option value="">(none / whole group)</option>
+                    <option th:each="a : ${applications}" th:value="${a.id}" th:text="'#' + ${a.id} + ' ' + ${a.fullName}"></option></select></div>
+                <div><label>Type</label><select name="type"><option th:each="x : ${incidentTypes}" th:value="${x}" th:text="${x}"></option></select></div>
+                <div><label>Severity</label><select name="severity"><option th:each="x : ${severities}" th:value="${x}" th:text="${x}"></option></select></div>
+                <div><label>Assign to</label><select name="assignedTo"><option value="">(me)</option>
+                    <option th:each="u : ${staff}" th:value="${u.username}" th:text="${u.username}"></option></select></div>
+            </div>
+            <div class="row"><div><label>Description</label><textarea name="description" required></textarea></div></div>
+            <button type="submit" class="btn btn-red">Log incident</button>
+            <span class="muted">A LOST_PASSPORT incident invalidates the traveller's passport record, re-locks their departure and emails a replacement checklist.</span>
+        </form>
+    </div>
+
+    <div class="panel" th:each="i : ${incidents}">
+        <div style="display:flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div>
+                <span class="badge" th:text="${i.type}"></span>
+                <span class="badge" th:classappend="'badge-' + ${i.severity}" th:text="${i.severity}"></span>
+                <span class="badge" th:classappend="'badge-' + ${i.status}" th:text="${i.status}"></span>
+                <strong th:if="${i.affectedPassportNumber != null}" th:text="${i.affectedTravellerName} ?: 'Traveller'"></strong>
+                <span class="muted" th:if="${i.departure != null}" th:text="'· ' + ${i.departure.code}"></span>
+            </div>
+            <span class="muted" th:text="${#temporals.format(i.createdAt, 'dd MMM yyyy HH:mm')} + ' · reported by ' + ${i.reportedBy} + ' · assigned to ' + ${i.assignedTo}"></span>
+        </div>
+        <p th:text="${i.description}"></p>
+        <div th:unless="${#lists.isEmpty(i.checklistItems)}">
+            <strong>Replacement checklist</strong>
+            <ol><li th:each="c : ${i.checklistItems}" th:text="${c}"></li></ol>
+        </div>
+        <p th:if="${i.resolution}"><strong>Resolution:</strong> <span th:text="${i.resolution}"></span></p>
+        <form th:if="${i.status == 'OPEN'}" th:action="@{/visas/incidents/{id}/resolve(id=${i.id})}" method="post" class="row">
+            <div><input type="text" name="resolution" placeholder="How was it resolved?" required></div>
+            <div style="flex:0;"><button type="submit" class="btn btn-green btn-sm">Resolve</button></div>
+        </form>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

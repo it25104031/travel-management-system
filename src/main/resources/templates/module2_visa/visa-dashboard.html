@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Visa Dashboard')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page" style="max-width: 1250px;">
+    <div class="panel">
+        <div style="display:flex; justify-content: space-between; align-items: center;">
+            <h2>Visa Applications</h2>
+            <a href="/visas/select-country" class="btn btn-green">+ New Application</a>
+        </div>
+        <div th:replace="~{layout/fragments :: messages}"></div>
+
+        <form method="get" action="/visas/dashboard" class="row">
+            <div style="max-width: 220px;"><label>Queue</label>
+                <select name="filter" onchange="this.form.submit()">
+                    <option value="open" th:selected="${filter == 'open'}">Open applications</option>
+                    <option value="mine" th:selected="${filter == 'mine'}">Assigned to me</option>
+                    <option value="unassigned" th:selected="${filter == 'unassigned'}">Unassigned</option>
+                    <option value="overdue" th:selected="${filter == 'overdue'}">Overdue</option>
+                    <option value="closed" th:selected="${filter == 'closed'}">Closed</option>
+                    <option value="all" th:selected="${filter == 'all'}">All</option>
+                </select></div>
+            <div style="max-width: 220px;"><label>Status</label>
+                <select name="status" onchange="this.form.submit()">
+                    <option value="">Any</option>
+                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}" th:selected="${s.name() == status}"></option>
+                </select></div>
+        </form>
+
+        <p class="muted">Sorted by priority: overdue first, then by travel date.
+            <span th:unless="${isAdmin}">Passport numbers are masked; open an application to reveal one when needed.</span></p>
+        <table>
+            <thead>
+            <tr><th>ID</th><th>Country</th><th>Name</th><th>Nationality</th><th>Passport</th><th>Visa</th><th>Travel</th><th>Due</th><th>Assigned</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${rows}" th:classappend="${r.overdue} ? 'overdue'">
+                <td th:text="${r.app.id}"></td>
+                <td><span class="badge badge-blue" th:text="${r.app.countryCode}"></span></td>
+                <td th:text="${r.app.fullName}"></td>
+                <td th:text="${r.app.nationality}"></td>
+                <td>
+                    <span th:text="${r.passportDisplay}"></span>
+                    <div><span class="badge" th:classappend="${r.passport.badgeClass}" th:text="${r.passport.result}"
+                               th:title="${r.passport.label}"></span></div>
+                </td>
+                <td th:text="${r.app.visaService}"></td>
+                <td>
+                    <span th:text="${r.travelDate}"></span>
+                    <div class="muted" th:if="${r.app.departure != null}" th:text="${r.app.departure.code}"></div>
+                </td>
+                <td><span th:text="${r.dueDate}"></span>
+                    <div th:if="${r.overdue}"><span class="badge badge-red">OVERDUE</span></div></td>
+                <td th:text="${r.app.assignedOperator} ?: '-'"></td>
+                <td><span class="badge" th:classappend="'badge-' + ${r.app.statusEnum}" th:text="${r.app.statusEnum.label}"></span></td>
+                <td><a th:href="@{/visas/dashboard/{id}(id=${r.app.id})}" class="btn btn-blue btn-sm">Review</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(rows)}"><td colspan="11" class="muted">No applications in this view.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>

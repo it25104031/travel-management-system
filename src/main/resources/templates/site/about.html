@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('About us')}"></head>
+<body class="site">
+<header th:replace="~{layout/fragments :: siteHeader('about')}"></header>
+<main id="main">
+    <section class="page-hero">
+        <div class="wrap">
+            <div class="crumbs"><a href="/">Home</a> / About us</div>
+            <h1 th:text="'About ' + ${site.name}">About us</h1>
+            <p>A small team in Pannipitiya that plans pilgrimages, family holidays and group tours, and prepares the visas that go with them.</p>
+        </div>
+    </section>
+    <section class="section">
+        <div class="wrap about-grid">
+            <div class="prose">
+                <h2 style="margin-top:0">How we work</h2>
+                <p>Most of our travellers come to us through their temple, their workplace or a friend who has travelled with us before. Many are going abroad for the first time, so we take care of the details: the route, the hotels, the coaches and guides, travel insurance and the visa forms.</p>
+                <p>Before every group leaves, our office checks that each traveller's visa, insurance and health declarations are in order. On the road, a tour leader travels with the group and stays in touch with our office.</p>
+                <h2>Why we built this website</h2>
+                <p>Until now our bookings lived in spreadsheets, e-mail threads and paper files. This site lets you book a tour, pay your invoice and follow your visa application in one place - and lets our staff see the full status of every trip.</p>
+                <div class="actions" style="margin-top:24px">
+                    <a class="btn btn-accent" href="/tours">Browse tours</a>
+                    <a class="btn btn-outline" href="/#contact">Contact us</a>
+                </div>
+            </div>
+            <ul class="promise">
+                <li><h3>Pilgrimages</h3><p>The Buddhist circuit in India and Nepal, with daily observances and vegetarian meals.</p></li>
+                <li><h3>Holidays</h3><p>India, Dubai, Thailand and Sri Lanka itself, for couples and families.</p></li>
+                <li><h3>Visa services</h3><p>Indian and Sri Lankan visas, with document checks before submission.</p></li>
+                <li><h3>Group logistics</h3><p>Hotels, coaches, guides and drivers arranged for your own dates.</p></li>
+            </ul>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{layout/fragments :: siteFooter}"></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

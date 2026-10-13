@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Transport')}"></head>
+<body class="staff">
+<th:block th:replace="~{layout/fragments :: staffNav}"></th:block>
+<main id="main" class="page">
+    <div class="page-title">
+        <div><h1>Transport</h1><p>Flights, coaches, trains and vehicles for each departure. The same vehicle can’t be booked twice on one day.</p></div>
+    </div>
+    <div th:replace="~{layout/fragments :: messages}"></div>
+
+    <form class="panel" method="post" th:action="${editing != null ? '/logistics/transports/' + editing.id + '/edit' : '/logistics/transports'}" id="recordForm">
+        <h2 th:text="${editing != null ? 'Edit transport' : 'Allocate transport'}">Allocate transport</h2>
+        <div class="form-grid">
+                <div><label for="f-supplierId">Supplier</label><select id="f-supplierId" name="supplierId" required><option value="" th:selected="${editing == null}" disabled>Choose...</option><option th:each="supplier : ${suppliers}" th:if="${supplier.type == 'TRANSPORT'}" th:value="${supplier.id}" th:text="${supplier.name}" th:selected="${editing != null and #strings.toString(editing.supplierId) == #strings.toString(supplier.id)}"></option></select></div>
+                <div><label for="f-departureId">Departure</label><select id="f-departureId" name="departureId" required><option value="" th:selected="${editing == null}" disabled>Choose a departure...</option><option th:each="departure : ${departures}" th:value="${departure.id}" th:text="${departure.reference + ' - ' + departure.destination}" th:selected="${editing != null and #strings.toString(editing.departureId) == #strings.toString(departure.id)}"></option></select></div>
+                <div><label for="f-mode">Mode</label><select id="f-mode" name="mode"><option value="FLIGHT" th:selected="${editing != null and editing.mode == 'FLIGHT'}">Flight</option><option value="COACH" th:selected="${editing != null and editing.mode == 'COACH'}">Coach</option><option value="TRAIN" th:selected="${editing != null and editing.mode == 'TRAIN'}">Train</option><option value="VEHICLE" th:selected="${editing != null and editing.mode == 'VEHICLE'}">Vehicle</option></select></div>
+                <div><label for="f-reference">Vehicle / service reference</label><input id="f-reference" type="text" name="reference" required maxlength="60" th:value="${editing != null ? editing.reference : ''}"></div>
+                <div><label for="f-serviceDate">Service date</label><input id="f-serviceDate" type="date" name="serviceDate" required th:value="${editing != null ? editing.serviceDate : ''}"></div>
+                <div><label for="f-seats">Seats</label><input id="f-seats" type="number" name="seats" required min="1" th:value="${editing != null ? editing.seats : ''}"></div>
+                <div><label for="f-cost">Total cost (LKR)</label><input id="f-cost" type="number" name="cost" required min="0" step="0.01" th:value="${editing != null ? editing.cost : ''}"></div>
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn" th:text="${editing != null ? 'Save changes' : 'Allocate transport'}">Allocate transport</button>
+            <a class="btn btn-ghost" th:if="${editing != null}" href="/logistics/transports">Cancel</a>
+        </div>
+    </form>
+
+    <form method="post" action="/logistics/transports/delete" data-bulk>
+        <div class="toolbar">
+            <div class="grow"><label for="q">Search</label><input id="q" type="search" data-filter="#recordTable" placeholder="Departure, supplier or vehicle"></div>
+            <div th:if="${!#lists.isEmpty(transports)}">
+                <button type="button" class="btn btn-red" data-bulk-start>Delete records</button>
+                <span class="actions" data-bulk-bar hidden>
+                    <button type="submit" class="btn btn-red" data-bulk-delete disabled>Delete selected (0)</button>
+                    <button type="button" class="btn btn-ghost" data-bulk-cancel>Cancel</button>
+                </span>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table id="recordTable">
+                <thead><tr><th class="sel-col" hidden><span class="sr-only">Select</span></th><th>Departure</th><th>Supplier</th><th>Mode</th><th>Reference</th><th>Date</th><th class="num">Seats</th><th class="num">Cost (LKR)</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="r : ${transports}">
+                    <td class="sel-col" hidden><input type="checkbox" name="ids" th:value="${r.id}" aria-label="Select record" disabled></td>
+                    <td th:text="${r.departure.reference}"></td><td th:text="${r.supplier.name}"></td><td th:text="${#strings.capitalize(#strings.toLowerCase(r.mode))}"></td><td th:text="${r.vehicleReference}"></td><td class="nowrap" th:text="${#temporals.format(r.serviceDate, 'd MMM yyyy')}"></td><td class="num" th:text="${r.seats}"></td><td class="num" th:text="${#numbers.formatDecimal(r.cost, 1, 'COMMA', 2, 'POINT')}"></td>
+                    <td><a class="btn btn-outline btn-sm" th:href="@{/logistics/transports/{id}/edit(id=${r.id})}">Edit</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(transports)}" data-empty><td th:colspan="9" class="empty">No transport allocated yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</main>
+<script src="/js/staff.js"></script>
+</body>
+</html>
