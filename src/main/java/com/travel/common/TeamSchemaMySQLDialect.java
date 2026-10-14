@@ -21,4 +21,27 @@ public class TeamSchemaMySQLDialect extends MySQLDialect {
 
     @Override
     public boolean supportsAlterColumnType() { return false; }
+
+    // ---- row locks: never use "FOR UPDATE OF <alias>" (not supported by MariaDB / XAMPP) ----
+
+    @Override
+    public String getWriteLockString(String aliases, int timeout) { return getWriteLockString(timeout); }
+
+    @Override
+    public String getWriteLockString(String aliases, jakarta.persistence.Timeout timeout) { return getWriteLockString(timeout); }
+
+    @Override
+    public String getReadLockString(String aliases, int timeout) { return getReadLockString(timeout); }
+
+    @Override
+    public String getReadLockString(String aliases, jakarta.persistence.Timeout timeout) { return getReadLockString(timeout); }
+
+    @Override
+    public String getForUpdateString(String aliases) { return getForUpdateString(); }
+
+    @Override
+    public String getForUpdateNowaitString(String aliases) { return getForUpdateNowaitString(); }
+
+    @Override
+    public String getForUpdateSkipLockedString(String aliases) { return getForUpdateSkipLockedString(); }
 }
