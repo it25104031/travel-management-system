@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Plain unit test - runs without a database. */
 class InvoiceStatusTest {
 
     private static String status(String total, String paid) {
@@ -31,7 +30,7 @@ class InvoiceStatusTest {
 
     @Test
     void decimalsAreExact() {
-        // With double, 0.1 + 0.2 = 0.30000000000000004 and this would wrongly be PAID/PARTIAL
+
         BigDecimal paid = new BigDecimal("0.10").add(new BigDecimal("0.20"));
         assertEquals("PAID", PaymentService.calculateStatus(new BigDecimal("0.30"), paid));
     }

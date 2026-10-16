@@ -1,20 +1,3 @@
--- =====================================================================================
--- Travel Agency ERP - full database schema for all five modules (MySQL 8, reference copy)
---
--- You do NOT need to run this file. Run travel_erp.sql once, then start the app:
--- Hibernate (ddl-auto: update) creates every other table below automatically.
--- This file is generated from the JPA entities so the report/EER can be checked against
--- the exact tables the application uses.
---
---   Module 1 Auth & identity : admin_users, customer_accounts, auth_audit_log, site_customers
---   Module 2 Visa            : supported_countries, visa_types, visa_requirement_rules, tour_departures,
---                              india_/srilanka_visa_applications (+ _documents), visa_status_history,
---                              traveler_compliance_records, tour_incidents
---   Module 3 Billing         : invoice, payment, payment_slip
---   Module 4 Logistics       : departure, supplier, hotel_booking, transport, guide, assignment, supplier_payment
---   Module 5 Packages        : tour_package, itinerary, tour_booking
--- =====================================================================================
-
 CREATE TABLE admin_users (active bit, must_change_password bit, created_at datetime(6), id bigint not null auto_increment, updated_at datetime(6), username varchar(100) not null, email varchar(255), full_name varchar(255), password varchar(255) not null, role varchar(255) not null, primary key (id)) engine=InnoDB;
 
 CREATE TABLE assignment (assignment_id integer not null auto_increment, cost decimal(10,2) not null, departure_id integer not null, end_date date not null, guide_id integer not null, start_date date not null, primary key (assignment_id)) engine=InnoDB;
@@ -158,4 +141,3 @@ ALTER TABLE traveler_compliance_records add constraint FKsdk7o49b25l5wg8tdccieb2
 ALTER TABLE visa_requirement_rules add constraint FKfa7i8tgxf9xsa3oevh0vjiufk foreign key (visa_type_id) references visa_types (id);
 
 ALTER TABLE visa_types add constraint FKb103385rxrmt8tej75ge5ktk2 foreign key (country_id) references supported_countries (id);
-

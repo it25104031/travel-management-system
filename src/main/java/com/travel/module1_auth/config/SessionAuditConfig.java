@@ -12,14 +12,9 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.session.HttpSessionDestroyedEvent;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
-/**
- * Audits sessions that end without an explicit logout, i.e. idle timeouts.
- * Explicit logouts and forced customer sign-outs mark the session first so they are not logged twice.
- */
 @Configuration
 public class SessionAuditConfig {
 
-    /** Session attribute set just before a session is ended on purpose. */
     public static final String ENDED_EXPLICITLY = "travel.sessionEndedExplicitly";
 
     private final AuthAuditService auditService;
@@ -28,7 +23,6 @@ public class SessionAuditConfig {
         this.auditService = auditService;
     }
 
-    // Turns servlet session lifecycle callbacks into Spring events
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {
         return new HttpSessionEventPublisher();
@@ -55,7 +49,7 @@ public class SessionAuditConfig {
         try {
             session.setAttribute(ENDED_EXPLICITLY, Boolean.TRUE);
         } catch (IllegalStateException ignored) {
-            // already invalidated
+
         }
     }
 

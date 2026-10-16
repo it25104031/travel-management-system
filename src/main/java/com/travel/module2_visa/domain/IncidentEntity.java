@@ -16,20 +16,18 @@ public class IncidentEntity {
     @JoinColumn(name = "departure_id", nullable = false)
     private TourDepartureEntity departure;
 
-    // The traveller concerned, if any (null for group-level incidents)
     private String affectedPassportNumber;
 
-    // Filled by IncidentService for display; not stored
     @Transient
     private String affectedTravellerName;
 
     @Column(name = "incident_type", nullable = false)
-    private String type; // IncidentType
+    private String type;
 
     @Column(nullable = false)
-    private String severity; // IncidentSeverity
+    private String severity;
 
-    private String status = "OPEN"; // OPEN / RESOLVED
+    private String status = "OPEN";
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
@@ -37,7 +35,6 @@ public class IncidentEntity {
     @Column(columnDefinition = "TEXT")
     private String resolution;
 
-    // Generated steps for lost-passport and similar emergencies, one per line
     @Column(name = "action_taken", columnDefinition = "TEXT")
     private String replacementChecklist;
 

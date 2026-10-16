@@ -5,7 +5,7 @@
 <header th:replace="~{layout/fragments :: siteHeader('home')}"></header>
 
 <main id="main">
-    <!-- Hero: the logo fades away as the visitor scrolls -->
+
     <section class="hero">
         <div class="hero-sky" aria-hidden="true">
             <div class="hero-sun"></div>
@@ -37,7 +37,6 @@
 
     <div th:if="${param.signedout}" class="wrap" style="margin-top:24px"><div class="alert alert-info">You have signed out. See you on your next trip.</div></div>
 
-    <!-- About -->
     <section class="section" id="about">
         <div class="wrap about-grid">
             <div>
@@ -53,7 +52,6 @@
         </div>
     </section>
 
-    <!-- Services -->
     <section class="section tint" id="services">
         <div class="wrap">
             <div class="section-head">
@@ -91,7 +89,6 @@
         </div>
     </section>
 
-    <!-- Featured tours -->
     <section class="section" id="tours" th:if="${!#lists.isEmpty(featured)}">
         <div class="wrap">
             <div class="section-head">
@@ -115,7 +112,6 @@
         </div>
     </section>
 
-    <!-- Contact -->
     <section class="section" id="contact" style="padding-top:0">
         <div class="wrap">
             <div class="contact">

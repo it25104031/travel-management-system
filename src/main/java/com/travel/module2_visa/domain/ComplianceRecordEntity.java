@@ -4,10 +4,6 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * A traveller's pre-departure compliance for one tour departure (table traveler_compliance_records):
- * travel insurance plus the health declaration and emergency contact. Keyed by passport number + departure.
- */
 @Entity
 @Table(name = "traveler_compliance_records")
 public class ComplianceRecordEntity {
@@ -28,7 +24,6 @@ public class ComplianceRecordEntity {
     @JoinColumn(name = "departure_id", nullable = false)
     private TourDepartureEntity departure;
 
-    // --- Travel insurance ---
     private String insuranceProvider;
     private String insurancePolicyNumber;
     private LocalDate insuranceStartDate;
@@ -39,7 +34,6 @@ public class ComplianceRecordEntity {
     private LocalDateTime insuranceVerifiedAt;
     private String insuranceRejectionReason;
 
-    // --- Health declaration and emergency contact ---
     private String healthDeclarationStatus = HEALTH_NOT_SUBMITTED;
     private Boolean fitToTravel;
     @Column(columnDefinition = "TEXT")
@@ -56,7 +50,6 @@ public class ComplianceRecordEntity {
         return insuranceProvider != null && insurancePolicyNumber != null && insuranceStartDate != null && insuranceEndDate != null;
     }
 
-    /** True when the policy covers every day from departure to return (inclusive). */
     public boolean insuranceCovers(LocalDate start, LocalDate end) {
         if (insuranceStartDate == null || insuranceEndDate == null || start == null || end == null) return false;
         return !insuranceStartDate.isAfter(start) && !insuranceEndDate.isBefore(end);

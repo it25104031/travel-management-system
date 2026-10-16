@@ -12,13 +12,6 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.List;
 
-/**
- * Upgrades a MySQL database created by earlier versions of this project before Hibernate
- * validates/updates the schema, so existing applications and documents are kept:
- *  - auth_audit_log.event_type is widened from ENUM to VARCHAR so new event types can be stored
- *  - payment_slip.user_id becomes optional, because website travellers (not staff) now upload slips
- * It does nothing on other databases (e.g. the H2 database used by the tests).
- */
 @Configuration
 public class LegacySchemaMigrator implements InitializingBean {
 
@@ -30,7 +23,6 @@ public class LegacySchemaMigrator implements InitializingBean {
         this.dataSource = dataSource;
     }
 
-    // Make Hibernate wait until this bean has run
     @Bean
     public static EntityManagerFactoryDependsOnPostProcessor entityManagerFactoryDependsOnLegacyMigrator() {
         return new EntityManagerFactoryDependsOnPostProcessor("legacySchemaMigrator");

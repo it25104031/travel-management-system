@@ -1,4 +1,3 @@
-/* Staff workspace helpers: confirm prompts, client-side table search, close menu on Escape. */
 (function () {
     document.querySelectorAll('[data-confirm]').forEach(function (el) {
         var handler = function (e) {
@@ -6,7 +5,7 @@
         };
         if (el.tagName === 'FORM') el.addEventListener('submit', handler); else el.addEventListener('click', handler);
     });
-    // <input data-filter="#tableId"> hides rows that don't contain the typed text
+
     document.querySelectorAll('[data-filter]').forEach(function (input) {
         var table = document.querySelector(input.getAttribute('data-filter'));
         if (!table) return;
@@ -21,8 +20,6 @@
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') document.body.classList.remove('side-open'); });
 })();
 
-/* Bulk delete: <form data-bulk> with [data-bulk-start], [data-bulk-bar], [data-bulk-delete], [data-bulk-cancel],
-   checkbox cells with class "sel-col" and inputs name="ids". */
 (function () {
     document.querySelectorAll('form[data-bulk]').forEach(function (form) {
         var start = form.querySelector('[data-bulk-start]'), bar = form.querySelector('[data-bulk-bar]'),

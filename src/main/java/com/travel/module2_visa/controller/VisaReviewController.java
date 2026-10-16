@@ -25,7 +25,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 
-/** Staff (ADMIN + USER) review workspace for visa applications. */
 @Controller
 @RequestMapping("/visas/dashboard")
 public class VisaReviewController {
@@ -56,12 +55,10 @@ public class VisaReviewController {
         this.auditService = auditService;
     }
 
-    // The only applicant fields staff may change from the review page (others are read-only there)
     private static final String[] EDITABLE_FIELDS = {"givenNames", "surname", "passportNumber", "emailId", "passportDateOfExpiry",
             "expectedDateOfArrival", "presentHouseNo", "presentVillageTownCity", "presentCountry", "presentMobileNo",
             "intendedArrivalDate", "contactNumber"};
 
-    // 4. Visa Dashboard (work queue)
     @GetMapping
     public String showDashboard(@RequestParam(defaultValue = "open") String filter,
                                 @RequestParam(required = false) String status,
@@ -74,7 +71,6 @@ public class VisaReviewController {
         return "module2_visa/visa-dashboard";
     }
 
-    // 5. Review Application Details
     @GetMapping("/{id}")
     public String viewApplicationDetails(@PathVariable Long id, @RequestParam(required = false) boolean reveal,
                                          Model model, Authentication auth, HttpServletRequest request) {
@@ -82,7 +78,7 @@ public class VisaReviewController {
         boolean isAdmin = GlobalModelAdvice.hasRole("ROLE_ADMIN");
         boolean showFull = isAdmin || reveal;
         if (reveal && !isAdmin) {
-            // Operators may reveal the full number when they need to type it into the government portal; it is audited
+
             auditService.record(auth.getName(), AuthEventType.SENSITIVE_DATA_REVEALED, RequestUtils.clientIp(request),
                     "Passport number of application " + id);
         }
@@ -102,11 +98,10 @@ public class VisaReviewController {
         return "module2_visa/visa-details";
     }
 
-    // 6. Update editable applicant details
     @PostMapping("/update")
     public String updateApplication(@RequestParam Long id, HttpServletRequest request,
                                     Authentication auth, RedirectAttributes flash) {
-        // Bind onto the same entity type as the stored application (India / Sri Lanka)
+
         VisaApplicationEntity updatedApp = applicationService.get(id).getCountryForm().newApplication();
         ServletRequestDataBinder binder = new ServletRequestDataBinder(updatedApp, "app");
         binder.setConversionService(conversionService);

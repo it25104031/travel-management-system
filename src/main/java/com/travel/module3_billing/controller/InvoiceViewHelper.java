@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Adds the paidAmounts / outstandingBalances / calculatedStatuses maps the templates use. */
 final class InvoiceViewHelper {
 
     private InvoiceViewHelper() {

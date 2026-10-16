@@ -3,7 +3,6 @@ package com.travel.module2_visa.domain;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/** Immutable audit row for every application status transition. */
 @Entity
 @Table(name = "visa_status_history")
 public class ApplicationStatusHistoryEntity {
@@ -12,7 +11,6 @@ public class ApplicationStatusHistoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // INDIA / SRI_LANKA: which destination table application_id refers to
     @Column(nullable = false, updatable = false)
     private String applicationType;
 

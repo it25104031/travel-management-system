@@ -11,6 +11,5 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
 
     boolean existsByInvoiceNumber(String invoiceNumber);
 
-    // Used when editing: is this number already used by a DIFFERENT invoice?
     boolean existsByInvoiceNumberAndInvoiceIdNot(String invoiceNumber, Integer invoiceId);
 }

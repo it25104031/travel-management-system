@@ -16,7 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-/** Checkout needs a traveller account (SecurityConfig sends guests to /login first, then back here). */
 @Controller
 public class CheckoutController {
 

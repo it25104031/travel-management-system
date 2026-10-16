@@ -23,10 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * Turns a traveller's cart into bookings. One checkout = one invoice in Billing (Module 3)
- * for the whole cart + one booking per item, all in a single transaction.
- */
 @Service
 public class BookingService implements InvoiceDeletionGuard {
 
@@ -51,13 +47,6 @@ public class BookingService implements InvoiceDeletionGuard {
         this.slipRepository = slipRepository;
     }
 
-    /**
-     * Lets a traveller remove a trip they haven't paid anything for.
-     * The trip's share comes off the invoice; if it was the only trip on the invoice, the invoice goes too.
-     * If the invoice has any payment history (e.g. a rejected slip) it is kept and the trip is cancelled instead.
-     *
-     * @return true when the trip was deleted, false when it was cancelled instead
-     */
     @Transactional
     public boolean deleteUnpaid(SiteCustomerEntity customer, Integer bookingId) {
         TourBooking booking = bookingId == null ? null : bookingRepository.findById(bookingId).orElse(null);
@@ -84,7 +73,7 @@ public class BookingService implements InvoiceDeletionGuard {
                 || slipRepository.existsByInvoice_InvoiceId(invoiceId));
 
         if (invoice != null && !others.isEmpty()) {
-            // Other trips still on this invoice: just take this trip's amount off the bill.
+
             BigDecimal newTotal = invoice.getTotalAmount().subtract(booking.getTotalAmount());
             if (newTotal.signum() <= 0) newTotal = others.stream().map(TourBooking::getTotalAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -107,7 +96,6 @@ public class BookingService implements InvoiceDeletionGuard {
 
     public record CheckoutResult(Invoice invoice, List<TourBooking> bookings) { }
 
-    /** Checks one cart line; returns the problems (empty when it can be booked). */
     @Transactional(readOnly = true)
     public List<String> check(BookingRequest request) {
         List<String> errors = new ArrayList<>();
@@ -197,7 +185,6 @@ public class BookingService implements InvoiceDeletionGuard {
         b.setStatus(cancelled ? TourBooking.CANCELLED : TourBooking.ACTIVE);
     }
 
-    /** Billing asks this before deleting an invoice. */
     @Override
     @Transactional(readOnly = true)
     public String blockReason(Integer invoiceId) {

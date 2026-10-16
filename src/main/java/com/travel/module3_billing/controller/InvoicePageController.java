@@ -17,7 +17,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.math.BigDecimal;
 import java.util.List;
 
-// Access to /billing/invoices/** is checked by SecurityConfig (ADMIN only)
 @Controller
 public class InvoicePageController {
 

@@ -24,11 +24,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Stores uploaded files on disk and keeps disk and database in step:
- * a file written inside a transaction that later rolls back is removed again, and a
- * file deleted inside a transaction is only removed from disk after the commit succeeds.
- */
 @Service
 public class DocumentStorageService {
 
@@ -51,7 +46,6 @@ public class DocumentStorageService {
         this.root = Paths.get(uploadDir).toAbsolutePath().normalize();
     }
 
-    /** Checks format, size and (for images) minimum dimensions. A null rule applies the default limits. */
     public void validate(MultipartFile file, RequiredDocumentEntity rule, String label) {
         List<String> errors = new ArrayList<>();
         String name = label != null ? label : (rule != null ? rule.getLabel() : "File");
@@ -96,7 +90,7 @@ public class DocumentStorageService {
 
     public StoredFile store(MultipartFile file, String subdir) {
         String ext = extension(file.getOriginalFilename());
-        // Never use the client's file name on disk; it may contain path segments
+
         String storedName = System.currentTimeMillis() + "_" + UUID.randomUUID() + (ext.isEmpty() ? "" : "." + ext);
         Path dir = root.resolve(subdir).normalize();
         Path target = dir.resolve(storedName);
@@ -122,7 +116,6 @@ public class DocumentStorageService {
         return new StoredFile(relative, original, file.getContentType(), file.getSize());
     }
 
-    /** Removes the file once the surrounding transaction commits (immediately when there is none). */
     public void deleteAfterCommit(String storedPath) {
         if (storedPath == null) return;
         Path path = resolve(storedPath);
@@ -137,7 +130,6 @@ public class DocumentStorageService {
         }
     }
 
-    /** Resolves a stored path, refusing anything outside the upload root. */
     public Path resolve(String storedPath) {
         if (storedPath == null) return null;
         Path path = Paths.get(storedPath).toAbsolutePath().normalize();

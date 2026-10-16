@@ -31,7 +31,7 @@ public class CustomerLoginSuccessHandler implements AuthenticationSuccessHandler
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         auditService.record(authentication.getName(), AuthEventType.CUSTOMER_LOGIN_SUCCESS, RequestUtils.clientIp(request), null);
         credentialService.markLoggedIn(authentication.getName());
-        // Shorter idle timeout for temporary customer sessions than for staff
+
         request.getSession().setMaxInactiveInterval(customerIdleMinutes * 60);
         response.sendRedirect("/portal/case");
     }

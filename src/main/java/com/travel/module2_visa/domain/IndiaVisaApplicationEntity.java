@@ -5,18 +5,15 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/** India e-Visa application (table india_visa_applications). Shared fields live in {@link VisaApplicationEntity}. */
 @Entity
 @Table(name = "india_visa_applications")
 public class IndiaVisaApplicationEntity extends VisaApplicationEntity {
 
-    // --- Page 1: Application Registration ---
     private String passportType;
     private LocalDate expectedDateOfArrival;
     private String visaService;
 
-    // --- Page 2: Applicant Details ---
-    private String changedName; // Yes/No
+    private String changedName;
     private String changedNameDetails;
     private String townCityOfBirth;
     private String countryOfBirth;
@@ -24,20 +21,17 @@ public class IndiaVisaApplicationEntity extends VisaApplicationEntity {
     private String religion;
     private String visibleIdentificationMarks;
     private String educationalQualification;
-    private String acquiredNationalityBy; // By Birth or Naturalization
-    private String livedInCountryTwoYears; // Yes/No
+    private String acquiredNationalityBy;
+    private String livedInCountryTwoYears;
 
-    // --- Page 2: Passport Details ---
-    // Unique per destination (checked in the service), so one passport can apply to several countries
     private String passportPlaceOfIssue;
-    private String otherPassportHeld; // Yes/No
+    private String otherPassportHeld;
     private String otherPassportCountry;
     private String otherPassportNo;
-    private String otherPassportIssueDate; // Changed to String to prevent empty submission crash
+    private String otherPassportIssueDate;
     private String otherPassportPlace;
     private String otherPassportNationality;
 
-    // --- Page 3: Address Details ---
     private String presentHouseNo;
     private String presentVillageTownCity;
     private String presentCountry;
@@ -50,7 +44,6 @@ public class IndiaVisaApplicationEntity extends VisaApplicationEntity {
     private String permanentVillageTownCity;
     private String permanentStateProvinceDistrict;
 
-    // --- Page 3: Family Details ---
     private String fatherName;
     private String fatherNationality;
     private String fatherPreviousNationality;
@@ -64,35 +57,32 @@ public class IndiaVisaApplicationEntity extends VisaApplicationEntity {
     private String motherCountryOfBirth;
 
     private String maritalStatus;
-    private String grandparentsPakistanOrigin; // Yes/No
+    private String grandparentsPakistanOrigin;
     private String pakistanOriginDetails;
 
-    // --- Page 4: Visa Details Sought ---
     @Column(name = "places_to_be_visited_line_1")
     private String placesToBeVisitedLine1;
 
     @Column(name = "places_to_be_visited_line_2")
     private String placesToBeVisitedLine2;
 
-    private String bookedThroughTourOperator; // Yes/No
+    private String bookedThroughTourOperator;
     private String expectedPortOfExit;
 
-    // --- Page 4: Previous Visa/Currently Valid Visa Details ---
-    private String visitedIndiaBefore; // Yes/No
+    private String visitedIndiaBefore;
     private String previousAddressInIndia;
     private String citiesPreviouslyVisited;
     private String lastIndianVisaNo;
     private String lastVisaType;
     private String lastVisaPlaceOfIssue;
-    private String lastVisaDateOfIssue; // Changed to String to prevent empty submission crash
-    private String permissionRefused; // Yes/No
+    private String lastVisaDateOfIssue;
+    private String permissionRefused;
     private String refusalDetails;
 
-    // --- Page 4: Other Information & Reference ---
     @Column(name = "countries_visited_last_10_years")
     private String countriesVisitedLast10Years;
 
-    private String visitedSaarcCountries; // Yes/No
+    private String visitedSaarcCountries;
 
     private String referenceNameInIndia;
     private String referenceAddressInIndia;
@@ -102,15 +92,12 @@ public class IndiaVisaApplicationEntity extends VisaApplicationEntity {
     private String referenceAddressInHomeCountry;
     private String referencePhoneInHomeCountry;
 
-    // --- Page 5: Additional Question Details (Security) ---
-    private String arrestedOrProsecuted; // Yes/No
-    private String refusedEntryOrDeported; // Yes/No
-    private String engagedInTraffickingOrFraud; // Yes/No
-    private String engagedInTerrorismOrCyberCrime; // Yes/No
-    private String expressedGlorifyingViews; // Yes/No
-    private String soughtAsylum; // Yes/No
-
-    // Set when an incident reports the passport as lost; blocks travel clearance until replaced
+    private String arrestedOrProsecuted;
+    private String refusedEntryOrDeported;
+    private String engagedInTraffickingOrFraud;
+    private String engagedInTerrorismOrCyberCrime;
+    private String expressedGlorifyingViews;
+    private String soughtAsylum;
 
     public String getPassportType() {
         return passportType;

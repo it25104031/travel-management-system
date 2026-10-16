@@ -3,7 +3,6 @@ package com.travel.module2_visa.domain;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-/** A visa category offered for a destination (e.g. India eTOURIST VISA) with its fee and processing time. */
 @Entity
 @Table(name = "visa_types")
 public class VisaTypeEntity {
@@ -19,7 +18,6 @@ public class VisaTypeEntity {
     @Column(name = "visa_name", nullable = false)
     private String name;
 
-    // TOURIST_EVISA, PILGRIM, GROUP, TRANSIT, SPECIAL_PERMIT, BUSINESS, MEDICAL ...
     private String category;
 
     @Column(nullable = false, precision = 10, scale = 2)

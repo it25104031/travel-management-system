@@ -13,7 +13,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/** Aggregate figures for the admin analytics page. */
 @Service
 public class ReportService {
 
@@ -46,7 +45,6 @@ public class ReportService {
         long rejected = byStatus.get(ApplicationStatus.REJECTED.name());
         BigDecimal rate = rate(approved, rejected);
 
-        // Average time from creation to the decision recorded in the status history
         List<ApplicationStatusHistoryEntity> decisions = historyRepository.findByToStatusIn(
                 List.of(ApplicationStatus.APPROVED.name(), ApplicationStatus.REJECTED.name()));
         Map<String, ApplicationStatusHistoryEntity> firstDecision = new HashMap<>();

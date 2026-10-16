@@ -19,11 +19,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * The test database is created from the team's schema (src/test/resources/team-schema.sql). These checks read the
- * rows back with plain SQL using the team's table and column names, so a mapping that drifted from the agreed
- * schema (for example writing to a new column instead of the existing one) fails here.
- */
 @SpringBootTest
 class TeamSchemaTest {
 
@@ -120,16 +115,16 @@ class TeamSchemaTest {
         List<String> team = List.of("admin_users", "supported_countries", "customer_accounts", "visa_types", "visa_requirement_rules",
                 "tour_departures", "india_visa_applications", "srilanka_visa_applications", "india_visa_application_documents",
                 "visa_status_history", "traveler_compliance_records", "tour_incidents");
-        // On MySQL the two id generators are small tables; on H2 they are sequences
+
         List<String> additions = List.of("auth_audit_log", "srilanka_visa_application_documents",
                 "visa_application_seq", "visa_document_seq",
-                // Module 1: website traveller accounts
+
                 "site_customers",
-                // Module 3: billing
+
                 "invoice", "payment", "payment_slip",
-                // Module 4: logistics
+
                 "departure", "supplier", "hotel_booking", "transport", "guide", "assignment", "supplier_payment",
-                // Module 5: tour packages and website bookings
+
                 "tour_package", "itinerary", "tour_booking");
         for (String table : tables) {
             assertTrue(team.contains(table) || additions.contains(table), "unexpected table " + table);
@@ -139,7 +134,7 @@ class TeamSchemaTest {
 
     @Test
     void teamColumnDefinitionsAreNotChanged() throws Exception {
-        // Hibernate would widen/shrink these to VARCHAR(255) without TeamSchema*Dialect
+
         assertEquals(10, columnSize("india_visa_applications", "changed_name"));
         assertEquals(500, columnSize("india_visa_applications", "approved_visa_file_path"));
         assertEquals(500, columnSize("india_visa_application_documents", "file_path"));

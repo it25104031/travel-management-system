@@ -254,8 +254,6 @@ CREATE TABLE tour_incidents (
         FOREIGN KEY (reported_by_staff_id) REFERENCES admin_users(id) ON DELETE RESTRICT
 );
 
-
-
 ALTER TABLE admin_users ADD COLUMN active BOOLEAN;
 ALTER TABLE admin_users ADD COLUMN created_at DATETIME(6);
 ALTER TABLE admin_users ADD COLUMN email VARCHAR(255);
@@ -305,7 +303,6 @@ CREATE TABLE auth_audit_log (
     ip_address VARCHAR(64),
     details VARCHAR(500)
 );
-
 
 CREATE TABLE srilanka_visa_application_documents (
     id BIGINT PRIMARY KEY,

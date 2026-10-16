@@ -40,7 +40,7 @@ public class LogisticsController {
         model.addAttribute("guides", logistics.listGuides());
         model.addAttribute("assignments", logistics.listAssignments());
         model.addAttribute("payments", logistics.listPayments());
-        // Package names from Module 5, offered as suggestions when creating a departure
+
         model.addAttribute("packageNames", packageRepository.findAll().stream()
                 .map(com.travel.module5_packages.entity.TourPackage::getPackageName).sorted().toList());
         model.addAttribute("page", page);

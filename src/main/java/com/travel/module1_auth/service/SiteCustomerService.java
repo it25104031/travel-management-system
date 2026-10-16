@@ -21,10 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-/**
- * Website traveller accounts. Travellers sign in on the same /login page as staff, with their
- * email address instead of a username, and receive ROLE_MEMBER.
- */
 @Service
 public class SiteCustomerService implements UserDetailsService {
 
@@ -145,7 +141,6 @@ public class SiteCustomerService implements UserDetailsService {
                 "Traveller " + customer.getEmail());
     }
 
-    /** The signed-in traveller, if the current user is one. */
     @Transactional(readOnly = true)
     public Optional<SiteCustomerEntity> current() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -153,7 +148,6 @@ public class SiteCustomerService implements UserDetailsService {
         return repository.findByEmailIgnoreCase(auth.getName());
     }
 
-    /** The signed-in traveller; throws if the current user is not one. */
     @Transactional(readOnly = true)
     public SiteCustomerEntity requireCurrent() {
         return current().orElseThrow(() -> new IllegalStateException("Please sign in with your traveller account."));

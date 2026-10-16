@@ -12,12 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * REST API for invoices. staff login required (see SecurityConfig).
- * Uses the same InvoiceService rules as the web pages. Errors come back as
- * {"error": "..."} (see ApiExceptionHandler). The invoiceStatus in a request body
- * is ignored - it is always calculated from the payments.
- */
 @RestController
 @RequestMapping("/api/invoices")
 public class InvoiceController {

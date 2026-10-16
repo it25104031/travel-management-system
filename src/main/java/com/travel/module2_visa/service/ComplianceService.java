@@ -11,11 +11,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Pre-departure checklist: travel insurance and health declaration with emergency contact.
- * Both are stored per traveller and departure in traveler_compliance_records, so they can only be
- * filled once the traveller has been added to a tour departure.
- */
 @Service
 public class ComplianceService {
 
@@ -29,7 +24,6 @@ public class ComplianceService {
         this.applicationService = applicationService;
     }
 
-    /** The traveller's record for their current departure, or null when there is none yet. */
     @Transactional(readOnly = true)
     public ComplianceRecordEntity record(VisaApplicationEntity app) {
         if (app.getDeparture() == null || app.getPassportNumber() == null) return null;
@@ -47,7 +41,6 @@ public class ComplianceService {
                 });
     }
 
-    /** Customer or operator saves insurance details; any change needs re-verification. */
     @Transactional
     public void saveInsurance(Long applicationId, String provider, String policyNumber, LocalDate coverFrom, LocalDate coverTo) {
         List<String> errors = new ArrayList<>();
@@ -91,7 +84,6 @@ public class ComplianceService {
         recordRepository.save(record);
     }
 
-    /** Operator decision on insurance. Approval is refused if the cover does not span the trip. */
     @Transactional
     public void reviewInsurance(Long applicationId, boolean approve, String reason, String actor) {
         VisaApplicationEntity app = applicationService.get(applicationId);

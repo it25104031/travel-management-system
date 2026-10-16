@@ -9,7 +9,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Exposes the local "uploads" folder so admins can view/download uploaded files
+
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:uploads/");
     }

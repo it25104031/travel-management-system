@@ -1,7 +1,3 @@
-/* ==========================================================================
-   Travel Agency ERP - one theme for the website and the staff workspace
-   Indigo night + lagoon blue + one saffron accent, Bricolage Grotesque / Figtree
-   ========================================================================== */
 :root {
     --indigo: #1B2A4A;
     --indigo-2: #24365E;
@@ -59,7 +55,6 @@ p { margin: 0 0 1em; }
 .skip-link { position: absolute; left: 12px; top: -60px; background: var(--saffron); color: var(--indigo); padding: 8px 14px; border-radius: var(--radius-s); z-index: 100; font-weight: 700; }
 .skip-link:focus { top: 12px; }
 
-/* ---------- Layout helpers ---------- */
 .page { max-width: 1180px; margin: 28px auto; padding: 0 20px; }
 .page.wide { max-width: 1420px; }
 .panel { background: var(--surface); padding: 24px; border-radius: var(--radius); border: 1px solid var(--line); margin-bottom: 20px; }
@@ -86,7 +81,6 @@ p { margin: 0 0 1em; }
 .money { font-variant-numeric: tabular-nums; white-space: nowrap; }
 hr, .divider { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
 
-/* ---------- Forms ---------- */
 label { display: block; font-weight: 600; margin-bottom: 5px; color: var(--ink-2); font-size: 13px; }
 input:not([type]), input[type=text], input[type=password], input[type=email], input[type=date], input[type=datetime-local],
 input[type=number], input[type=tel], input[type=url], input[type=search], input[type=file], select, textarea {
@@ -107,7 +101,6 @@ textarea { min-height: 80px; resize: vertical; }
 fieldset { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin: 0 0 16px; }
 legend { font-weight: 700; color: var(--indigo); padding: 0 6px; font-family: var(--font-display); }
 
-/* ---------- Buttons ---------- */
 .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 7px;
     padding: 9px 16px; border-radius: var(--radius-s); border: 1px solid var(--indigo);
@@ -132,7 +125,6 @@ legend { font-weight: 700; color: var(--indigo); padding: 0 6px; font-family: va
 .btn[disabled], .btn.disabled { opacity: .5; pointer-events: none; }
 .link-btn { background: none; border: 0; padding: 0; color: var(--lagoon); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 
-/* ---------- Tables ---------- */
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
 table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
 .table-wrap table { margin-top: 0; }
@@ -146,7 +138,6 @@ tr.overdue td:first-child { box-shadow: inset 3px 0 0 var(--red); }
 tr.is-muted td { color: var(--ink-3); }
 .empty { text-align: center; color: var(--ink-3); padding: 28px 12px !important; }
 
-/* ---------- Badges & alerts ---------- */
 .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 650; background: var(--mist); color: var(--ink-2); white-space: nowrap; line-height: 1.6; }
 .badge-green, .badge-VERIFIED, .badge-APPROVED, .badge-READY, .badge-RESOLVED, .badge-PAID, .badge-COMPLETED, .badge-AVAILABLE, .badge-ACTIVE { background: var(--green-soft); color: var(--green); }
 .badge-red, .badge-REJECTED, .badge-INVALIDATED, .badge-CRITICAL, .badge-HIGH, .badge-FAILED, .badge-UNPAID { background: var(--red-soft); color: var(--red); }
@@ -161,7 +152,6 @@ tr.is-muted td { color: var(--ink-3); }
 .alert-warn { background: var(--amber-soft); color: var(--amber-ink); border-color: #F2DDAA; border-left-color: var(--saffron); }
 .alert ul { margin: 4px 0 0 18px; padding: 0; }
 
-/* ---------- Data bits ---------- */
 .kv { display: grid; grid-template-columns: 170px 1fr; gap: 7px 14px; font-size: 14px; margin: 0; }
 .kv dt { font-weight: 600; color: var(--ink-3); }
 .kv dd { margin: 0; }
@@ -198,9 +188,6 @@ details.box > summary::after { content: "+"; font-size: 20px; color: var(--ink-3
 details.box[open] > summary::after { content: "\2013"; }
 details.box > .box-body { padding: 0 18px 18px; }
 
-/* ==========================================================================
-   Staff workspace: fixed sidebar + top bar
-   ========================================================================== */
 body.staff { padding-left: var(--side-w); }
 body.staff .page { margin: 24px 32px 48px; max-width: 1280px; padding: 0; }
 .side {
@@ -246,7 +233,6 @@ body.staff .page { margin: 24px 32px 48px; max-width: 1280px; padding: 0; }
     .who .who-text { display: none; }
 }
 
-/* Legacy top nav (kept for any page that still uses it) */
 .nav { background: var(--indigo); color: #fff; padding: 10px 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .nav a { color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; }
 .nav .spacer { flex: 1; }
@@ -261,7 +247,6 @@ body.staff .page { margin: 24px 32px 48px; max-width: 1280px; padding: 0; }
     body.staff .page { margin: 0; }
 }
 
-/* "Coming soon" placeholder (card payments) */
 .coming-soon { text-align: center; padding: 40px 28px; }
 .coming-soon > svg { width: 44px; height: 44px; color: var(--saffron-deep); background: var(--saffron-soft); border-radius: 50%; padding: 10px; box-sizing: content-box; margin-bottom: 12px; }
 .coming-soon h1, .coming-soon h3 { margin-bottom: 8px; }

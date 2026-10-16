@@ -10,7 +10,6 @@ import java.util.List;
 
 public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
-    // SUM returns null when there are no rows - the service turns that into 0.
     @Query("""
         SELECT SUM(p.amount)
         FROM Payment p
@@ -31,8 +30,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             @Param("paymentId") Integer paymentId
     );
 
-    // One query for the completed total of every invoice (avoids one query per invoice row).
-    // Each row is [invoiceId, sum].
     @Query("""
         SELECT p.invoice.invoiceId, SUM(p.amount)
         FROM Payment p

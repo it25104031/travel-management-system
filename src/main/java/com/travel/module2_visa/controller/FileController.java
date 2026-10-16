@@ -17,10 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * Serves uploaded files to signed-in staff only (replaces the old public /uploads/** mapping).
- * Customers get their own files through the portal, which checks ownership.
- */
 @Controller
 public class FileController {
 

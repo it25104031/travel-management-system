@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/** Official passenger departure manifests for airlines and immigration, as CSV or PDF. */
 @Service
 public class ManifestService {
 
@@ -46,7 +45,7 @@ public class ManifestService {
             }
             sb.append('\n');
         }
-        // BOM so Excel opens UTF-8 names correctly
+
         return ("﻿" + sb).getBytes(StandardCharsets.UTF_8);
     }
 
@@ -111,7 +110,7 @@ public class ManifestService {
     private static String csv(String value) {
         if (value == null) return "";
         String v = value;
-        // Neutralise spreadsheet formula injection
+
         if (!v.isEmpty() && "=+-@".indexOf(v.charAt(0)) >= 0) v = "'" + v;
         if (v.contains(",") || v.contains("\"") || v.contains("\n")) {
             v = "\"" + v.replace("\"", "\"\"") + "\"";

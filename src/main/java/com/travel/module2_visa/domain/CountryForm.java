@@ -4,11 +4,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-/**
- * Registry of destination-specific application forms. Adding a destination means adding an entry here,
- * an application entity + document entity for its tables, and its template; submission, review, documents,
- * portal, readiness and manifests are shared.
- */
 public enum CountryForm {
 
     INDIA("india", "IN", "module2_visa/visa-apply-india", IndiaVisaApplicationEntity::new),
@@ -31,7 +26,6 @@ public enum CountryForm {
     public String getTemplate() { return template; }
     public String getRoute() { return "/visas/apply/" + slug; }
 
-    /** A new, empty application of this destination's entity type. */
     public VisaApplicationEntity newApplication() { return factory.get(); }
 
     public static Optional<CountryForm> bySlug(String slug) {

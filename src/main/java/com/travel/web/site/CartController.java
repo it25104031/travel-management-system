@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/** The cart: anyone can add packages; signing in is only needed at checkout. */
 @Controller
 @RequestMapping("/cart")
 public class CartController {
@@ -30,7 +29,6 @@ public class CartController {
         this.bookingService = bookingService;
     }
 
-    /** One cart row with its current price. */
     public record Line(Cart.Item item, TourPackage pkg, BigDecimal total, List<String> problems) {
         public boolean isOk() { return problems.isEmpty(); }
     }
@@ -98,7 +96,7 @@ public class CartController {
         for (Cart.Item item : cart.getItems()) {
             TourPackage pkg = packageRepository.findById(item.getPackageId()).orElse(null);
             if (pkg == null) {
-                cart.remove(item.getId()); // package was deleted by staff
+                cart.remove(item.getId());
                 continue;
             }
             BigDecimal total = pkg.getPrice().multiply(BigDecimal.valueOf(item.getTravellers()));

@@ -13,11 +13,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 
-/**
- * Adds a few sample tour packages (with day-by-day itineraries) the first time the app starts
- * on an empty tour_package table, so the website has something to show. Prices are examples -
- * edit or delete them under Staff > Packages. Turn off with app.demo-data=false.
- */
 @Configuration
 public class PackageDemoData {
 

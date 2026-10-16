@@ -16,10 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Application flow for applicants. Travellers must be signed in to their website account
- * (the application then shows in their profile); staff can also enter one for a walk-in customer.
- */
 @Controller
 @RequestMapping("/visas")
 public class VisaApplyController {
@@ -35,7 +31,6 @@ public class VisaApplyController {
         this.customerService = customerService;
     }
 
-    // Applicants must not be able to set workflow fields by adding them to the form post
     @InitBinder("visaApplication")
     public void restrictFields(WebDataBinder binder) {
         binder.setDisallowedFields("id", "status", "createdAt", "documents*", "govReferenceNo", "govSubmissionDate",
@@ -43,26 +38,22 @@ public class VisaApplyController {
                 "departure*", "passportInvalidated", "siteCustomerId");
     }
 
-    // The posted form is bound onto the entity type of the destination in the URL (India, Sri Lanka, ...)
     @ModelAttribute("visaApplication")
     public VisaApplicationEntity visaApplication(@PathVariable(required = false) String slug) {
         return CountryForm.bySlug(slug == null ? "" : slug).orElse(CountryForm.INDIA).newApplication();
     }
 
-    // Redirect direct /visas/apply links to the country selector
     @GetMapping("/apply")
     public String redirectToCountrySelector() {
         return "redirect:/visas/select-country";
     }
 
-    // 1. Customer Country Selection Gateway
     @GetMapping("/select-country")
     public String showCountrySelector(Model model) {
         model.addAttribute("countries", ruleService.activeCountries());
         return "module2_visa/visa-country-select";
     }
 
-    // 2. Choose visa type + nationality, then render that country's form with the matching document slots
     @GetMapping("/apply/{slug}")
     public String showApplicationForm(@PathVariable String slug,
                                       @RequestParam(required = false) Long visaTypeId,
@@ -91,7 +82,6 @@ public class VisaApplyController {
         return form.getTemplate();
     }
 
-    // 3. Submission (form data + one file per required document)
     @PostMapping("/apply/{slug}")
     public String submitApplication(@PathVariable String slug,
                                     @ModelAttribute("visaApplication") VisaApplicationEntity application,
@@ -117,7 +107,7 @@ public class VisaApplyController {
 
     @GetMapping("/apply/submitted")
     public String submitted(Model model) {
-        // Credentials are only available on the redirect straight after submission (flash attribute)
+
         if (!model.containsAttribute("credentials")) return "redirect:/portal/login";
         return "module2_visa/visa-submitted";
     }

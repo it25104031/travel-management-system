@@ -25,7 +25,6 @@
     <div class="wrap" style="padding-top:32px; padding-bottom:72px">
         <div th:replace="~{layout/fragments :: messages}"></div>
 
-        <!-- ===================== Trips ===================== -->
         <th:block th:if="${tab == 'trips'}">
             <div class="alert alert-warn" th:if="${amountDue > 0}">
                 You have <b th:text="'LKR ' + ${#numbers.formatDecimal(amountDue, 1, 'COMMA', 2, 'POINT')}">LKR</b> left to pay.
@@ -73,7 +72,6 @@
             </th:block>
         </th:block>
 
-        <!-- ===================== Payments ===================== -->
         <th:block th:if="${tab == 'payments'}">
             <h2>Invoices</h2>
             <div class="empty-state" th:if="${#lists.isEmpty(invoices)}">
@@ -119,7 +117,6 @@
             </th:block>
         </th:block>
 
-        <!-- ===================== Visas ===================== -->
         <th:block th:if="${tab == 'visas'}">
             <div class="panel-head">
                 <h2>Visa applications</h2>
@@ -152,7 +149,6 @@
                 <a href="/portal/login">visa portal</a> with the reference number and passkey we emailed you.</p>
         </th:block>
 
-        <!-- ===================== Settings ===================== -->
         <div class="grid-2" th:if="${tab == 'settings'}">
             <form class="panel" th:action="@{/my/settings}" method="post">
                 <h2>Your details</h2>

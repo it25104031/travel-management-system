@@ -6,7 +6,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-/** Exposes the signed-in user and role flags to every Thymeleaf view. */
 @ControllerAdvice
 public class GlobalModelAdvice {
 

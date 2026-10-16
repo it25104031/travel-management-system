@@ -1,6 +1,5 @@
 package com.travel.module2_visa.service;
 
-/** Masks sensitive identifiers in operator views, e.g. N1234589 -> N1****89. */
 public final class MaskingUtil {
 
     private MaskingUtil() { }

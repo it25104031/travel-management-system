@@ -19,10 +19,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 
-/**
- * Applicant self-service (ROLE_CUSTOMER). The application is always resolved from the signed-in
- * reference number, never from an id in the URL, so a customer can only ever see their own case.
- */
 @Controller
 @RequestMapping("/portal")
 public class CustomerPortalController {

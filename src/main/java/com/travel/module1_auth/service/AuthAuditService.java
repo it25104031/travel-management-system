@@ -26,7 +26,6 @@ public class AuthAuditService {
         this.lockoutMinutes = lockoutMinutes;
     }
 
-    // Own transaction so an audit row survives even if the caller's transaction rolls back
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void record(String username, AuthEventType type, String ip, String details) {
         String safeName = (username == null || username.isBlank()) ? "(blank)" : username;
@@ -34,10 +33,6 @@ public class AuthAuditService {
         repository.save(new AuthAuditLogEntity(safeName, type, ip, safeDetails));
     }
 
-    /**
-     * An account is locked when it has reached the failure limit within the lockout window,
-     * counting only failures since its last successful login.
-     */
     @Transactional(readOnly = true)
     public boolean isLockedOut(String username, AuthEventType failureType, AuthEventType successType) {
         LocalDateTime since = LocalDateTime.now().minusMinutes(lockoutMinutes);

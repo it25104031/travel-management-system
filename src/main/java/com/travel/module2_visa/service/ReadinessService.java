@@ -13,10 +13,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Computes traveller and departure-group readiness and enforces the booking gate:
- * a departure can only be marked READY when every requirement of every traveller is met.
- */
 @Service
 public class ReadinessService {
 
@@ -93,7 +89,6 @@ public class ReadinessService {
         return new DepartureReadiness(departure, travellers, satisfied, total, percent(satisfied, total));
     }
 
-    /** Recomputes readiness and stores it in tour_departures.readiness_percentage. */
     @Transactional
     public DepartureReadiness refresh(Long departureId) {
         DepartureReadiness readiness = forDeparture(departureId);
@@ -105,16 +100,14 @@ public class ReadinessService {
         return readiness;
     }
 
-    /** Exact percentage with two decimals; 100.00 only when every item is satisfied. */
     public static BigDecimal percent(long satisfied, long total) {
         if (total == 0) return BigDecimal.ZERO.setScale(2);
         if (satisfied == total) return new BigDecimal("100.00");
-        // Round down so an incomplete group can never display as 100%
+
         return BigDecimal.valueOf(satisfied).multiply(BigDecimal.valueOf(100))
                 .divide(BigDecimal.valueOf(total), 2, RoundingMode.DOWN);
     }
 
-    /** The booking gate. */
     @Transactional
     public void markReady(Long departureId, String actor) {
         DepartureReadiness readiness = refresh(departureId);
@@ -134,7 +127,6 @@ public class ReadinessService {
         departure.setReadyAt(LocalDateTime.now());
     }
 
-    /** Emails each traveller who is not yet cleared with the items still outstanding. Returns how many were sent. */
     @Transactional(readOnly = true)
     public int sendReminders(Long departureId) {
         DepartureReadiness readiness = forDeparture(departureId);

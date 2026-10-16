@@ -15,10 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A booking's payment state always comes from Billing (Module 3): the invoice's completed
- * payments decide PAID / PARTIAL / UNPAID, and a slip waiting for review shows as "In review".
- */
 @Service
 public class BookingStatusService {
 
@@ -32,7 +28,6 @@ public class BookingStatusService {
         this.slipService = slipService;
     }
 
-    /** What a page needs to show for one booking. */
     public record BookingView(TourBooking booking, Invoice invoice, String state, String label, String badge,
                               BigDecimal paid, BigDecimal outstanding) {
         public boolean isPayable() {
@@ -41,7 +36,6 @@ public class BookingStatusService {
         }
     }
 
-    /** Payment state of one invoice (shared by every booking on it). */
     public record InvoiceView(Invoice invoice, String state, String label, String badge,
                               BigDecimal paid, BigDecimal outstanding, boolean slipPending) {
         public boolean isPayable() { return outstanding != null && outstanding.signum() > 0 && !slipPending; }

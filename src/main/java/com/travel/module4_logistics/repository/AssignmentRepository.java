@@ -9,7 +9,7 @@ import java.util.List;
 public interface AssignmentRepository extends JpaRepository<Assignment, Integer> {
     boolean existsByGuide_IdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(Integer guideId, LocalDate end, LocalDate start);
     List<Assignment> findByDeparture_Id(Integer departureId);
-    // Load the linked records with the list (open-in-view is off in the combined app)
+
     @EntityGraph(attributePaths = {"guide","departure"})
     List<Assignment> findAllByOrderByStartDateDesc();
 }

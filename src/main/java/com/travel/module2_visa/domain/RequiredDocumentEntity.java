@@ -5,10 +5,6 @@ import jakarta.persistence.*;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * One mandatory (or optional) upload slot for a visa type. A null nationality means the
- * rule applies to every applicant; otherwise only to applicants of that nationality.
- */
 @Entity
 @Table(name = "visa_requirement_rules")
 public class RequiredDocumentEntity {
@@ -23,7 +19,6 @@ public class RequiredDocumentEntity {
 
     private String nationality;
 
-    // Upload slot key (PHOTO, PASSPORT_BIO, ...); added to visa_requirement_rules, filled from document_name when missing
     private String docCode;
 
     @Column(name = "document_name", nullable = false)
@@ -47,7 +42,6 @@ public class RequiredDocumentEntity {
         return Arrays.stream(allowedFormats.toLowerCase().split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList();
     }
 
-    /** Value for the HTML accept attribute, e.g. ".jpg,.png,.pdf". */
     public String getAcceptAttribute() {
         return String.join(",", getAllowedFormatList().stream().map(f -> "." + f).toList());
     }

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface SupplierPaymentRepository extends JpaRepository<SupplierPayment, Integer> {
     List<SupplierPayment> findByDeparture_Id(Integer departureId);
-    // Load the linked records with the list (open-in-view is off in the combined app)
+
     @EntityGraph(attributePaths = {"supplier","departure"})
     List<SupplierPayment> findAllByOrderByPaymentDateDesc();
 }

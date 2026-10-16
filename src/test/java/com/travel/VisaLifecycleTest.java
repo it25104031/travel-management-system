@@ -17,7 +17,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** End-to-end compliance flow: submission, review, re-upload, approval, checklist, readiness gate, manifests. */
 @SpringBootTest
 class VisaLifecycleTest {
 
@@ -74,7 +73,6 @@ class VisaLifecycleTest {
         assertEquals(photo.getId(), current.getPreviousVersionId());
         assertEquals(DocumentStatus.SUPERSEDED, applicationService.document(photo.getId()).getStatusEnum());
 
-        // A verified slot cannot be replaced by the customer
         applicationService.verifyDocument(current.getId(), "operator");
         assertThrows(ValidationException.class,
                 () -> applicationService.customerUpload(app.getId(), "PHOTO", TestData.photo("file"), "IN-REF"));
@@ -98,7 +96,6 @@ class VisaLifecycleTest {
         var departure = departureService.create("TEST-" + id, "Golden Triangle", "India", LocalDate.now().plusMonths(2), LocalDate.now().plusMonths(2).plusDays(10));
         departureService.addTravellers(departure.getId(), List.of(id));
 
-        // Incomplete group: gate stays locked
         assertThrows(ValidationException.class, () -> readinessService.markReady(departure.getId(), "operator"));
 
         applicationService.get(id).getCurrentDocuments().forEach(d -> applicationService.verifyDocument(d.getId(), "operator"));
@@ -109,7 +106,7 @@ class VisaLifecycleTest {
         assertEquals(ApplicationStatus.APPROVED, applicationService.get(id).getStatusEnum());
 
         complianceService.saveInsurance(id, "Ceylinco", "POL-1", departure.getDepartureDate(), departure.getReturnDate().minusDays(1));
-        // Cover ends a day early: operator cannot verify it
+
         assertThrows(ValidationException.class, () -> complianceService.reviewInsurance(id, true, null, "operator"));
         complianceService.saveInsurance(id, "Ceylinco", "POL-1", departure.getDepartureDate(), departure.getReturnDate());
         complianceService.reviewInsurance(id, true, null, "operator");
@@ -125,13 +122,11 @@ class VisaLifecycleTest {
         String csv = new String(manifestService.csv(departure.getId()));
         assertTrue(csv.contains("IND-GOV-123"));
 
-        // Lost passport: record invalidated and the gate re-locks
         incidentService.log(departure.getId(), id, IncidentType.LOST_PASSPORT, IncidentSeverity.HIGH, "Lost at hotel", null, "operator");
         assertEquals(DepartureStatus.PENDING, departureService.get(departure.getId()).getStatusEnum());
         assertEquals(DocumentStatus.INVALIDATED, docByCode(id, "PASSPORT_BIO").getStatusEnum());
         assertFalse(readinessService.forDeparture(departure.getId()).isComplete());
 
-        // Replacement passport uploaded through the portal and verified clears the flag
         applicationService.customerUpload(id, "PASSPORT_BIO", TestData.pdf("file", "new-passport.pdf"), "IN-REF");
         applicationService.verifyDocument(docByCode(id, "PASSPORT_BIO").getId(), "operator");
         assertFalse(applicationService.get(id).getPassportInvalidated());

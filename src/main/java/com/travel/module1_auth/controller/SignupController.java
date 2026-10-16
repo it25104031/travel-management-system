@@ -21,7 +21,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-/** Website sign-up. A new traveller is signed in straight away and sent on to where they were going. */
 @Controller
 public class SignupController {
 
@@ -57,7 +56,6 @@ public class SignupController {
             return "module1_auth/signup";
         }
 
-        // Sign the new traveller in (new session id to prevent session fixation)
         request.getSession(true);
         request.changeSessionId();
         var token = UsernamePasswordAuthenticationToken.authenticated(customer.getEmail(), null,

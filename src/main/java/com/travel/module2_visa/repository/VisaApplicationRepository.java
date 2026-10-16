@@ -15,6 +15,5 @@ public interface VisaApplicationRepository extends JpaRepository<VisaApplication
 
     List<VisaApplicationEntity> findByPassportNumber(String passportNumber);
 
-    // A traveller's applications: the ones they submitted while signed in, plus older ones sent with their email
     List<VisaApplicationEntity> findBySiteCustomerIdOrEmailIdIgnoreCaseOrderByCreatedAtDesc(Long siteCustomerId, String emailId);
 }

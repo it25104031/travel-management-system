@@ -7,10 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-/**
- * Billing no longer has its own users or login. Everyone uses the shared staff login
- * (admin_users, com.travel.module1_auth). This helper returns the logged-in staff account.
- */
 @Component
 public class CurrentStaff {
 
@@ -20,7 +16,6 @@ public class CurrentStaff {
         this.adminUserRepository = adminUserRepository;
     }
 
-    /** The logged-in staff account, or null when nobody is logged in. */
     public AdminUserEntity get() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
@@ -29,7 +24,6 @@ public class CurrentStaff {
         return adminUserRepository.findByUsername(auth.getName());
     }
 
-    /** The logged-in staff account; throws if it no longer exists. */
     public AdminUserEntity require() {
         AdminUserEntity user = get();
         if (user == null) {
@@ -38,10 +32,6 @@ public class CurrentStaff {
         return user;
     }
 
-    /**
-     * What the billing pages show in their header. All staff accounts (ADMIN and USER)
-     * are billing staff, so the pages always show the staff view.
-     */
     public BillingUserView view() {
         AdminUserEntity user = get();
         String name = user == null ? "Staff"
