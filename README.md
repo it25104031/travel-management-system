@@ -15,3 +15,6 @@ One Spring Boot application, one MySQL database (`travel_erp`), one design for t
 Templates follow the same folders: `src/main/resources/templates/module1_auth`, `module2_visa`, ... `site`, `web`, `layout`.
 One stylesheet pair (`static/css/app.css` + `site.css`) styles every page.
 
+Deployed successfully using railway
+
+access now https://travel-agency-erp-production.up.railway.app/
