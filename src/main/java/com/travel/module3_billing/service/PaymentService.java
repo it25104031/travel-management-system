@@ -16,13 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * All payment rules live here, so the web pages, the REST API, the payment gateway
- * and slip approval all follow exactly the same rules:
- *  - amount must be greater than 0
- *  - a payment can never be more than the invoice's outstanding balance
- *  - the invoice status (UNPAID / PARTIAL / PAID) is recalculated after every change
- */
 @Service
 public class PaymentService {
 
@@ -40,13 +33,8 @@ public class PaymentService {
         this.invoiceRepository = invoiceRepository;
     }
 
-    /** Paid / outstanding / status of one invoice, calculated from its COMPLETED payments. */
     public record InvoiceSummary(BigDecimal paidAmount, BigDecimal outstandingBalance, String status) {
     }
-
-    // ------------------------------------------------------------------
-    // Reading
-    // ------------------------------------------------------------------
 
     public List<Payment> getAllPayments() {
         return paymentRepository.findAll();
@@ -94,7 +82,6 @@ public class PaymentService {
         return buildSummary(invoice, paid);
     }
 
-    /** Summaries for many invoices using a single grouped query (instead of ~5 queries per invoice). */
     public Map<Integer, InvoiceSummary> getSummaries(List<Invoice> invoices) {
         Map<Integer, BigDecimal> paidByInvoice = new HashMap<>();
         for (Object[] row : paymentRepository.sumCompletedGroupedByInvoice()) {
@@ -109,20 +96,15 @@ public class PaymentService {
         return summaries;
     }
 
-    /** UNPAID when nothing is paid, PARTIAL when some is paid, PAID when fully paid. */
     public static String calculateStatus(BigDecimal totalAmount, BigDecimal paidAmount) {
         if (paidAmount.compareTo(totalAmount) >= 0) {
-            return "PAID";             // also covers a 0-total invoice
+            return "PAID";
         }
         if (paidAmount.signum() > 0) {
             return "PARTIAL";
         }
         return "UNPAID";
     }
-
-    // ------------------------------------------------------------------
-    // Writing (every change goes through validation + status refresh)
-    // ------------------------------------------------------------------
 
     @Transactional
     public Payment createPayment(Integer invoiceId, LocalDateTime paymentDate, BigDecimal amount,
@@ -168,7 +150,7 @@ public class PaymentService {
 
         refreshInvoiceStatus(newInvoice);
         if (oldInvoice != null && !oldInvoice.getInvoiceId().equals(newInvoice.getInvoiceId())) {
-            refreshInvoiceStatus(oldInvoice); // the payment moved away from this invoice
+            refreshInvoiceStatus(oldInvoice);
         }
         return saved;
     }
@@ -184,7 +166,6 @@ public class PaymentService {
         refreshInvoiceStatus(invoice);
     }
 
-    /** Recalculates the stored invoice status from the COMPLETED payments and saves it. */
     @Transactional
     public void refreshInvoiceStatus(Invoice invoice) {
         if (invoice == null) {
@@ -194,10 +175,6 @@ public class PaymentService {
         invoice.setInvoiceStatus(calculateStatus(invoice.getTotalAmount(), paid));
         invoiceRepository.save(invoice);
     }
-
-    // ------------------------------------------------------------------
-    // Helpers
-    // ------------------------------------------------------------------
 
     private Invoice findInvoice(Integer invoiceId) {
         if (invoiceId == null) {

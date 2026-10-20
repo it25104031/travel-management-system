@@ -11,11 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Payment slips for the Vite frontend.
- *  (travellers upload slips from their website profile, see /my)
- *  /api/admin/slips/...   -> ADMIN only (review, approve, reject)
- */
 @RestController
 public class ApiSlipController {
 

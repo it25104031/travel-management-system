@@ -17,13 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
-/**
- * Two filter chains:
- *  1. /portal/**  - visa applicants sign in with a reference number + temporary passkey (ROLE_CUSTOMER).
- *  2. everything else - one /login form for
- *       staff     : username + BCrypt password (ROLE_ADMIN / ROLE_USER)  -> staff workspace
- *       travellers: email    + BCrypt password (ROLE_MEMBER)            -> website, cart, profile
- */
 @Configuration
 public class SecurityConfig {
 
@@ -94,7 +87,7 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain mainChain(HttpSecurity http, SiteCustomerService siteCustomerService) throws Exception {
-        // Staff sign in with a username, travellers with their email address - same /login form.
+
         DaoAuthenticationProvider staffProvider = new DaoAuthenticationProvider(adminUserService);
         staffProvider.setPasswordEncoder(passwordEncoder);
         DaoAuthenticationProvider memberProvider = new DaoAuthenticationProvider(siteCustomerService);
@@ -102,29 +95,24 @@ public class SecurityConfig {
 
         http
                 .authenticationManager(new ProviderManager(staffProvider, memberProvider))
-                // The REST API (Postman) sends no CSRF token
+
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .authorizeHttpRequests(auth -> auth
-                        // PUBLIC WEBSITE
+
                         .requestMatchers("/", "/about", "/tours", "/tours/**", "/cart", "/cart/**",
                                 "/signup", "/login", "/css/**", "/js/**", "/img/**", "/favicon.ico",
                                 "/error", "/error/**").permitAll()
 
-                        // TRAVELLERS (website accounts)
                         .requestMatchers("/my", "/my/**", "/checkout", "/checkout/**").hasRole("MEMBER")
 
-                        // VISA APPLICATIONS: a signed-in traveller, or staff entering one for a walk-in customer
                         .requestMatchers("/visas/apply", "/visas/apply/**", "/visas/select-country")
                         .hasAnyRole("MEMBER", "ADMIN", "USER")
 
-                        // ADMIN-ONLY URLS (users, travellers, countries, visa rules, reports, audit)
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // ALL STAFF (ADMIN + USER)
                         .requestMatchers("/staff", "/staff/**", "/visas/**", "/files/**", "/account/**",
                                 "/logistics/**", "/packages/**", "/itineraries/**").hasAnyRole("ADMIN", "USER")
 
-                        // BILLING (Module 3): deleting invoices/payments is admin-only, the rest is for all staff
                         .requestMatchers(HttpMethod.POST, "/billing/invoices/delete/**", "/billing/payments/delete/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/invoices/**", "/api/payments/**",
                                 "/api/billing/invoices/**", "/api/billing/payments/**", "/api/packages/**").hasRole("ADMIN")
@@ -155,7 +143,7 @@ public class SecurityConfig {
                                         RequestUtils.clientIp(request), null);
                             }
                         })
-                        // Travellers go back to the website, staff to the sign-in page
+
                         .logoutSuccessHandler((request, response, authentication) ->
                                 response.sendRedirect(SiteCustomerService.isMember(authentication) ? "/?signedout" : "/login?logout&staff"))
                         .permitAll()

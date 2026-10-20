@@ -4,7 +4,7 @@
     <th:block th:replace="~{layout/fragments :: headLinks('Review Application')}"></th:block>
     <style>
         fieldset { margin-bottom: 20px; padding: 18px; background-color: var(--paper); }
-        
+
         .form-row { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 12px; }
         .form-group { flex: 1; min-width: 220px; position: relative; }
         .admin-input { background-color: var(--paper); padding-right: 58px !important; }
@@ -40,7 +40,7 @@
     </div>
 
     <div class="grid-2">
-        <!-- Workflow -->
+
         <div class="panel">
             <h3 style="margin-top:0;">Status workflow</h3>
             <form th:action="@{/visas/dashboard/{id}/status(id=${app.id})}" method="post">
@@ -80,7 +80,6 @@
             </form>
         </div>
 
-        <!-- Government tracking -->
         <div class="panel" id="government">
             <h3 style="margin-top:0;">Government reference tracking</h3>
             <form th:action="@{/visas/dashboard/{id}/gov-reference(id=${app.id})}" method="post" class="row">
@@ -109,7 +108,6 @@
         </div>
     </div>
 
-    <!-- Documents -->
     <div class="panel" id="documents">
         <h3 style="margin-top:0;">Documents</h3>
         <div th:each="slot : ${slots}" class="doc-item">
@@ -159,7 +157,6 @@
         </form>
     </div>
 
-    <!-- Compliance -->
     <div class="grid-2" id="compliance">
         <div class="panel">
             <h3 style="margin-top:0;">Travel insurance</h3>
@@ -237,7 +234,6 @@
         </div>
     </div>
 
-    <!-- Applicant data with copy buttons for government portal entry -->
     <div class="panel">
         <div style="display:flex; justify-content: space-between; align-items:center;">
             <h3 style="margin:0;">Applicant data</h3>
@@ -246,7 +242,7 @@
         <p class="muted">Fields are locked to prevent accidental changes. Use Copy to paste values into the government portal.</p>
         <form th:action="@{/visas/dashboard/update}" th:object="${app}" method="post">
             <input type="hidden" th:field="*{id}" />
-        <!-- Page 1: Registration Details -->
+
         <fieldset>
             <legend>1. Registration Details</legend>
             <div class="form-row">
@@ -265,7 +261,6 @@
             </div>
         </fieldset>
 
-        <!-- Page 2: Applicant & Passport Details -->
         <fieldset>
             <legend>2. Applicant & Passport Details</legend>
             <div class="form-row">
@@ -293,7 +288,6 @@
             </div>
         </fieldset>
 
-        <!-- Page 3: Address & Family Details (India e-Visa) -->
         <fieldset th:if="${app.countryCode == 'IN'}">
             <legend>3. Address & Family Details</legend>
             <div class="form-row">
@@ -318,7 +312,6 @@
             </div>
         </fieldset>
 
-        <!-- Sri Lanka ETA details -->
         <fieldset th:if="${app.countryCode == 'LK'}">
             <legend>Sri Lanka ETA Details</legend>
             <div class="form-row">
@@ -327,7 +320,6 @@
             </div>
         </fieldset>
 
-        <!-- Page 4: Travel & References (India e-Visa) -->
         <fieldset th:if="${app.countryCode == 'IN'}">
             <legend>4. Travel & References</legend>
             <div class="form-row">

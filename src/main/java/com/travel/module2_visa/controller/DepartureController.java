@@ -19,7 +19,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.util.List;
 
-/** Group departures: batching travellers, readiness, the booking gate and manifests. */
 @Controller
 @RequestMapping("/visas/departures")
 public class DepartureController {

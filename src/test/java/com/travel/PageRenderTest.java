@@ -21,12 +21,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** Renders every page with real data so template errors are caught by the build. */
 @SpringBootTest
 @AutoConfigureMockMvc
 class PageRenderTest {
 
-    // Visa applications need a signed-in website traveller (or staff)
     static final org.springframework.test.web.servlet.request.RequestPostProcessor TRAVELLER =
             org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user("traveller@example.com").roles("MEMBER");
 
@@ -55,7 +53,7 @@ class PageRenderTest {
                         .param("passportNumber", "WEB12345")
                         .param("passportDateOfExpiry", LocalDate.now().plusYears(4).toString())
                         .param("expectedDateOfArrival", LocalDate.now().plusMonths(1).toString())
-                        .param("status", "APPROVED") // must be ignored
+                        .param("status", "APPROVED")
                         .with(csrf()))
                 .andExpect(redirectedUrl("/visas/apply/submitted")).andReturn();
 
@@ -102,7 +100,7 @@ class PageRenderTest {
             mvc.perform(get("/visas/departures/" + departure.getId() + "/manifest.csv").with(u)).andExpect(status().isOk());
             mvc.perform(get("/files/documents/" + applicationService.get(id).getDocuments().get(0).getId()).with(u)).andExpect(status().isOk());
         }
-        // Operators see masked passport numbers in the queue
+
         mvc.perform(get("/visas/dashboard").param("filter", "all").with(user("operator").roles("USER")))
                 .andExpect(content().string(org.hamcrest.Matchers.not(containsString(submission.application().getPassportNumber()))));
         mvc.perform(get("/admin/dashboard").with(user("admin").roles("ADMIN"))).andExpect(redirectedUrl("/staff"));

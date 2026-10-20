@@ -17,7 +17,6 @@ public class TourPackage {
     @Column(nullable=false,precision=12,scale=2) private BigDecimal price;
     @Column(nullable=false,length=30) private String status;
 
-    // Shown on the public website (all optional)
     @Column(length=100) private String destination;
     @Column(length=40) private String category;
     @Column(name="image_url",length=500) private String imageUrl;
@@ -48,10 +47,8 @@ public class TourPackage {
 
     public boolean isAvailable(){return "AVAILABLE".equals(status);}
 
-    /** Number of nights for display ("5 days / 4 nights"). */
     public int getNights(){return duration==null||duration<1?0:duration-1;}
 
-    /** A stable 0-5 index used to pick the card colour on the website when there is no image. */
     public int getThemeIndex(){
         String key = category!=null&&!category.isBlank()?category:(packageName==null?"":packageName);
         return Math.floorMod(key.toLowerCase().hashCode(),6);

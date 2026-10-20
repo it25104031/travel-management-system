@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
-/** Operator work queue: filtering, prioritising by travel date and flagging overdue applications. */
 @Service
 public class VisaQueueService {
 
@@ -28,10 +27,6 @@ public class VisaQueueService {
         this.passportService = passportService;
     }
 
-    /**
-     * @param filter all | mine | unassigned | overdue | open | closed
-     * @param maskPassports true for operators (ROLE_USER) so full numbers are not shown in lists
-     */
     @Transactional(readOnly = true)
     public List<QueueRow> queue(String filter, String status, String currentUser, boolean maskPassports) {
         String f = filter == null ? "all" : filter;
@@ -46,7 +41,7 @@ public class VisaQueueService {
                     default -> true;
                 })
                 .filter(row -> status == null || status.isBlank() || row.app().getStatusEnum().name().equals(status))
-                // Overdue first, then soonest travel date, then oldest application
+
                 .sorted(Comparator.comparing(QueueRow::overdue).reversed()
                         .thenComparing(QueueRow::travelDate, Comparator.nullsLast(Comparator.naturalOrder()))
                         .thenComparing(r -> r.app().getCreatedAt(), Comparator.nullsLast(Comparator.naturalOrder())))

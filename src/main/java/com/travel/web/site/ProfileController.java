@@ -44,11 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * The traveller's profile: trips (bookings), payments (invoices and bank slips; card payments are coming soon),
- * visa applications and account settings. Every page checks the record belongs to the
- * signed-in traveller.
- */
 @Controller
 @RequestMapping("/my")
 public class ProfileController {
@@ -79,7 +74,6 @@ public class ProfileController {
         this.storage = storage;
     }
 
-    /** One invoice row on the Payments tab. */
     public record InvoiceRow(InvoiceView view, List<TourBooking> bookings) { }
 
     @GetMapping
@@ -93,7 +87,6 @@ public class ProfileController {
         List<BookingView> past = trips.stream()
                 .filter(v -> v.booking().isCancelled() || v.booking().getTravelDate().isBefore(today)).toList();
 
-        // Payments tab: one row per invoice
         Map<Integer, InvoiceRow> invoices = new LinkedHashMap<>();
         for (BookingView v : trips) {
             if (v.invoice() == null) continue;
@@ -119,8 +112,6 @@ public class ProfileController {
         return "site/profile";
     }
 
-    // ------------------------------------------------------------------ trips
-
     @PostMapping("/trips/{bookingId}/delete")
     public String deleteTrip(@PathVariable Integer bookingId, RedirectAttributes flash) {
         SiteCustomerEntity me = customerService.requireCurrent();
@@ -132,8 +123,6 @@ public class ProfileController {
         }
         return "redirect:/my?tab=trips";
     }
-
-    // ------------------------------------------------------------------ invoices & payments
 
     @GetMapping("/invoices/{id}")
     public String invoice(@PathVariable Integer id, Model model) {
@@ -192,8 +181,6 @@ public class ProfileController {
                 .body(resource);
     }
 
-    // ------------------------------------------------------------------ visas
-
     @GetMapping("/visas/{id}/approved-visa")
     public ResponseEntity<Resource> approvedVisa(@PathVariable Long id) {
         SiteCustomerEntity me = customerService.requireCurrent();
@@ -205,8 +192,6 @@ public class ProfileController {
         }
         return FileController.serve(storage, app.getApprovedVisaPath(), "application/pdf", "visa-" + id + ".pdf");
     }
-
-    // ------------------------------------------------------------------ settings
 
     @PostMapping("/settings")
     public String updateSettings(@RequestParam String fullName, @RequestParam(required = false) String phone,
@@ -235,9 +220,6 @@ public class ProfileController {
         return "redirect:/my?tab=settings";
     }
 
-    // ------------------------------------------------------------------ helpers
-
-    /** The bookings on this invoice, but only if they belong to the signed-in traveller (else 404). */
     private List<TourBooking> ownedBookings(Integer invoiceId, SiteCustomerEntity me) {
         List<TourBooking> bookings = bookingService.forInvoice(invoiceId);
         if (bookings.isEmpty() || bookings.stream().anyMatch(b -> !b.getCustomer().getId().equals(me.getId()))) {

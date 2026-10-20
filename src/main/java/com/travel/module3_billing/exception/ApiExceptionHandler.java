@@ -14,10 +14,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.util.Map;
 
-/**
- * Turns errors from the REST API (/api/...) into clean JSON responses
- * like {"error": "..."} with a proper status code, instead of a 500.
- */
 @RestControllerAdvice(assignableTypes = {InvoiceController.class, PaymentController.class,
         ApiBillingController.class, ApiSlipController.class})
 public class ApiExceptionHandler {

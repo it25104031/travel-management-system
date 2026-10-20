@@ -5,7 +5,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 
-/** Append-only record of authentication and account events. No setters after creation. */
 @Entity
 @Table(name = "auth_audit_log")
 public class AuthAuditLogEntity {
@@ -17,7 +16,6 @@ public class AuthAuditLogEntity {
     @Column(nullable = false, updatable = false)
     private String username;
 
-    // Stored as plain text (not a MySQL ENUM) so new event types never need a schema change
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(nullable = false, updatable = false, length = 40)

@@ -44,7 +44,7 @@ class AuthenticationFlowTest {
 
     @Test
     void adminFromTheTeamSchemaIsKeptAsIs() {
-        // team-schema.sql inserts admin with its own BCrypt hash and role ADMIN; startup must not overwrite either
+
         var admin = userService.findByUsername("admin");
         assertTrue(admin.getPassword().startsWith("$2a$10$XGZ9grESLT0UzMW1Wh8JNOB"), admin.getPassword());
         assertEquals("ADMIN", admin.getRole());
@@ -69,7 +69,7 @@ class AuthenticationFlowTest {
             mvc.perform(post("/login").with(csrf()).param("username", "locktest").param("password", "wrong"))
                     .andExpect(redirectedUrl("/login?error"));
         }
-        // Even the right password is refused while locked
+
         mvc.perform(post("/login").with(csrf()).param("username", "locktest").param("password", "correct-horse"))
                 .andExpect(redirectedUrl("/login?locked"));
     }

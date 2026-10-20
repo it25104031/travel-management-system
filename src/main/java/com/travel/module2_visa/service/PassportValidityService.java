@@ -6,10 +6,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-/**
- * Enforces the 6-month rule: a passport must remain valid for at least six calendar months
- * after the traveller's return (or arrival, when no return date is known yet).
- */
 @Service
 public class PassportValidityService {
 
@@ -65,7 +61,6 @@ public class PassportValidityService {
         return check(app.getPassportDateOfExpiry(), travelEnd(app));
     }
 
-    /** The return date of the traveller's departure group, falling back to the expected arrival date. */
     public static LocalDate travelEnd(VisaApplicationEntity app) {
         if (app.getDeparture() != null && app.getDeparture().getReturnDate() != null) {
             return app.getDeparture().getReturnDate();

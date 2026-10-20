@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-/** One sign-in page for travellers (email) and staff (username). */
 @Controller
 public class LoginController {
 

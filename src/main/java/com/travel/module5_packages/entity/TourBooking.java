@@ -6,11 +6,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * A tour package booked by a website traveller at checkout. One checkout creates one invoice
- * (Module 3) and one booking per cart item; the booking keeps the invoice id so payment
- * progress (UNPAID / PARTIAL / PAID) always comes from Billing.
- */
 @Entity
 @Table(name = "tour_booking")
 public class TourBooking {

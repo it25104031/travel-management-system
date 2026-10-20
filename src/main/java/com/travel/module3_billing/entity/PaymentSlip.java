@@ -16,7 +16,6 @@ public class PaymentSlip {
     @JoinColumn(name = "invoice_id", nullable = false)
     private Invoice invoice;
 
-    // Who uploaded the slip: a staff member (user_id) or a website traveller (customer_id)
     @ManyToOne
     @JoinColumn(name = "user_id")
     private com.travel.module1_auth.domain.AdminUserEntity user;
@@ -90,7 +89,6 @@ public class PaymentSlip {
         this.customer = customer;
     }
 
-    /** Name shown on the review page, whoever uploaded the slip. */
     public String getUploaderName() {
         if (customer != null) return customer.getFullName() + " (traveller)";
         if (user != null) return user.getFullName() != null && !user.getFullName().isBlank() ? user.getFullName() : user.getUsername();

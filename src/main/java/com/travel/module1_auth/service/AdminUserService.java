@@ -46,14 +46,11 @@ public class AdminUserService implements UserDetailsService {
                 .build();
     }
 
-    // admin_users.role holds "ADMIN" / "USER" (team schema); older rows may say "ROLE_ADMIN" / "ROLE_USER".
-    // Spring's hasRole() requires the ROLE_ prefix, so normalise it here.
     public static String normaliseRole(String role) {
         if (role == null || role.isBlank()) return "ROLE_USER";
         return role.startsWith("ROLE_") ? role : "ROLE_" + role;
     }
 
-    /** The value stored in admin_users.role: ADMIN or USER. */
     public static String storedRole(String role) {
         return normaliseRole(role).substring("ROLE_".length());
     }
@@ -120,7 +117,6 @@ public class AdminUserService implements UserDetailsService {
         auditService.record(actor, active ? AuthEventType.USER_REACTIVATED : AuthEventType.USER_DEACTIVATED, ip, user.getUsername());
     }
 
-    /** Generates a one-time temporary password, forces a change on next login and returns the plain value once. */
     @Transactional
     public String resetPassword(Long id, String actor, String ip) {
         AdminUserEntity user = get(id);

@@ -33,9 +33,8 @@ public class PaymentSlipService {
     public static final String APPROVED = "APPROVED";
     public static final String REJECTED = "REJECTED";
 
-    private static final long MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+    private static final long MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
-    // Allowed extension -> the content type we store and serve it as
     private static final Map<String, String> ALLOWED_TYPES = Map.of(
             ".jpg", "image/jpeg",
             ".jpeg", "image/jpeg",
@@ -62,7 +61,6 @@ public class PaymentSlipService {
         }
     }
 
-    /** Slip uploaded by a website traveller from their profile. */
     @Transactional
     public PaymentSlip saveCustomerPaymentSlip(
             com.travel.module1_auth.domain.SiteCustomerEntity customer,
@@ -104,7 +102,6 @@ public class PaymentSlipService {
             String bankReference,
             MultipartFile file) {
 
-        // ---- amount / date / invoice checks ----
         if (amountPaid == null || amountPaid.signum() <= 0) {
             throw new IllegalArgumentException("Amount paid must be greater than 0.");
         }
@@ -127,7 +124,6 @@ public class PaymentSlipService {
             throw new IllegalArgumentException("Bank reference can be at most 100 characters.");
         }
 
-        // ---- file checks ----
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("Please select a file to upload.");
         }
@@ -207,11 +203,6 @@ public class PaymentSlipService {
         }
     }
 
-    /**
-     * Approving creates a COMPLETED payment through PaymentService, so the same
-     * "can't pay more than outstanding" rule applies and the invoice status is refreshed.
-     * Only PENDING slips can be approved, so a slip can never be counted twice.
-     */
     @Transactional
     public void approveSlip(Integer slipId, String adminRemark) {
         PaymentSlip slip = getPendingSlip(slipId);
@@ -264,7 +255,6 @@ public class PaymentSlipService {
         return (remark == null || remark.isBlank()) ? null : remark.trim();
     }
 
-    /** Keeps just the file name and removes characters that could break the download header. */
     private static String cleanFileName(String name) {
         if (name == null || name.isBlank()) {
             return "uploaded_slip";
@@ -277,7 +267,6 @@ public class PaymentSlipService {
         return cleaned;
     }
 
-    /** Checks the first bytes of the file ("magic numbers") so a renamed .exe can't pass as a .png. */
     private static boolean fileContentMatches(MultipartFile file, String ext) {
         byte[] head = new byte[8];
         int read;

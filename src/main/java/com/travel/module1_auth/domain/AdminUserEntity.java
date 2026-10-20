@@ -18,16 +18,14 @@ public class AdminUserEntity {
     private String password;
 
     @Column(nullable = false)
-    private String role = "USER"; // ADMIN or USER
+    private String role = "USER";
 
     private String fullName;
 
     private String email;
 
-    // Nullable so existing rows (created before this column existed) stay active
     private Boolean active = true;
 
-    // Set after an admin-forced reset; the user is sent to the change-password page on next login
     private Boolean mustChangePassword = false;
 
     @Column(updatable = false)
@@ -52,7 +50,6 @@ public class AdminUserEntity {
 
     public boolean isAdmin() { return "ROLE_ADMIN".equals(role) || "ADMIN".equals(role); }
 
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

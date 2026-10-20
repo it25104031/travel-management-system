@@ -12,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
-/** Validates a reference number + temporary passkey and grants ROLE_CUSTOMER. Not a bean on purpose. */
 public class CustomerAuthenticationProvider implements AuthenticationProvider {
 
     public static final String ROLE_CUSTOMER = "ROLE_CUSTOMER";

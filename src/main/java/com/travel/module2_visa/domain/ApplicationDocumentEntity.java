@@ -4,11 +4,6 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * An uploaded file for a visa application. Each destination keeps its documents in its own table
- * (india_visa_application_documents, srilanka_visa_application_documents) so the foreign key points at
- * that destination's application table; ids are shared across them, like application ids.
- */
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class ApplicationDocumentEntity {
@@ -25,25 +20,21 @@ public abstract class ApplicationDocumentEntity {
     private String filePath;
     private Long fileSize;
 
-    // Which required-document slot this file fills (PHOTO, PASSPORT_BIO, ...); OTHER for extra uploads
     @Column(name = "document_type")
     private String docCode;
 
-    // Verification workflow
     @Column(name = "verification_status")
-    private String status; // DocumentStatus
+    private String status;
     @Column(columnDefinition = "TEXT")
     private String rejectionReason;
     private LocalDate expiryDate;
     private String reviewedBy;
     private LocalDateTime reviewedAt;
 
-    // Version history: a replacement points at the document it superseded
     @Column(name = "version_number")
     private Integer version = 1;
     private Long previousVersionId;
-    private String uploadedBy; // staff username or customer reference number
-
+    private String uploadedBy;
 
     private LocalDateTime uploadedAt;
 
@@ -61,7 +52,6 @@ public abstract class ApplicationDocumentEntity {
 
     public boolean isImage() { return fileType != null && fileType.startsWith("image"); }
 
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

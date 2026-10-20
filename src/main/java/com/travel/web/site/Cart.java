@@ -11,11 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * The visitor's cart, kept in their HTTP session. Anyone can fill it; signing in is only
- * needed at checkout. Only ids, dates and traveller counts are stored - prices are always
- * read fresh from the package when the cart is shown or checked out.
- */
 @Component
 @SessionScope
 public class Cart implements Serializable {

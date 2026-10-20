@@ -16,10 +16,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Issues, validates and retires the temporary reference number + passkey pairs that
- * applicants use to sign in to the customer portal.
- */
 @Service
 public class TempCredentialService {
 
@@ -48,7 +44,6 @@ public class TempCredentialService {
         this.portalUrl = portalUrl;
     }
 
-    /** Creates the customer account for a newly submitted application and emails the credentials. */
     @Transactional
     public IssuedCredentials issue(Long applicationId, String countryCode, String email) {
         CustomerAccountEntity account = repository.findByApplicationId(applicationId).orElseGet(CustomerAccountEntity::new);
@@ -60,7 +55,6 @@ public class TempCredentialService {
         return rotatePasskey(account, "issued");
     }
 
-    /** Issues a fresh passkey for an existing reference when the applicant proves the email on file. */
     @Transactional
     public Optional<IssuedCredentials> renew(String referenceNo, String email) {
         Optional<CustomerAccountEntity> found = repository.findByReferenceNo(normalise(referenceNo));
@@ -69,7 +63,7 @@ public class TempCredentialService {
         }
         CustomerAccountEntity account = found.get();
         if (!Boolean.TRUE.equals(account.getActive()) && !account.isExpired()) {
-            // Closed by staff (e.g. application rejected or travel completed); renewal not allowed
+
             return Optional.empty();
         }
         return Optional.of(rotatePasskey(account, "renewed"));
@@ -110,7 +104,6 @@ public class TempCredentialService {
         repository.findByReferenceNo(referenceNo).ifPresent(a -> a.setLastLoginAt(LocalDateTime.now()));
     }
 
-    /** Ends portal access when the application is closed. Active sessions are cut on their next request. */
     @Transactional
     public void deactivateForApplication(Long applicationId, String reason) {
         repository.findByApplicationId(applicationId).ifPresent(account -> {
@@ -121,7 +114,6 @@ public class TempCredentialService {
         });
     }
 
-    /** Called by the daily scheduler: flags expired accounts as inactive. Returns how many were closed. */
     @Transactional
     public int deactivateExpired() {
         List<CustomerAccountEntity> expired = repository.findByActiveTrueAndExpiresAtBefore(LocalDateTime.now());

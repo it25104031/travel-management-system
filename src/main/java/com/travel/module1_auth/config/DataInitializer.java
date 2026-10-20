@@ -14,7 +14,7 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initData(AdminUserRepository repository, PasswordEncoder passwordEncoder) {
         return args -> {
-            // Create default admin if it doesn't exist
+
             if (repository.findByUsername("admin") == null) {
                 AdminUserEntity admin = new AdminUserEntity();
                 admin.setUsername("admin");
@@ -24,7 +24,6 @@ public class DataInitializer {
                 repository.save(admin);
             }
 
-            // Create default operator if it doesn't exist
             if (repository.findByUsername("operator") == null) {
                 AdminUserEntity operator = new AdminUserEntity();
                 operator.setUsername("operator");
@@ -34,7 +33,6 @@ public class DataInitializer {
                 repository.save(operator);
             }
 
-            // Bring rows created before the new columns existed up to date
             for (AdminUserEntity user : repository.findAll()) {
                 boolean changed = false;
                 String role = AdminUserService.storedRole(user.getRole());

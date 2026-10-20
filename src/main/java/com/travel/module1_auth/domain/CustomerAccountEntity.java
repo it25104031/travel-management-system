@@ -3,11 +3,6 @@ package com.travel.module1_auth.domain;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * Temporary credentials issued to an applicant when they submit a visa application.
- * Only the BCrypt hash of the passkey is stored. The linked application is kept as a
- * plain id so the auth module has no compile-time dependency on visa entities.
- */
 @Entity
 @Table(name = "customer_accounts")
 public class CustomerAccountEntity {
@@ -28,7 +23,6 @@ public class CustomerAccountEntity {
     @Column(name = "is_active")
     private Boolean active = true;
 
-    // Added to the team's customer_accounts table; nullable so rows created elsewhere don't block the upgrade
     @Column(unique = true)
     private Long applicationId;
 

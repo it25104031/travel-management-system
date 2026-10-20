@@ -91,10 +91,9 @@ public class LogisticsService {
                 (!linkedHotels.isEmpty() || !linkedTransports.isEmpty() || hasGuides || hasPayments))
             badRequest("Cannot change service type while this supplier has linked records");
 
-        // Validate before changing the managed entity, so rejected edits leave it intact.
         for (HotelBooking booking : linkedHotels) {
             checkUpdatedContract(start, end, booking.getCheckIn(), booking.getCheckOut());
-            // Check each arrival date: occupancy can only increase when a stay starts.
+
             long occupied = linkedHotels.stream()
                     .filter(h -> !h.getCheckIn().isAfter(booking.getCheckIn())
                             && h.getCheckOut().isAfter(booking.getCheckIn()))
@@ -162,7 +161,7 @@ public class LogisticsService {
     @Transactional
     public void assignGuide(Integer guideId, Integer departureId, LocalDate start, LocalDate end) {
         Guide guide = guides.findById(guideId).orElseThrow(() -> missing("Guide or driver not found"));
-        // Lock the supplier so two assignments for its staff cannot pass the availability check together.
+
         Supplier supplier = lockedSupplier(guide.getSupplier().getId(), "GUIDE");
         Departure departure = departure(departureId);
         checkTripDates(departure, start, end);
@@ -301,7 +300,7 @@ public class LogisticsService {
     public void updateRecord(String page, Integer id, Map<String, String> values) {
         if (!Set.of("departures", "hotels", "transports", "guides", "assignments", "payments").contains(page))
             throw missing("Page not found");
-        // Use the same supplier locks as allocation and payment creation.
+
         suppliers.findAll().stream().map(Supplier::getId).sorted()
                 .forEach(supplierId -> suppliers.findForAllocation(supplierId)
                         .orElseThrow(() -> missing("Supplier not found")));
@@ -342,7 +341,7 @@ public class LogisticsService {
         } catch (IllegalArgumentException | java.time.format.DateTimeParseException error) {
             badRequest("Enter valid dates, whole numbers and amounts");
         }
-        // No further repository queries: validate the proposed managed state before commit.
+
         for (Departure d : allDepartures) {
             checkDates(d.getStartDate(), d.getEndDate());
             if (allDepartures.stream().anyMatch(other -> !other.getId().equals(d.getId())
@@ -425,7 +424,7 @@ public class LogisticsService {
         if (selectedIds == null || selectedIds.isEmpty()) badRequest("Select at least one record to delete");
         Set<Integer> ids = new java.util.HashSet<>(selectedIds);
         if (ids.contains(null)) badRequest("Invalid record selection");
-        // Lock in the same order as editing; creations lock these suppliers too.
+
         suppliers.findAll().stream().map(Supplier::getId).sorted()
                 .forEach(id -> suppliers.findForAllocation(id).orElseThrow(() -> missing("Supplier not found")));
         List<Departure> allDepartures = departures.findAll();
@@ -461,7 +460,7 @@ public class LogisticsService {
         if (page.equals("guides") && allAssignments.stream().anyMatch(a -> ids.contains(a.getGuide().getId())))
             badRequest("Cannot delete: a selected guide or driver has assignments");
         if (Set.of("hotels", "transports", "assignments").contains(page)) {
-            // Calculate the combined effect of the entire selection before deleting any row.
+
             for (SupplierPayment payment : allPayments) {
                 Integer dep = payment.getDeparture().getId(), supplierId = payment.getSupplier().getId();
                 BigDecimal cost = BigDecimal.ZERO, paid = BigDecimal.ZERO;
@@ -484,7 +483,7 @@ public class LogisticsService {
                     badRequest("Cannot delete: supplier payments would exceed the remaining recorded cost");
             }
         }
-        // All checks passed. The transaction commits the whole selection or rolls it all back.
+
         if (page.equals("departures")) departures.deleteAll(allDepartures.stream().filter(record -> ids.contains(record.getId())).toList());
         if (page.equals("suppliers")) suppliers.deleteAll(allSuppliers.stream().filter(record -> ids.contains(record.getId())).toList());
         if (page.equals("hotels")) hotels.deleteAll(allHotels.stream().filter(record -> ids.contains(record.getId())).toList());

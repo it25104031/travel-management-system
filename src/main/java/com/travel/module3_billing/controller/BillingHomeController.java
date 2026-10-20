@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Billing dashboard and the (coming soon) card payment page. */
 @Controller
 public class BillingHomeController {
 
@@ -44,7 +43,6 @@ public class BillingHomeController {
         return "module3_billing/admin-dashboard";
     }
 
-    /** Card payment gateway - not live yet (LankaPay merchant approval pending). */
     @GetMapping("/billing/pay")
     public String showPaymentGateway() {
         return "module3_billing/payment-gateway";

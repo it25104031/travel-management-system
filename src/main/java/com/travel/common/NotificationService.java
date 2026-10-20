@@ -8,10 +8,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-/**
- * Sends customer emails. When no SMTP server is configured (spring.mail.host unset) the
- * message is written to the application log instead, so the system works in a demo setup.
- */
 @Service
 public class NotificationService {
 
@@ -26,7 +22,6 @@ public class NotificationService {
         this.fromAddress = fromAddress;
     }
 
-    /** Returns true when the email was handed to an SMTP server, false when it was only logged. */
     public boolean send(String to, String subject, String body) {
         if (to == null || to.isBlank()) {
             log.warn("Skipping email '{}' because no recipient address is known", subject);

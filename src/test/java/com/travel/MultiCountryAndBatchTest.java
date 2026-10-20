@@ -38,7 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class MultiCountryAndBatchTest {
 
-    // Visa applications need a signed-in website traveller (or staff)
     static final org.springframework.test.web.servlet.request.RequestPostProcessor TRAVELLER =
             org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user("traveller@example.com").roles("MEMBER");
 
@@ -70,7 +69,7 @@ class MultiCountryAndBatchTest {
                         .param("contactNumber", "+94 77 123 4567")
                         .param("passportDateOfExpiry", LocalDate.now().plusYears(5).toString())
                         .param("intendedArrivalDate", LocalDate.now().plusMonths(1).toString())
-                        .param("countryCode", "IN") // must be ignored: destination comes from the URL
+                        .param("countryCode", "IN")
                         .with(csrf()))
                 .andExpect(redirectedUrl("/visas/apply/submitted")).andReturn();
 
@@ -107,7 +106,7 @@ class MultiCountryAndBatchTest {
 
     @Test
     void visaTypeMustBelongToTheDestination() {
-        var app = TestData.newApplication(TestData.sriLankaTouristType(ruleService).getId()); // countryCode IN
+        var app = TestData.newApplication(TestData.sriLankaTouristType(ruleService).getId());
         ValidationException e = assertThrows(ValidationException.class, () -> applicationService.submit(app, TestData.requiredFiles()));
         assertTrue(e.getErrors().get(0).contains("valid visa type"));
     }
@@ -119,7 +118,6 @@ class MultiCountryAndBatchTest {
         var departure = departureService.create("BATCH-" + a.getId(), "Batch Tour", "India", LocalDate.now().plusMonths(1), LocalDate.now().plusMonths(1).plusDays(3));
         departureService.addTravellers(departure.getId(), List.of(a.getId(), b.getId()));
 
-        // Only a is ready for government submission
         applicationService.get(a.getId()).getCurrentDocuments().forEach(d -> applicationService.verifyDocument(d.getId(), "operator"));
         applicationService.recordGovReference(a.getId(), "G-A");
         applicationService.recordGovReference(b.getId(), "G-B");
@@ -149,7 +147,7 @@ class MultiCountryAndBatchTest {
                 .andExpect(redirectedUrl("/staff")).andReturn();
         MockHttpSession session = (MockHttpSession) login.getRequest().getSession(false);
         mvc.perform(post("/logout").session(session).with(csrf())).andExpect(redirectedUrl("/login?logout&staff"));
-        events.publishEvent(new HttpSessionDestroyedEvent(session)); // what the container fires on invalidate
+        events.publishEvent(new HttpSessionDestroyedEvent(session));
         assertEquals(0, auditRepository.countByUsernameAndEventTypeAndCreatedAtAfter("operator", AuthEventType.SESSION_EXPIRED,
                 java.time.LocalDateTime.now().minusMinutes(1)));
     }

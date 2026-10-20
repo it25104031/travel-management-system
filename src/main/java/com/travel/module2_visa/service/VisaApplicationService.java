@@ -19,17 +19,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-/**
- * All application writes go through here so that each multi-step operation (form + files,
- * status + history + notification) commits or rolls back as one unit.
- */
 @Service
 public class VisaApplicationService {
 
     public static final String OTHER_DOC_CODE = "OTHER";
     public static final String PASSPORT_DOC_CODE = "PASSPORT_BIO";
 
-    /** One required upload slot together with the file currently filling it (if any). */
     public record DocumentSlot(RequiredDocumentEntity rule, ApplicationDocumentEntity current) {
         public boolean isMandatory() { return rule == null || Boolean.TRUE.equals(rule.getMandatory()); }
         public boolean isSatisfied() { return current != null && current.getStatusEnum() == DocumentStatus.VERIFIED; }
@@ -73,13 +68,11 @@ public class VisaApplicationService {
         this.adminUserRepository = adminUserRepository;
     }
 
-    // ------------------------------------------------------------------ queries
-
     @Transactional(readOnly = true)
     public VisaApplicationEntity get(Long id) {
         VisaApplicationEntity app = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid application Id: " + id));
-        if (app.getDocuments() != null) app.getDocuments().size(); // initialise for the view
+        if (app.getDocuments() != null) app.getDocuments().size();
         return app;
     }
 
@@ -100,7 +93,6 @@ public class VisaApplicationService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Document Id: " + documentId));
     }
 
-    /** Required slots for the application's visa type, plus any extra documents uploaded outside a slot. */
     @Transactional(readOnly = true)
     public List<DocumentSlot> documentSlots(VisaApplicationEntity app) {
         List<ApplicationDocumentEntity> current = app.getCurrentDocuments();
@@ -119,7 +111,6 @@ public class VisaApplicationService {
         return slots;
     }
 
-    /** True when every mandatory slot holds a verified file (legacy apps: all current files verified). */
     @Transactional(readOnly = true)
     public boolean allDocumentsVerified(VisaApplicationEntity app) {
         List<DocumentSlot> slots = documentSlots(app);
@@ -148,12 +139,6 @@ public class VisaApplicationService {
                 .orElse(null);
     }
 
-    // ------------------------------------------------------------------ submission
-
-    /**
-     * Saves a new application with its required documents, records the first status and
-     * issues the applicant's temporary portal credentials. Any failure rolls the whole thing back.
-     */
     @Transactional
     public SubmissionResult submit(VisaApplicationEntity app, Map<String, MultipartFile> files) {
         List<String> errors = new ArrayList<>();
@@ -164,7 +149,7 @@ public class VisaApplicationService {
         } else if (app instanceof IndiaVisaApplicationEntity india) {
             india.setVisaService(type.getName());
         }
-        // customer_accounts.customer_email is required: the passkey and status emails go there
+
         if (app.getEmailId() == null || app.getEmailId().isBlank()) {
             errors.add("Email address is required.");
         }
@@ -172,7 +157,7 @@ public class VisaApplicationService {
             errors.add("Passport number is required.");
         } else {
             app.setPassportNumber(app.getPassportNumber().trim().toUpperCase());
-            // passport_number is unique within each destination's table
+
             boolean duplicate = repository.findByPassportNumber(app.getPassportNumber()).stream()
                     .anyMatch(other -> other.getCountryCode().equals(app.getCountryCode()));
             if (duplicate) {
@@ -212,7 +197,7 @@ public class VisaApplicationService {
 
     private ApplicationDocumentEntity attach(VisaApplicationEntity app, MultipartFile file, String docCode, String uploadedBy) {
         DocumentStorageService.StoredFile stored = storage.store(file, uploadDir(app));
-        // A new file for the same slot supersedes the previous one but keeps it for history
+
         ApplicationDocumentEntity previous = OTHER_DOC_CODE.equals(docCode) ? null : latestFor(app.getCurrentDocuments(), docCode);
         ApplicationDocumentEntity doc = app.newDocument();
         doc.setFileName(stored.originalName());
@@ -233,14 +218,12 @@ public class VisaApplicationService {
         return documentRepository.save(doc);
     }
 
-    // ------------------------------------------------------------------ operator edits & documents
-
     @Transactional
     public void updateDetails(VisaApplicationEntity form, String actor) {
         VisaApplicationEntity existing = get(form.getId());
         existing.setGivenNames(form.getGivenNames());
         existing.setSurname(form.getSurname());
-        // Operators see a masked number; only overwrite when a real value was typed in
+
         if (form.getPassportNumber() != null && !form.getPassportNumber().isBlank() && !MaskingUtil.isMasked(form.getPassportNumber())) {
             existing.setPassportNumber(form.getPassportNumber().trim().toUpperCase());
         }
@@ -258,7 +241,6 @@ public class VisaApplicationService {
         }
     }
 
-    /** Operator or customer upload into a slot (docCode) or as an extra document (OTHER). */
     @Transactional
     public ApplicationDocumentEntity uploadDocument(Long applicationId, String docCode, MultipartFile file, String uploadedBy) {
         VisaApplicationEntity app = get(applicationId);
@@ -269,7 +251,6 @@ public class VisaApplicationService {
         return attach(app, file, code, uploadedBy);
     }
 
-    /** Customer upload: only into a slot that is missing, rejected or invalidated. */
     @Transactional
     public void customerUpload(Long applicationId, String docCode, MultipartFile file, String referenceNo) {
         VisaApplicationEntity app = get(applicationId);
@@ -290,7 +271,7 @@ public class VisaApplicationService {
         VisaApplicationEntity app = doc.getVisaApplication();
         app.getDocuments().remove(doc);
         documentRepository.delete(doc);
-        // Physical file goes only after the database delete has committed
+
         storage.deleteAfterCommit(doc.getFilePath());
         return app.getId();
     }
@@ -304,7 +285,7 @@ public class VisaApplicationService {
         doc.setReviewedAt(LocalDateTime.now());
         VisaApplicationEntity app = doc.getVisaApplication();
         if (PASSPORT_DOC_CODE.equals(doc.getDocCode()) && Boolean.TRUE.equals(app.getPassportInvalidated())) {
-            app.setPassportInvalidated(false); // replacement passport accepted after a loss
+            app.setPassportInvalidated(false);
         }
         return app.getId();
     }
@@ -324,9 +305,6 @@ public class VisaApplicationService {
         return app.getId();
     }
 
-    // ------------------------------------------------------------------ status workflow
-
-    /** Business rules for moving an application to a new status; empty when the move is allowed. */
     @Transactional(readOnly = true)
     public List<String> transitionErrors(VisaApplicationEntity app, ApplicationStatus target, String reason) {
         ApplicationStatus from = app.getStatusEnum();
@@ -394,7 +372,6 @@ public class VisaApplicationService {
         app.setGovReferenceNo(govReferenceNo.trim());
     }
 
-    /** Records the grant details and approved visa PDF, then moves the application to APPROVED. */
     @Transactional
     public void recordGrant(Long applicationId, LocalDate grantDate, LocalDate validFrom, LocalDate validTo,
                             String entryType, MultipartFile approvedVisa, String actor) {
@@ -448,9 +425,6 @@ public class VisaApplicationService {
         app.setAssignedOperatorUser(operator);
     }
 
-    // ------------------------------------------------------------------ helpers
-
-    /** Uploads are kept per destination, e.g. uploads/in, uploads/lk. */
     private static String uploadDir(VisaApplicationEntity app) {
         return app.getCountryCode().toLowerCase();
     }

@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** On-tour emergencies, including the automatic lost-passport workflow. */
 @Service
 public class IncidentService {
 
@@ -51,7 +50,6 @@ public class IncidentService {
         return withTravellerNames(incidentRepository.findByDepartureIdOrderByCreatedAtDesc(departureId));
     }
 
-    // tour_incidents stores the passport number; show the traveller's name next to it
     private List<IncidentEntity> withTravellerNames(List<IncidentEntity> incidents) {
         for (IncidentEntity incident : incidents) {
             if (incident.getAffectedPassportNumber() == null) continue;
@@ -98,7 +96,6 @@ public class IncidentService {
         return incidentRepository.save(incident);
     }
 
-    /** Invalidates every current passport file, flags the traveller and re-locks the group's booking gate. */
     private void invalidatePassport(VisaApplicationEntity app, TourDepartureEntity departure) {
         app.setPassportInvalidated(true);
         for (ApplicationDocumentEntity doc : app.getCurrentDocuments()) {

@@ -9,7 +9,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 
-/** Administrator configuration of visa types, fees, processing times and required documents. */
 @Controller
 @RequestMapping("/admin/visa-rules")
 public class AdminVisaRuleController {

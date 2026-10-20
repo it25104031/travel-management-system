@@ -1,7 +1,3 @@
--- The team's agreed travel_db schema, exactly as given (only the stray "s" after the first column of
--- india_visa_application_documents is removed). The tests start from this schema so the application
--- is checked against the real table and column names; Hibernate only adds the extra columns/tables.
-
 CREATE TABLE admin_users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,

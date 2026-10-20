@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
 
-/** Public website: home, about us and the tour package catalogue. */
 @Controller
 public class SiteController {
 

@@ -4,12 +4,8 @@ spring:
     username: root
     password:
   jpa:
-    # Keeps the team's travel_db column definitions exactly as written (see TeamSchemaMySQLDialect)
     database-platform: com.travel.common.TeamSchemaMySQLDialect
     hibernate:
-      # 'update' adds the extra tables/columns this module needs to the team's travel_db automatically;
-      # it never changes or drops the team's own columns. travel_db.sql has the full script if you prefer
-      # to create everything by hand (then use 'none').
       ddl-auto: update
     show-sql: false
     open-in-view: false
@@ -18,12 +14,9 @@ spring:
       max-file-size: 10MB
       max-request-size: 30MB
 
-
 server:
   port: 8082
   tomcat:
-    # The India e-Visa form sends ~100 fields + document uploads in one request;
-    # Tomcat's default limit is 50 parts, which caused "413 Content Too Large".
     max-part-count: 500
     max-swallow-size: -1
   servlet:
@@ -44,31 +37,25 @@ app:
     max-failed-attempts: 5
     lockout-minutes: 15
   scheduler:
-    # Daily at 07:00 (second minute hour day month weekday)
     daily-cron: "0 0 7 * * *"
 
-  # Adds sample tour packages the first time the app starts with an empty tour_package table
   demo-data: true
-  # Company details shown on the public website - change these to the client's real details
   site:
     name: "Dahamde Pilgrims & Tours"
     tagline: Pilgrimages, holidays and visas - planned end to end.
     phone: "077 811 4262"
     email: dhanuskape@gmail.com
     address: '59/10 "Samadhi Garden", Pannipitiya 10230, Sri Lanka'
-    # Leave blank to hide from the website
     hours: ""
     whatsapp: https://wa.me/94777138924
     facebook: https://www.facebook.com/p/Dahamde-Pilgrims-Tours-61591633416052/
     instagram: ""
     youtube: ""
     tiktok: ""
-    # Shown to travellers who pay by bank transfer - replace with the agency's real account
     bank-name: "[Bank name]"
     bank-account-name: "Dahamde Pilgrims & Tours"
     bank-account-number: "[Account number]"
     bank-branch: "[Branch]"
 
-# Billing (Module 3): where uploaded bank slips are saved
 file:
   upload-dir: uploads/payment-slips

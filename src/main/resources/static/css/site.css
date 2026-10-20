@@ -1,13 +1,8 @@
-/* ==========================================================================
-   Public website (home, tours, cart, checkout, sign in, traveller profile)
-   Builds on app.css tokens.
-   ========================================================================== */
 body.site { background: var(--paper); }
 .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 .wrap-narrow { max-width: 760px; margin: 0 auto; padding: 0 24px; }
 main.site-main { min-height: 60vh; padding: 36px 0 72px; }
 
-/* ---------- Header ---------- */
 .site-header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.94); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
 .site-header .wrap { display: flex; align-items: center; gap: 28px; height: 70px; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--indigo); }
@@ -47,7 +42,6 @@ main.site-main { min-height: 60vh; padding: 36px 0 72px; }
     .signin-link { padding: 8px; border-radius: 50%; }
 }
 
-/* Over the home hero the header starts transparent */
 body.home .site-header { position: fixed; left: 0; right: 0; background: transparent; border-bottom-color: transparent; backdrop-filter: none; transition: background .25s, border-color .25s; }
 body.home .site-header .brand, body.home .site-header .site-nav a, body.home .site-header .icon-btn, body.home .site-header .signin-link,
 body.home .site-header .profile-menu > summary b { color: #fff; }
@@ -62,7 +56,6 @@ body.home.scrolled .site-header .signin-link, body.home.scrolled .site-header .p
 body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-header .icon-btn:hover { background: var(--mist); }
 @media (max-width: 860px) { body.home .site-header.nav-open .site-nav a { color: var(--ink-2); } }
 
-/* ---------- Home hero: the horizon ---------- */
 .hero {
     position: relative; min-height: 92vh; display: flex; align-items: flex-end; overflow: hidden; color: #fff;
     background: linear-gradient(180deg, #121D36 0%, #1B2A4A 38%, #3A4E7E 62%, #8C6F86 80%, #E6A869 100%);
@@ -95,7 +88,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .route li b { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--saffron); margin-right: 8px; box-shadow: 0 0 0 3px rgba(227,154,45,.25); }
 .route { padding: 0; }
 
-/* ---------- Sections ---------- */
 .section { padding: 88px 0; }
 .section.tint { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; margin-bottom: 34px; flex-wrap: wrap; }
@@ -127,7 +119,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
     .service + .service { border-left: 0; border-top: 1px solid var(--line); }
 }
 
-/* ---------- Package postcards ---------- */
 .postcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 24px; }
 .postcard { position: relative; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-l); overflow: hidden; text-decoration: none; color: inherit; }
 .postcard:hover { border-color: var(--indigo-3); color: inherit; }
@@ -144,7 +135,7 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .pc-price { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--indigo); }
 .pc-price small { display: block; font-family: var(--font-body); font-weight: 500; font-size: 12px; color: var(--ink-3); }
 .pc-days { font-size: 13px; color: var(--ink-3); font-weight: 600; }
-/* Six duotone "postcard" skies used when a package has no photo */
+
 .art-0 { background: radial-gradient(circle at 78% 34%, #F6C177 0 34px, transparent 35px), linear-gradient(180deg, #2C4F86 0%, #D9875A 100%); }
 .art-1 { background: radial-gradient(circle at 22% 36%, #FFE3A8 0 28px, transparent 29px), linear-gradient(160deg, #1F6B6F 0%, #8FC1A9 100%); }
 .art-2 { background: radial-gradient(circle at 72% 40%, #FFD8B0 0 38px, transparent 39px), linear-gradient(180deg, #6A3E6E 0%, #E49470 100%); }
@@ -152,7 +143,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .art-4 { background: radial-gradient(circle at 82% 30%, #FFE0A0 0 32px, transparent 33px), linear-gradient(180deg, #8A4B2D 0%, #E9B872 100%); }
 .art-5 { background: radial-gradient(circle at 64% 36%, #FDE7C3 0 36px, transparent 37px), linear-gradient(170deg, #1B2A4A 0%, #5C7FB0 100%); }
 
-/* ---------- Contact ---------- */
 .contact { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: var(--indigo); color: #DCE3F1; border-radius: var(--radius-l); padding: 48px; }
 .contact h2 { color: #fff; font-size: clamp(28px, 3.4vw, 40px); }
 .contact a { color: #fff; }
@@ -166,7 +156,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .socials svg { width: 19px; height: 19px; }
 @media (max-width: 860px) { .contact { grid-template-columns: 1fr; padding: 32px 24px; } }
 
-/* ---------- Footer ---------- */
 .site-footer { background: #111B31; color: #9AA7C2; padding: 56px 0 28px; font-size: 14px; }
 .site-footer a { color: #C9D3E6; text-decoration: none; }
 .site-footer a:hover { color: #fff; text-decoration: underline; }
@@ -177,7 +166,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .foot-base { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid #23304F; margin-top: 40px; padding-top: 20px; font-size: 13px; }
 @media (max-width: 860px) { .foot-grid { grid-template-columns: 1fr 1fr; } }
 
-/* ---------- Inner page header ---------- */
 .page-hero { background: var(--indigo); color: #DCE3F1; padding: 52px 0 46px; }
 .page-hero h1 { color: #fff; font-size: clamp(30px, 4vw, 48px); margin: 0 0 8px; letter-spacing: -0.03em; }
 .page-hero p { margin: 0; max-width: 60ch; font-size: 17px; }
@@ -186,7 +174,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .site-main .crumbs { color: var(--ink-3); }
 .site-main .crumbs a { color: var(--lagoon); }
 
-/* ---------- Tour detail ---------- */
 .tour-hero { position: relative; color: #fff; padding: 64px 0 46px; }
 .tour-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12,18,34,.15), rgba(12,18,34,.6)); }
 .tour-hero .wrap { position: relative; z-index: 1; }
@@ -211,7 +198,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .total-line b { font-family: var(--font-display); font-size: 22px; color: var(--indigo); }
 @media (max-width: 960px) { .tour-layout { grid-template-columns: 1fr; } .book-box { position: static; } }
 
-/* ---------- Catalogue filters ---------- */
 .filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
 .filters .grow { flex: 1 1 240px; }
 .filters > div { flex: 0 1 200px; }
@@ -220,7 +206,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .chip:hover { border-color: var(--indigo); color: var(--indigo); }
 .chip.active { background: var(--indigo); border-color: var(--indigo); color: #fff; }
 
-/* ---------- Cart / checkout ---------- */
 .cart-line { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto; gap: 18px; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 14px; align-items: start; }
 .cart-line.has-problem { border-color: #E7B9BB; }
 .cart-thumb { height: 90px; border-radius: var(--radius-s); background-size: cover; background-position: center; }
@@ -240,7 +225,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .empty-state h2 { font-size: 24px; }
 .empty-state p { color: var(--ink-2); }
 
-/* ---------- Sign in / sign up ---------- */
 .auth { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 70px); }
 .auth-art { position: relative; overflow: hidden; color: #DCE3F1; padding: 56px; display: flex; flex-direction: column; justify-content: flex-end;
     background: linear-gradient(180deg, #121D36 0%, #1B2A4A 45%, #3A4E7E 70%, #C48A6A 100%); }
@@ -257,7 +241,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .pw-wrap button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: 0; color: var(--lagoon); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; padding: 4px 6px; }
 @media (max-width: 860px) { .auth { grid-template-columns: 1fr; } .auth-art { display: none; } }
 
-/* ---------- Profile ---------- */
 .profile-head { background: var(--indigo); color: #DCE3F1; padding: 40px 0 0; }
 .profile-head .wrap { display: flex; flex-direction: column; gap: 22px; }
 .profile-id { display: flex; align-items: center; gap: 18px; }
@@ -276,7 +259,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .trip .side-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
 @media (max-width: 760px) { .trip { grid-template-columns: 1fr; } .trip .side-actions { align-items: flex-start; } }
 
-/* ---------- Payment ---------- */
 .pay-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
 .pay-tab { border: 2px solid var(--line); border-radius: var(--radius); padding: 14px; background: var(--surface); cursor: pointer; text-align: left; font: inherit; color: var(--ink); }
 .pay-tab b { display: block; font-family: var(--font-display); color: var(--indigo); font-size: 16px; }
@@ -301,7 +283,6 @@ body.home.scrolled .site-header .site-nav a:hover, body.home.scrolled .site-head
 .prose p { color: var(--ink-2); font-size: 17px; line-height: 1.7; }
 .prose h2 { margin-top: 1.6em; }
 
-/* ---------- Visa application forms (Module 2) ---------- */
 .visa-form { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-l); padding: 28px; }
 .visa-form fieldset { background: var(--paper); border-color: var(--line); padding: 18px 20px 6px; margin-bottom: 22px; }
 .visa-form legend { font-size: 17px; }

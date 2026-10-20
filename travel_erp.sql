@@ -1,11 +1,3 @@
--- Database for the combined Travel Agency ERP (all five modules).
--- Run this ONCE in MySQL Workbench before starting the app. It creates a NEW database (travel_erp)
--- and does not touch travel_db, travel_management_db or travel_logistics_db.
--- If you already created travel_erp for the earlier 3-module version, do NOT run it again -
--- just start the new version and the new tables are added to your existing database.
--- Tables for Billing (Module 3), Logistics (Module 4), Tour Packages (Module 5) and website
--- traveller accounts are created automatically when the app starts (see all_modules_schema.sql).
-
 CREATE DATABASE IF NOT EXISTS travel_erp;
 USE travel_erp;
 
@@ -15,8 +7,6 @@ CREATE TABLE admin_users (
     password VARCHAR(255) NOT NULL,
     role VARCHAR(50) DEFAULT 'ADMIN'
 );
-
--- (no admin INSERT here: the app creates admin / admin123 and operator / operator123 on first start)
 
 CREATE TABLE supported_countries (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -261,8 +251,6 @@ CREATE TABLE tour_incidents (
         FOREIGN KEY (reported_by_staff_id) REFERENCES admin_users(id) ON DELETE RESTRICT
 );
 
-
-
 ALTER TABLE admin_users ADD COLUMN active BOOLEAN;
 ALTER TABLE admin_users ADD COLUMN created_at DATETIME(6);
 ALTER TABLE admin_users ADD COLUMN email VARCHAR(255);
@@ -312,7 +300,6 @@ CREATE TABLE auth_audit_log (
     ip_address VARCHAR(64),
     details VARCHAR(500)
 );
-
 
 CREATE TABLE srilanka_visa_application_documents (
     id BIGINT PRIMARY KEY,

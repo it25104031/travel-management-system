@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/** A tour departure that groups several travellers' applications for batch processing and clearance. */
 @Entity
 @Table(name = "tour_departures")
 public class TourDepartureEntity {
@@ -21,7 +20,6 @@ public class TourDepartureEntity {
     @Column(nullable = false)
     private String tourName;
 
-    // Country name as listed in supported_countries
     @Column(nullable = false)
     private String destinationCountry;
 
@@ -34,7 +32,6 @@ public class TourDepartureEntity {
     @Column(name = "booking_gate_status")
     private String status = DepartureStatus.PENDING.name();
 
-    // Last computed readiness (0-100), refreshed whenever the departure is viewed or its gate changes
     @Column(precision = 5, scale = 2)
     private java.math.BigDecimal readinessPercentage = java.math.BigDecimal.ZERO;
 

@@ -6,7 +6,6 @@ import com.travel.web.site.Cart;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-/** Values every page can use: company details, the signed-in traveller and the cart badge. */
 @ControllerAdvice(annotations = org.springframework.stereotype.Controller.class)
 public class SiteModelAdvice {
 
@@ -31,7 +30,7 @@ public class SiteModelAdvice {
         try {
             return cart.getItems().size();
         } catch (Exception e) {
-            return 0; // no web session (e.g. background request)
+            return 0;
         }
     }
 }

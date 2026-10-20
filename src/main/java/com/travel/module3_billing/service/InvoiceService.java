@@ -15,13 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * Invoice rules:
- *  - invoice number is required and must be unique
- *  - total amount must be greater than 0 and can't be lowered below what is already paid
- *  - the status is NOT typed in by the admin; it is always calculated from the payments
- *  - an invoice that already has payments or payment slips can't be deleted
- */
 @Service
 public class InvoiceService {
 
@@ -31,7 +24,7 @@ public class InvoiceService {
     private final PaymentRepository paymentRepository;
     private final PaymentSlipRepository paymentSlipRepository;
     private final PaymentService paymentService;
-    // Looked up lazily: guards (e.g. BookingService) themselves use InvoiceService
+
     private final org.springframework.beans.factory.ObjectProvider<InvoiceDeletionGuard> deletionGuards;
 
     public InvoiceService(InvoiceRepository invoiceRepository,
@@ -143,7 +136,6 @@ public class InvoiceService {
         invoiceRepository.delete(invoice);
     }
 
-    /** Generates a unique number like INV-20261008143015-482 (fits the 30-char column). */
     public String generateInvoiceNumber() {
         String number;
         do {

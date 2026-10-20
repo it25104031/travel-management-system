@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Group / family batch management for a shared tour departure. */
 @Service
 public class DepartureService {
 
@@ -111,7 +110,6 @@ public class DepartureService {
         }
     }
 
-    /** Copies the shared address and itinerary from a lead traveller to everyone else in the group. */
     @Transactional
     public int copySharedDetails(Long departureId, Long leadApplicationId) {
         TourDepartureEntity departure = get(departureId);
@@ -128,10 +126,6 @@ public class DepartureService {
         return updated;
     }
 
-    /**
-     * Moves several travellers in the group to the same status in one all-or-nothing step.
-     * Every traveller is checked first; if any of them cannot move, nobody is changed.
-     */
     @Transactional
     public int batchChangeStatus(Long departureId, List<Long> applicationIds, ApplicationStatus target, String reason, String actor) {
         TourDepartureEntity departure = get(departureId);
@@ -158,7 +152,6 @@ public class DepartureService {
         return selected.size();
     }
 
-    /** Closes the trip: no further changes, and the travellers' temporary portal access ends. */
     @Transactional
     public void markDeparted(Long departureId) {
         TourDepartureEntity departure = get(departureId);

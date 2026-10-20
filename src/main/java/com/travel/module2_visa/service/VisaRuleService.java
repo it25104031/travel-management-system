@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-/** Destination countries, visa types and the document rules that drive the dynamic application form. */
 @Service
 public class VisaRuleService {
 
@@ -30,8 +29,6 @@ public class VisaRuleService {
         this.visaTypeRepository = visaTypeRepository;
         this.requiredDocumentRepository = requiredDocumentRepository;
     }
-
-    // ---- Countries ----
 
     @Transactional(readOnly = true)
     public List<CountryEntity> allCountries() { return countryRepository.findAll(); }
@@ -60,8 +57,6 @@ public class VisaRuleService {
         CountryEntity country = countryRepository.findById(id).orElseThrow(() -> new ValidationException("Unknown country."));
         country.setIsActive(!Boolean.TRUE.equals(country.getIsActive()));
     }
-
-    // ---- Visa types ----
 
     @Transactional(readOnly = true)
     public List<VisaTypeEntity> allVisaTypes() { return visaTypeRepository.findAllByOrderByCountryCountryNameAscNameAsc(); }
@@ -104,8 +99,6 @@ public class VisaRuleService {
         return visaType(visaTypeId).map(VisaTypeEntity::getProcessingDays).filter(d -> d != null && d > 0).orElse(DEFAULT_PROCESSING_DAYS);
     }
 
-    // ---- Document rules ----
-
     @Transactional(readOnly = true)
     public List<RequiredDocumentEntity> rulesForType(VisaTypeEntity type) {
         return requiredDocumentRepository.findByVisaTypeOrderByIdAsc(type);
@@ -114,7 +107,6 @@ public class VisaRuleService {
     @Transactional(readOnly = true)
     public List<RequiredDocumentEntity> allRequiredDocuments() { return requiredDocumentRepository.findAll(); }
 
-    /** The upload slots an applicant of the given nationality must fill for a visa type. */
     @Transactional(readOnly = true)
     public List<RequiredDocumentEntity> requiredDocuments(Long visaTypeId, String nationality) {
         Optional<VisaTypeEntity> type = visaType(visaTypeId);

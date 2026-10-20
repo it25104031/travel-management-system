@@ -9,7 +9,7 @@ import java.util.List;
 public interface TransportRepository extends JpaRepository<Transport, Integer> {
     boolean existsBySupplier_IdAndVehicleReferenceIgnoreCaseAndServiceDate(Integer supplierId, String reference, LocalDate date);
     List<Transport> findByDeparture_Id(Integer departureId);
-    // Load the linked records with the list (open-in-view is off in the combined app)
+
     @EntityGraph(attributePaths = {"supplier","departure"})
     List<Transport> findAllByOrderByServiceDateDesc();
 }

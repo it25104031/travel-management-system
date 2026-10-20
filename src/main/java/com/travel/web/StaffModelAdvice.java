@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-/** Values for the staff sidebar: which link is active and how many bank slips wait for review. */
 @ControllerAdvice(annotations = org.springframework.stereotype.Controller.class)
 public class StaffModelAdvice {
 

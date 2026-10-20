@@ -3,11 +3,6 @@ package com.travel.module1_auth.domain;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * A traveller who signed up on the public website (email + password).
- * Travellers book tour packages, pay invoices and apply for visas from their profile.
- * Staff accounts live in admin_users; temporary visa-portal passkeys live in customer_accounts.
- */
 @Entity
 @Table(name = "site_customers")
 public class SiteCustomerEntity {
@@ -61,7 +56,6 @@ public class SiteCustomerEntity {
     public LocalDateTime getLastLoginAt() { return lastLoginAt; }
     public void setLastLoginAt(LocalDateTime lastLoginAt) { this.lastLoginAt = lastLoginAt; }
 
-    /** First name for greetings ("Hi, Nimal"). */
     public String getFirstName() {
         if (fullName == null || fullName.isBlank()) return "Traveller";
         return fullName.trim().split("\\s+")[0];

@@ -16,7 +16,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 
-/** Seeds India and Sri Lanka with their visa rules on first start, and upgrades rows written by earlier versions. */
 @Configuration
 public class VisaDataInitializer {
 
@@ -30,8 +29,7 @@ public class VisaDataInitializer {
                                           TransactionTemplate tx,
                                           JdbcTemplate jdbc) {
         return args -> {
-            // Application and document ids are shared across the per-destination tables (see VisaApplicationEntity);
-            // make sure the id generators start after any rows that were inserted directly into those tables.
+
             alignIdGenerator(jdbc, "visa_application_seq", "india_visa_applications", "srilanka_visa_applications");
             alignIdGenerator(jdbc, "visa_document_seq", "india_visa_application_documents", "srilanka_visa_application_documents");
             tx.executeWithoutResult(status -> seed(countryRepository, ruleService, applicationRepository, documentRepository));
@@ -72,13 +70,12 @@ public class VisaDataInitializer {
                 rule(ruleService, transit, "ONWARD_TICKET", "Confirmed onward ticket", "pdf,jpg,jpeg,png", 2, null, null, true);
             }
 
-            // Status values from the earlier version: DRAFT -> PENDING, COMPLETED -> APPROVED
             for (VisaApplicationEntity app : applicationRepository.findAll()) {
                 String normalised = app.getStatusEnum().name();
                 if (!normalised.equals(app.getStatus())) app.setStatus(normalised);
                 if (app.getPassportInvalidated() == null) app.setPassportInvalidated(false);
             }
-            // Rules inserted straight into visa_requirement_rules have no slot code yet: derive one from the name
+
             for (RequiredDocumentEntity rule : ruleService.allRequiredDocuments()) {
                 if (rule.getDocCode() == null || rule.getDocCode().isBlank()) {
                     rule.setDocCode(rule.getLabel().trim().toUpperCase().replaceAll("[^A-Z0-9]+", "_").replaceAll("^_|_$", ""));
@@ -100,14 +97,14 @@ public class VisaDataInitializer {
         }
         Integer rows;
         try {
-            // MySQL has no sequences: Hibernate keeps the next id in a one-row table (next_val)
+
             rows = jdbc.queryForObject("SELECT COUNT(*) FROM " + generator, Integer.class);
         } catch (DataAccessException notATable) {
             rows = null;
         }
         try {
             if (rows == null) {
-                // Databases with real sequences (H2 in the tests)
+
                 jdbc.execute("ALTER SEQUENCE " + generator + " RESTART WITH " + (max + 1));
             } else if (rows == 0) {
                 jdbc.update("INSERT INTO " + generator + " (next_val) VALUES (?)", max + 1);
@@ -119,7 +116,6 @@ public class VisaDataInitializer {
         }
     }
 
-    /** Creates the country if missing and makes sure its form route matches the registered form. */
     private static CountryEntity country(CountryRepository repository, String name, CountryForm form) {
         CountryEntity country = repository.findByCountryCode(form.getCountryCode())
                 .or(() -> repository.findByCountryNameIgnoreCase(name))

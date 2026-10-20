@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** Website journey across modules: sign up (M1) -> cart and checkout (M5) -> invoice and bank-slip payment (M3). */
 @SpringBootTest
 @AutoConfigureMockMvc
 class WebsiteBookingFlowTest {
@@ -46,7 +45,6 @@ class WebsiteBookingFlowTest {
         BigDecimal price = packages.findById(packageId).orElseThrow().getPrice();
         MockHttpSession session = new MockHttpSession();
 
-        // Guests can fill the cart, but checkout needs an account
         mvc.perform(post("/cart/add").session(session).with(csrf())
                         .param("packageId", packageId.toString())
                         .param("travelDate", LocalDate.now().plusDays(30).toString())
@@ -54,7 +52,6 @@ class WebsiteBookingFlowTest {
                 .andExpect(redirectedUrl("/cart"));
         mvc.perform(get("/checkout").session(session)).andExpect(status().is3xxRedirection());
 
-        // Sign up and continue to checkout with the same cart
         mvc.perform(post("/signup").session(session).with(csrf())
                         .param("fullName", "Kamala Silva").param("email", "kamala@example.com")
                         .param("password", "travel123").param("confirmPassword", "travel123")
@@ -73,10 +70,8 @@ class WebsiteBookingFlowTest {
         assertEquals(1, booked.size());
         assertEquals(0, price.multiply(BigDecimal.valueOf(2)).compareTo(invoices.findById(invoiceId).orElseThrow().getTotalAmount()));
 
-        // An invoice with an active booking can't be deleted from Billing
         assertThrows(IllegalStateException.class, () -> invoiceService.deleteInvoice(invoiceId));
 
-        // Card payments are switched off ("coming soon"); travellers pay by bank slip
         mvc.perform(post(location + "/card").session(session).with(csrf()).param("amount", "1000"))
                 .andExpect(status().is4xxClientError());
         mvc.perform(get(location).session(session)).andExpect(content().string(containsString("coming soon")));
@@ -92,7 +87,6 @@ class WebsiteBookingFlowTest {
                 .andExpect(flash().attributeExists("success"));
         mvc.perform(get("/my").session(session)).andExpect(content().string(containsString("Payment in review")));
 
-        // Staff accept the slip in Billing -> the booking is confirmed
         Integer slipId = slipService.getPaymentSlipsForInvoice(invoiceId).get(0).getSlipId();
         slipService.approveSlip(slipId, "Received");
         assertEquals("PAID", paymentService.getInvoiceStatus(invoiceId));
@@ -100,7 +94,6 @@ class WebsiteBookingFlowTest {
         mvc.perform(get("/my").session(session)).andExpect(status().isOk())
                 .andExpect(content().string(containsString("Confirmed")));
 
-        // A paid trip can't be deleted by the traveller
         Integer paidBookingId = booked.get(0).getBookingId();
         mvc.perform(post("/my/trips/" + paidBookingId + "/delete").session(session).with(csrf()))
                 .andExpect(redirectedUrl("/my?tab=trips")).andExpect(flash().attributeExists("error"));
@@ -126,7 +119,6 @@ class WebsiteBookingFlowTest {
         assertEquals(2, booked.size());
         mvc.perform(get("/my").session(session)).andExpect(content().string(containsString("Delete trip")));
 
-        // Someone else can't delete these trips
         MockHttpSession other = new MockHttpSession();
         mvc.perform(post("/signup").session(other).with(csrf())
                 .param("fullName", "Someone Else").param("email", "someone@example.com")
@@ -135,14 +127,12 @@ class WebsiteBookingFlowTest {
                 .andExpect(flash().attributeExists("error"));
         assertEquals(2, bookings.findByInvoiceId(invoiceId).size());
 
-        // Deleting one trip takes its amount off the shared invoice
         TourBooking first = booked.get(0), second = booked.get(1);
         mvc.perform(post("/my/trips/" + first.getBookingId() + "/delete").session(session).with(csrf()))
                 .andExpect(redirectedUrl("/my?tab=trips")).andExpect(flash().attribute("success", "Trip deleted."));
         assertFalse(bookings.findById(first.getBookingId()).isPresent());
         assertEquals(0, second.getTotalAmount().compareTo(invoices.findById(invoiceId).orElseThrow().getTotalAmount()));
 
-        // Deleting the last trip removes the invoice too
         mvc.perform(post("/my/trips/" + second.getBookingId() + "/delete").session(session).with(csrf()))
                 .andExpect(flash().attribute("success", "Trip deleted."));
         assertTrue(bookings.findByInvoiceId(invoiceId).isEmpty());

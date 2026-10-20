@@ -19,11 +19,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URI;
 
-/**
- * After a successful sign-in on /login:
- *  - travellers go back to the page that asked them to sign in (e.g. checkout), or to their profile;
- *  - staff go to the staff workspace (or to the password page after an admin-forced reset).
- */
 @Component
 public class CustomLoginSuccessHandler implements org.springframework.security.web.authentication.AuthenticationSuccessHandler {
 
@@ -60,7 +55,6 @@ public class CustomLoginSuccessHandler implements org.springframework.security.w
             return;
         }
 
-        // After an admin-forced reset the user must choose a new password before anything else
         AdminUserEntity user = adminUserService.findByUsername(authentication.getName());
         if (user != null && Boolean.TRUE.equals(user.getMustChangePassword())) {
             response.sendRedirect("/account/password?forced");
@@ -71,7 +65,6 @@ public class CustomLoginSuccessHandler implements org.springframework.security.w
         response.sendRedirect(staffPage ? savedPath : "/staff");
     }
 
-    /** Only same-site paths such as "/checkout" are accepted, never "//evil.com" or full URLs. */
     public static String safeLocal(String path) {
         if (path == null || path.isBlank()) return null;
         String p = path.trim();
@@ -85,7 +78,7 @@ public class CustomLoginSuccessHandler implements org.springframework.security.w
             String path = uri.getRawPath();
             if (path == null || path.isBlank() || path.startsWith("/error")) return null;
             String q = uri.getRawQuery();
-            // Spring adds "continue" to the saved URL; drop it
+
             if (q != null) q = q.replaceAll("(^|&)continue(=[^&]*)?", "").replaceAll("^&", "");
             return safeLocal(path + (q == null || q.isEmpty() ? "" : "?" + q));
         } catch (Exception e) {

@@ -22,7 +22,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-/** Staff home: one overview across all five modules. */
 @Controller
 public class StaffHomeController {
 

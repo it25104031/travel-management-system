@@ -4,7 +4,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-/** Runs a controller action and turns business-rule failures into flash messages. */
 public final class FlashMessages {
 
     private FlashMessages() { }

@@ -9,11 +9,6 @@ import com.travel.module3_billing.service.PaymentService.InvoiceSummary;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * JSON shapes sent to the Vite frontend.
- * Entities are never returned directly where they could leak data
- * (e.g. PaymentSlip -> User -> password hash).
- */
 public final class ApiDtos {
 
     private ApiDtos() {
@@ -70,8 +65,6 @@ public final class ApiDtos {
         }
     }
 
-    // ---- request bodies ----
-
     public record LoginRequest(String username, String password) {
     }
 
@@ -85,7 +78,6 @@ public final class ApiDtos {
     public record PaymentRequest(Integer invoiceId, String paymentDate, BigDecimal amount,
                                  String paymentMethod, String paymentStatus) {
     }
-
 
     public record RemarkRequest(String adminRemark) {
     }

@@ -2,7 +2,6 @@ package com.travel.common;
 
 import java.util.List;
 
-/** A business-rule failure carrying one or more messages that can be shown to the user. */
 public class ValidationException extends RuntimeException {
 
     private final List<String> errors;

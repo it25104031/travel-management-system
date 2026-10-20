@@ -20,11 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Admin billing API for the Vite frontend (staff login - see SecurityConfig).
- * Every write goes through the same services as the Thymeleaf pages, so all
- * validation rules (amount > 0, no overpaying, unique invoice numbers ...) apply.
- */
 @RestController
 @RequestMapping("/api/billing")
 public class ApiBillingController {
@@ -42,8 +37,6 @@ public class ApiBillingController {
         this.adminUserRepository = adminUserRepository;
         this.paymentSlipRepository = paymentSlipRepository;
     }
-
-    // ---------------- dashboard ----------------
 
     @GetMapping("/dashboard")
     public Map<String, Object> dashboard() {
@@ -67,8 +60,6 @@ public class ApiBillingController {
         result.put("topOpenInvoices", open.stream().limit(5).toList());
         return result;
     }
-
-    // ---------------- invoices ----------------
 
     @GetMapping("/invoices")
     public List<InvoiceDto> invoices() {
@@ -101,8 +92,6 @@ public class ApiBillingController {
         invoiceService.deleteInvoice(id);
         return ResponseEntity.noContent().build();
     }
-
-    // ---------------- payments ----------------
 
     @GetMapping("/payments")
     public List<PaymentDto> payments() {

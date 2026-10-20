@@ -9,10 +9,6 @@ public final class DateUtils {
     private DateUtils() {
     }
 
-    /**
-     * Parses "2026-10-08T14:30" (datetime-local input) or "2026-10-08" (date input).
-     * Throws IllegalArgumentException with a friendly message instead of a raw parse error.
-     */
     public static LocalDateTime parseDateTime(String value) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Date is required.");

@@ -39,10 +39,6 @@ public class PaymentSlipController {
         this.currentStaff = currentStaff;
     }
 
-    // ==========================================
-    // ADMIN ENDPOINTS (staff login - see SecurityConfig)
-    // ==========================================
-
     @GetMapping("/billing/slips")
     public String showAdminPaymentSlips(
             @RequestParam(required = false, defaultValue = "ALL") String status,
@@ -92,10 +88,6 @@ public class PaymentSlipController {
         return "redirect:/billing/slips?status=" + cleanStatusFilter(currentStatus);
     }
 
-    // ==========================================
-    // SECURE FILE VIEW & DOWNLOAD (ONLY OWNER OR ADMIN)
-    // ==========================================
-
     @GetMapping("/billing/slips/file/{id}")
     public ResponseEntity<Resource> viewSlipFile(@PathVariable Integer id) {
         return serveFile(id, false);
@@ -117,8 +109,6 @@ public class PaymentSlipController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        // Every account on the staff login is billing staff, so staff may open any slip.
-        // Travellers open their own slips through /my/slips/{id}/file (see ProfileController).
         try {
             Resource resource = paymentSlipService.loadFileAsResource(slip);
 
@@ -129,7 +119,6 @@ public class PaymentSlipController {
                 mediaType = MediaType.APPLICATION_OCTET_STREAM;
             }
 
-            // ContentDisposition builder escapes the file name safely
             ContentDisposition disposition = (isDownload ? ContentDisposition.attachment() : ContentDisposition.inline())
                     .filename(slip.getOriginalFileName(), StandardCharsets.UTF_8)
                     .build();

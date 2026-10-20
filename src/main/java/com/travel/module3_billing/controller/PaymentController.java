@@ -11,14 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * REST API for payments. staff login required (see SecurityConfig).
- * Create/update go through PaymentService, so the API can no longer skip the
- * "amount > 0" and "not more than outstanding balance" checks.
- * Request body example:
- * {"invoice": {"invoiceId": 1}, "paymentDate": "2026-10-08T10:00:00",
- *  "amount": 50000.00, "paymentMethod": "CARD", "paymentStatus": "COMPLETED"}
- */
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {

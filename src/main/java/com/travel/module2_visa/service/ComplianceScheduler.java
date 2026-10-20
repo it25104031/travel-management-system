@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
-/** Daily background jobs: expiry warnings, re-upload reminders and closing expired customer access. */
 @Component
 public class ComplianceScheduler {
 

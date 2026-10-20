@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** Role isolation: ADMIN vs USER vs CUSTOMER vs anonymous. */
 @SpringBootTest
 @AutoConfigureMockMvc
 class SecurityRoutesTest {

@@ -5,13 +5,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Sri Lanka ETA application (table srilanka_visa_applications). Shared fields live in {@link VisaApplicationEntity}. */
 @Entity
 @Table(name = "srilanka_visa_applications")
 public class SriLankaVisaApplicationEntity extends VisaApplicationEntity {
 
     private LocalDate intendedArrivalDate;
-    private String purposeOfVisit; // TOURISM / BUSINESS / TRANSIT / VISITING FRIENDS & RELATIVES
+    private String purposeOfVisit;
     private String contactNumber;
 
     @OneToMany(mappedBy = "visaApplication", cascade = CascadeType.ALL)

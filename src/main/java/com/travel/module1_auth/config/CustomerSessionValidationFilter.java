@@ -17,10 +17,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Optional;
 
-/**
- * Ends a customer's session as soon as their temporary account is closed or expires,
- * even if the HTTP session itself is still alive.
- */
 public class CustomerSessionValidationFilter extends OncePerRequestFilter {
 
     private final TempCredentialService credentialService;

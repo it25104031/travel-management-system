@@ -6,14 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Fields and workflow shared by every destination's visa application. Each destination keeps its own
- * table (india_visa_applications, srilanka_visa_applications), as in the team schema; this class maps the
- * columns they have in common, so review, queue, departures, portal and reports work on any of them.
- *
- * Ids come from one shared generator, so an application id is unique across all destination tables
- * (VisaDataInitializer moves the generator past any rows inserted directly into the tables).
- */
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class VisaApplicationEntity {
@@ -23,7 +15,6 @@ public abstract class VisaApplicationEntity {
     @SequenceGenerator(name = "visa_application_seq", sequenceName = "visa_application_seq", allocationSize = 1)
     private Long id;
 
-    // --- Applicant and passport ---
     private String givenNames;
     private String surname;
     private String nationality;
@@ -36,10 +27,8 @@ public abstract class VisaApplicationEntity {
     private String portOfArrival;
     private String emailId;
 
-    // --- Visa rule selected at the start of the application ---
     private Long visaTypeId;
 
-    // --- Government reference tracking (filled by operator) ---
     @Column(name = "gov_portal_ref_no")
     private String govReferenceNo;
     private LocalDate govSubmissionDate;
@@ -49,28 +38,23 @@ public abstract class VisaApplicationEntity {
     private LocalDate visaValidFrom;
     @Column(name = "visa_validity_end")
     private LocalDate visaValidTo;
-    private String entryType; // SINGLE / DOUBLE / MULTIPLE
+    private String entryType;
     @Column(name = "approved_visa_file_path", length = 500)
     private String approvedVisaPath;
 
-    // --- Queue management ---
     @ManyToOne
     @JoinColumn(name = "assigned_operator_id")
     private AdminUserEntity assignedOperatorUser;
 
-    // --- Group departure & compliance ---
     @ManyToOne
     @JoinColumn(name = "departure_id")
     private TourDepartureEntity departure;
 
-    // Set when an incident reports the passport as lost; blocks travel clearance until replaced
     private Boolean passportInvalidated = false;
 
-    // --- Website traveller who submitted it (null for walk-in applications entered by staff) ---
     @Column(name = "site_customer_id")
     private Long siteCustomerId;
 
-    // --- System fields ---
     private String status;
     private LocalDateTime createdAt;
 
@@ -82,25 +66,18 @@ public abstract class VisaApplicationEntity {
         }
     }
 
-    // --- Destination-specific parts ---
-
-    /** The destination form this application belongs to. */
     public abstract CountryForm getCountryForm();
 
-    /** Planned arrival date (India: expected_date_of_arrival, Sri Lanka: intended_arrival_date). */
     public abstract LocalDate getExpectedDateOfArrival();
 
     public abstract List<? extends ApplicationDocumentEntity> getDocuments();
 
-    /** Creates a document row in this destination's document table, already linked to this application. */
     public abstract ApplicationDocumentEntity newDocument();
 
     public String getCountryCode() { return getCountryForm().getCountryCode(); }
 
-    /** Visa applied for, as shown in lists. */
     public String getVisaService() { return null; }
 
-    /** Value stored in visa_status_history.application_type. */
     public String getApplicationType() { return getCountryForm().name(); }
 
     public ApplicationStatus getStatusEnum() { return ApplicationStatus.fromLegacy(status); }
@@ -109,24 +86,19 @@ public abstract class VisaApplicationEntity {
         return ((givenNames == null ? "" : givenNames) + " " + (surname == null ? "" : surname)).trim();
     }
 
-    /** Documents that are still current (not replaced by a newer version). */
     public List<ApplicationDocumentEntity> getCurrentDocuments() {
         if (getDocuments() == null) return List.of();
         return getDocuments().stream().filter(d -> d.getStatusEnum() != DocumentStatus.SUPERSEDED)
                 .map(d -> (ApplicationDocumentEntity) d).toList();
     }
 
-    /** Copies the travel details a group shares (arrival port, dates, addresses) from the lead traveller. */
     public void copyTravelDetailsFrom(VisaApplicationEntity lead) {
         this.portOfArrival = lead.getPortOfArrival();
     }
 
-    /** Username of the assigned operator, or null. */
     public String getAssignedOperator() {
         return assignedOperatorUser == null ? null : assignedOperatorUser.getUsername();
     }
-
-    // --- Getters and setters ---
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

@@ -2,10 +2,6 @@ package com.travel.web;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- * Company details shown on the public website (header, footer, contact section, bank details for
- * transfers). Change them in application.yml under app.site - no code changes needed.
- */
 @ConfigurationProperties(prefix = "app.site")
 public record SiteInfo(
         String name,
@@ -42,7 +38,6 @@ public record SiteInfo(
         bankBranch = or(bankBranch, "[Branch]");
     }
 
-    /** "Dahamde Pilgrims & Tours" -> "DP" for the logo mark. */
     public String getMonogram() {
         String[] parts = name.trim().split("\\s+");
         String m = parts[0].substring(0, 1) + (parts.length > 1 ? parts[1].substring(0, 1) : "");
@@ -51,12 +46,11 @@ public record SiteInfo(
 
     public String getPhoneLink() {
         String d = phone.replaceAll("[^+0-9]", "");
-        // Sri Lankan local numbers (077 ...) get the +94 country code so the link works from abroad too
+
         if (d.matches("0\\d{9}")) d = "+94" + d.substring(1);
         return "tel:" + d;
     }
 
-    /** WhatsApp number for display, taken from the wa.me link (e.g. +94 77 713 8924). */
     public String getWhatsappNumber() {
         String d = whatsapp.replaceAll("\\D", "");
         if (d.length() == 11 && d.startsWith("94")) {
